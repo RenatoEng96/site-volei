@@ -2,92 +2,168 @@ import { state } from './state.js';
 import { db, appId, teamsRef, doc, addDoc, updateDoc, deleteDoc } from './firebase.js';
 import { showToast, openConfirmModal } from './ui.js';
 
-// --- Algoritmos Puros de Balanceamento --- //
+// --- Algoritmos de Balanceamento (Rigorosamente baseados no TeamBalancer.kt) --- //
 
 export function balanceStrongInside(playersList, playersPerTeam) {
     const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
-    if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
     
+    if (numberOfTeams === 0) {
+        return { teams: [], waitlist: [...playersList] };
+    }
+
+    // 1. Shuffled
     let shuffledPlayers = [...playersList];
     for (let i = shuffledPlayers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
     }
     
-    let sortedPlayers = shuffledPlayers.sort((a, b) => (b.categoria || 1) - (a.categoria || 1));
-    let randomizedPlayers = [];
-    
-    for (let i = 0; i < sortedPlayers.length; i += numberOfTeams) {
-        let chunk = sortedPlayers.slice(i, i + numberOfTeams);
-        for (let k = chunk.length - 1; k > 0; k--) {
-            const j = Math.floor(Math.random() * (k + 1));
-            [chunk[k], chunk[j]] = [chunk[j], chunk[k]];
-        }
-        randomizedPlayers.push(...chunk);
-    }
+    // 2. Sorted By Descending (rating = categoria de 1 a 5)
+    let sortedPlayers = shuffledPlayers.sort((a, b) => (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1));
     
     const activePlayersCount = numberOfTeams * playersPerTeam;
-    const activePlayers = randomizedPlayers.slice(0, activePlayersCount);
-    const waitlist = randomizedPlayers.slice(activePlayersCount);
+    const activePlayers = sortedPlayers.slice(0, activePlayersCount);
+    const waitlist = sortedPlayers.slice(activePlayersCount);
+    
     const teams = Array.from({ length: numberOfTeams }, () => []);
     
-    let direction = 1, currentTeamIndex = 0;
+    let direction = 1;
+    let currentTeamIndex = 0;
+    
+    // Distribuição em zigue-zague (Serpentine Draft)
     for (const player of activePlayers) {
         teams[currentTeamIndex].push(player);
         currentTeamIndex += direction;
-        if (currentTeamIndex >= numberOfTeams) { direction = -1; currentTeamIndex = numberOfTeams - 1; }
-        else if (currentTeamIndex < 0) { direction = 1; currentTeamIndex = 0; }
+        
+        if (currentTeamIndex >= numberOfTeams) {
+            direction = -1;
+            currentTeamIndex = numberOfTeams - 1;
+        } else if (currentTeamIndex < 0) {
+            direction = 1;
+            currentTeamIndex = 0;
+        }
     }
+    
     return { teams, waitlist };
 }
 
 export function balanceStrongOutside(playersList, playersPerTeam) {
     const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
     const waitlistSize = playersList.length % playersPerTeam;
-    if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
     
-    const bucketsCount = waitlistSize > 0 ? numberOfTeams + 1 : numberOfTeams;
+    if (numberOfTeams === 0) {
+        return { teams: [], waitlist: [...playersList] };
+    }
+
+    // 1. Shuffled
     let shuffledPlayers = [...playersList];
     for (let i = shuffledPlayers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
     }
     
-    let sortedPlayers = shuffledPlayers.sort((a, b) => (b.categoria || 1) - (a.categoria || 1));
-    let randomizedPlayers = [];
-    
-    for (let i = 0; i < sortedPlayers.length; i += bucketsCount) {
-        let chunk = sortedPlayers.slice(i, i + bucketsCount);
-        for (let k = chunk.length - 1; k > 0; k--) {
-            const j = Math.floor(Math.random() * (k + 1));
-            [chunk[k], chunk[j]] = [chunk[j], chunk[k]];
-        }
-        randomizedPlayers.push(...chunk);
-    }
+    // 2. Sorted By Descending
+    let sortedPlayers = shuffledPlayers.sort((a, b) => (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1));
     
     const teams = Array.from({ length: numberOfTeams }, () => []);
     const waitlist = [];
+    
     const buckets = [...teams];
     if (waitlistSize > 0) buckets.push(waitlist);
     
     const capacities = buckets.map((_, i) => i < numberOfTeams ? playersPerTeam : waitlistSize);
+    
     const draftOrder = [];
     const currentCaps = new Array(buckets.length).fill(0);
+    let dir = 1;
+    let cur = 0;
     
-    let dir = 1, cur = 0;
     while (draftOrder.length < playersList.length) {
-        if (currentCaps[cur] < capacities[cur]) { draftOrder.push(cur); currentCaps[cur]++; }
+        if (currentCaps[cur] < capacities[cur]) {
+            draftOrder.push(cur);
+            currentCaps[cur]++;
+        }
+        
         const next = cur + dir;
-        if (next >= buckets.length || next < 0) { dir *= -1; } else { cur = next; }
+        if (next >= buckets.length || next < 0) {
+            dir *= -1;
+        } else {
+            cur = next;
+        }
     }
     
-    randomizedPlayers.forEach((player, index) => { 
+    sortedPlayers.forEach((player, index) => { 
         const bucketIndex = draftOrder[index]; 
         buckets[bucketIndex].push(player); 
     });
+
+    // --- LÓGICA DE BALANCEAMENTO ALEATÓRIO PÓS-SORTEIO ---
+    if (waitlist.length > 0 && teams.length >= 2) {
+        let attempts = 0;
+        while (attempts < 5) {
+            let weakestTeam = teams[0];
+            let strongestTeam = teams[0];
+            let minSum = Infinity;
+            let maxSum = -Infinity;
+
+            // Encontra a equipa mais fraca e a mais forte baseada no somatório das categorias
+            teams.forEach(t => {
+                const sum = t.reduce((acc, p) => acc + (parseInt(p.categoria) || 1), 0);
+                if (sum < minSum) { minSum = sum; weakestTeam = t; }
+                if (sum > maxSum) { maxSum = sum; strongestTeam = t; }
+            });
+
+            const diff = maxSum - minSum;
+            if (diff <= 0) break; // Equipas perfeitamente niveladas
+
+            // Encontra o jogador mais fraco da equipa mais fraca
+            let weakestPlayer = weakestTeam[0];
+            let minRating = Infinity;
+            weakestTeam.forEach(p => {
+                const r = parseInt(p.categoria) || 1;
+                if (r < minRating) { minRating = r; weakestPlayer = p; }
+            });
+
+            // Descobre qual é a maior nota atualmente na lista de espera
+            let maxWaitlistRating = -Infinity;
+            waitlist.forEach(p => {
+                const r = parseInt(p.categoria) || 1;
+                if (r > maxWaitlistRating) { maxWaitlistRating = r; }
+            });
+
+            const weakestPlayerRating = parseInt(weakestPlayer.categoria) || 1;
+
+            // Filtra os candidatos: > que o jogador fraco E diferente do líder da espera
+            const candidates = waitlist.filter(p => {
+                const r = parseInt(p.categoria) || 1;
+                return r > weakestPlayerRating && r !== maxWaitlistRating;
+            });
+
+            if (candidates.length > 0) {
+                // Sorteia um candidato válido para entrar
+                const swapIn = candidates[Math.floor(Math.random() * candidates.length)];
+                
+                // Realiza a troca (Swap)
+                const weakestIdx = weakestTeam.indexOf(weakestPlayer);
+                weakestTeam.splice(weakestIdx, 1);
+                
+                const swapInIdx = waitlist.indexOf(swapIn);
+                waitlist.splice(swapInIdx, 1);
+
+                weakestTeam.push(swapIn);
+                waitlist.push(weakestPlayer);
+            } else {
+                break; // Sem candidatos válidos, encerra o pós-balanceamento
+            }
+            attempts++;
+        }
+    }
+
     return { teams, waitlist };
 }
 
+// Extra: Função de salvaguarda de espalhamento de cabeças de chave. 
+// Opcional, mas ajuda a garantir que jogadores de nível 5 (Cabeça de Chave) não fiquem na mesma equipa se houver vagas.
 export function preventDoubleCabeças(result, mandatoryIds) {
     let teams = result.teams.map(t => [...t]);
     let waitlist = [...result.waitlist];
@@ -104,7 +180,7 @@ export function preventDoubleCabeças(result, mandatoryIds) {
             let teamWithZeroIndex = teams.findIndex(t => t.filter(p => parseInt(p.categoria) === 5).length === 0);
             if (teamWithZeroIndex !== -1) {
                 let otherTeam = teams[teamWithZeroIndex];
-                let nonCabecas = otherTeam.filter(p => parseInt(p.categoria) !== 5).sort((a, b) => (b.categoria || 1) - (a.categoria || 1));
+                let nonCabecas = otherTeam.filter(p => parseInt(p.categoria) !== 5).sort((a, b) => (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1));
                 if (nonCabecas.length > 0) {
                     let swapTarget = nonCabecas[0];
                     team.splice(team.indexOf(toMove), 1, swapTarget);
@@ -114,7 +190,7 @@ export function preventDoubleCabeças(result, mandatoryIds) {
             }
             
             if (!swapped && waitlist.length > 0) {
-                let nonCabecasWait = waitlist.filter(p => parseInt(p.categoria) !== 5).sort((a, b) => (b.categoria || 1) - (a.categoria || 1));
+                let nonCabecasWait = waitlist.filter(p => parseInt(p.categoria) !== 5).sort((a, b) => (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1));
                 if (nonCabecasWait.length > 0) {
                     let swapTarget = nonCabecasWait[0];
                     team.splice(team.indexOf(toMove), 1, swapTarget);
@@ -141,6 +217,8 @@ export const drawTeams = async (size) => {
     let result = { teams: [], waitlist: [] };
     
     strategy === 'FORA' ? result = balanceStrongOutside(activePlayers, size) : result = balanceStrongInside(activePlayers, size);
+    
+    // Aplica a salvaguarda extra
     result = preventDoubleCabeças(result, new Set());
 
     openConfirmModal("Sorteio Geral", "Deseja realizar um novo sorteio geral? Todas as equipes atuais serão desfeitas.", async () => {
@@ -150,7 +228,7 @@ export const drawTeams = async (size) => {
             
             for (let i = 0; i < result.teams.length; i++) {
                 let sortedTeam = result.teams[i].sort((a, b) => {
-                    const catDiff = (b.categoria || 1) - (a.categoria || 1);
+                    const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
                     if (catDiff !== 0) return catDiff;
                     return (b.pontos || 0) - (a.pontos || 0);
                 });
@@ -159,7 +237,7 @@ export const drawTeams = async (size) => {
             
             if (result.waitlist.length > 0) {
                 let sortedWaitlist = result.waitlist.sort((a, b) => {
-                    const catDiff = (b.categoria || 1) - (a.categoria || 1);
+                    const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
                     if (catDiff !== 0) return catDiff;
                     return (b.pontos || 0) - (a.pontos || 0);
                 });
@@ -202,7 +280,7 @@ export const redrawTeamWithWaitlist = async (teamId) => {
             let closestIdx = 0;
             let minDiff = Infinity;
             for(let j = 0; j < originalTeamPlayers.length; j++) {
-                let diff = Math.abs((originalTeamPlayers[j].categoria || 1) - (inP.categoria || 1));
+                let diff = Math.abs((parseInt(originalTeamPlayers[j].categoria) || 1) - (parseInt(inP.categoria) || 1));
                 if(diff < minDiff) { minDiff = diff; closestIdx = j; }
             }
             let outP = originalTeamPlayers.splice(closestIdx, 1)[0];
@@ -216,13 +294,13 @@ export const redrawTeamWithWaitlist = async (teamId) => {
         let localResult = preventDoubleCabeças({ teams: [newTeamPlayers], waitlist: nextWaitlist }, new Set());
         
         newTeamPlayers = localResult.teams[0].sort((a, b) => {
-            const catDiff = (b.categoria || 1) - (a.categoria || 1);
+            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
             if (catDiff !== 0) return catDiff;
             return (b.pontos || 0) - (a.pontos || 0);
         });
         
         nextWaitlist = localResult.waitlist.sort((a, b) => {
-            const catDiff = (b.categoria || 1) - (a.categoria || 1);
+            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
             if (catDiff !== 0) return catDiff;
             return (b.pontos || 0) - (a.pontos || 0);
         });
@@ -260,7 +338,7 @@ export const createWaitlist = () => {
             }
             
             const updatedWaitlist = [...currentWaitlistPlayers, ...newPlayersToAdd].sort((a, b) => {
-                const catDiff = (b.categoria || 1) - (a.categoria || 1);
+                const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
                 if (catDiff !== 0) return catDiff;
                 return (b.pontos || 0) - (a.pontos || 0);
             });
