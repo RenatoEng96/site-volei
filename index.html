@@ -70,14 +70,17 @@
         }
 
         /* Cores Dinâmicas por Níveis e Brilho Colorido Exterior */
-        .card-nivel4 { background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #713f12 100%); border: 4px solid #fde047; color: #2e1a05; }
-        .group:hover .card-nivel4 { box-shadow: 0 15px 35px rgba(234, 179, 8, 0.65); border-color: #fef08a; }
+        .card-nivel5 { background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #713f12 100%); border: 4px solid #fde047; color: #2e1a05; }
+        .group:hover .card-nivel5 { box-shadow: 0 15px 35px rgba(234, 179, 8, 0.65); border-color: #fef08a; }
+
+        .card-nivel4 { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 50%, #4c1d95 100%); border: 4px solid #c084fc; color: white; }
+        .group:hover .card-nivel4 { box-shadow: 0 15px 35px rgba(168, 85, 247, 0.65); border-color: #e9d5ff; }
         
         .card-nivel3 { background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #14532d 100%); border: 4px solid #4ade80; color: white; }
         .group:hover .card-nivel3 { box-shadow: 0 15px 35px rgba(34, 197, 94, 0.65); border-color: #bbf7d0; }
         
-        .card-nivel2 { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 50%, #4c1d95 100%); border: 4px solid #c084fc; color: white; }
-        .group:hover .card-nivel2 { box-shadow: 0 15px 35px rgba(168, 85, 247, 0.65); border-color: #e9d5ff; }
+        .card-nivel2 { background: linear-gradient(135deg, #f97316 0%, #c2410c 50%, #7c2d12 100%); border: 4px solid #fb923c; color: white; }
+        .group:hover .card-nivel2 { box-shadow: 0 15px 35px rgba(249, 115, 22, 0.65); border-color: #fed7aa; }
         
         .card-nivel1 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #7f1d1d 100%); border: 4px solid #f87171; color: white; }
         .group:hover .card-nivel1 { box-shadow: 0 15px 35px rgba(239, 68, 68, 0.65); border-color: #fecaca; }
@@ -85,8 +88,8 @@
         .overall { font-family: 'Oswald', sans-serif; font-size: 58px; font-weight: 700; line-height: 0.9; margin-top: 0; }
         
         .player-name {
-            font-family: 'Oswald', sans-serif; font-size: 16px; text-transform: uppercase;
-            margin-top: 6px; text-align: center; width: 95%; border-bottom: 2px solid currentColor;
+            font-family: 'Oswald', sans-serif; font-size: 19px; text-transform: uppercase;
+            margin-top: 4px; text-align: center; width: 95%; border-bottom: 2px solid currentColor;
             padding-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
         }
 
@@ -134,7 +137,7 @@
                 padding: 16% 4% 8% 4%; 
             }
             .overall { font-size: 42px; }
-            .player-name { font-size: 12px; margin-top: 4px; width: 98%; border-bottom-width: 1px; padding-bottom: 2px; }
+            .player-name { font-size: 15px; margin-top: 2px; width: 98%; border-bottom-width: 1px; padding-bottom: 2px; }
             .stat-value { font-size: 13px; }
             .stat-label { font-size: 8px; }
             .stats-grid { gap: 4px 8px; margin-top: 8px; } /* Ajuste do gap horizontal para o telemóvel */
@@ -254,12 +257,19 @@
                         <div class="space-y-4">
                             <input type="text" id="playerName" placeholder="Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-green-500">
                             
-                            <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                            <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
                                 <div><label class="text-[10px] sm:text-xs text-slate-400">ATQ</label><input type="number" id="statAtk" value="80" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></div>
                                 <div><label class="text-[10px] sm:text-xs text-slate-400">DEF</label><input type="number" id="statDef" value="80" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></div>
                                 <div><label class="text-[10px] sm:text-xs text-slate-400">LEV</label><input type="number" id="statLev" value="80" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm"></div>
-                                <div class="col-span-3">
-                                    <label class="text-[10px] sm:text-xs text-yellow-500 font-bold uppercase tracking-wider">Número de Vitórias</label>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label class="text-[10px] sm:text-xs text-blue-400 font-bold uppercase tracking-wider">Partidas Jogadas</label>
+                                    <input type="number" id="statJogos" value="0" class="w-full bg-slate-900 border border-blue-500/30 rounded-lg p-2 sm:p-3 text-base sm:text-lg font-bold text-blue-400">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] sm:text-xs text-yellow-500 font-bold uppercase tracking-wider">Vitórias</label>
                                     <input type="number" id="statVit" value="0" class="w-full bg-slate-900 border border-yellow-500/30 rounded-lg p-2 sm:p-3 text-base sm:text-lg font-bold text-yellow-500">
                                 </div>
                             </div>
@@ -305,7 +315,7 @@
                                         <th class="px-2 sm:px-4 py-3 sm:py-4 w-8 sm:w-10 text-center"><input type="checkbox" id="selectAll" onclick="toggleAllPlayers(this.checked)" class="w-3 h-3 sm:w-4 sm:h-4 accent-green-500 cursor-pointer"></th>
                                         <th class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">Jogador</th>
                                         <th class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">OVR</th>
-                                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">Vitórias</th>
+                                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">Vit / Jogos</th>
                                         <th class="px-3 sm:px-6 py-3 sm:py-4 text-right whitespace-nowrap">Ações</th>
                                     </tr>
                                 </thead>
@@ -382,9 +392,13 @@
                 <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 uppercase tracking-wider">Fim de Jogo!</h2>
                 <p class="text-slate-300 mb-4 sm:mb-6 text-base sm:text-lg">A equipe vencedora é:</p>
                 <div id="victoryTeamName" class="text-2xl sm:text-4xl font-black text-yellow-400 mb-6 sm:mb-8 px-4 sm:px-6 py-3 bg-slate-900 rounded-2xl border border-yellow-500/30 w-full truncate">EQUIPE 1</div>
-                <button onclick="closeVictoryModal()" class="w-full bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 sm:py-4 rounded-xl text-base sm:text-lg transition-all active:scale-95">
-                    NOVO JOGO
-                </button>
+                
+                <p id="victoryTeamWarning" class="text-xs text-red-400 mb-4 hidden">Para contabilizar o ranking, os times precisam estar selecionados no placar.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-3 w-full">
+                    <button onclick="closeVictoryModalOnly()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 sm:py-4 rounded-xl text-xs sm:text-sm transition-all active:scale-95">APENAS ZERAR</button>
+                    <button id="btnSaveResult" onclick="saveAndCloseVictoryModal()" class="flex-[2] bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 sm:py-4 rounded-xl text-sm sm:text-base transition-all active:scale-95 shadow-[0_0_15px_rgba(34,197,94,0.4)]">SALVAR RANKING</button>
+                </div>
             </div>
         </div>
 
@@ -410,7 +424,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, onSnapshot, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCWjwuRy4BVliXYUog-_qy6I8vWEPJBbHk",
@@ -443,9 +457,10 @@
         // Função de Apoio para Mapear Níveis baseados no OVR
         const getLevelInfo = (overall) => {
             if (overall <= 50) return { type: 'nivel1', label: 'NÍVEL 1', bg: 'bg-red-500/20', text: 'text-red-400', dot: 'bg-red-500' };
-            if (overall <= 77) return { type: 'nivel2', label: 'NÍVEL 2', bg: 'bg-fuchsia-500/20', text: 'text-fuchsia-400', dot: 'bg-fuchsia-500' };
-            if (overall <= 89) return { type: 'nivel3', label: 'NÍVEL 3', bg: 'bg-green-500/20', text: 'text-green-400', dot: 'bg-green-500' };
-            return { type: 'nivel4', label: 'NÍVEL 4', bg: 'bg-yellow-500/20', text: 'text-yellow-400', dot: 'bg-yellow-500' };
+            if (overall <= 60) return { type: 'nivel2', label: 'NÍVEL 2', bg: 'bg-orange-500/20', text: 'text-orange-400', dot: 'bg-orange-500' };
+            if (overall <= 70) return { type: 'nivel3', label: 'NÍVEL 3', bg: 'bg-green-500/20', text: 'text-green-400', dot: 'bg-green-500' };
+            if (overall <= 80) return { type: 'nivel4', label: 'NÍVEL 4', bg: 'bg-fuchsia-500/20', text: 'text-fuchsia-400', dot: 'bg-fuchsia-500' };
+            return { type: 'nivel5', label: 'NÍVEL 5', bg: 'bg-yellow-500/20', text: 'text-yellow-400', dot: 'bg-yellow-500' };
         };
 
         // Função de Apoio para Extrair o Nome do Time (Cabeça de Chave)
@@ -496,6 +511,7 @@
             const atk = parseInt(document.getElementById('statAtk').value);
             const def = parseInt(document.getElementById('statDef').value);
             const lev = parseInt(document.getElementById('statLev').value);
+            const partidas = parseInt(document.getElementById('statJogos').value) || 0;
             const vitorias = parseInt(document.getElementById('statVit').value) || 0;
             const icon = document.getElementById('playerIcon').value || 'user';
             const destaque = document.getElementById('playerDestaque').checked;
@@ -503,12 +519,20 @@
 
             if (!name) { showToast("Preencha o nome!", "error"); return; }
             
-            // O OVR é calculado pela média simples dos 3 atributos
-            const overall = Math.round((atk + def + lev) / 3);
+            // O OVR é calculado pela média simples + saldo de vitórias/derrotas (máx 100, mín 1)
+            const baseOvr = Math.round((atk + def + lev) / 3);
+            const validVitorias = Math.min(partidas, vitorias); // Garante que vitórias não excedem partidas
+            const derrotas = partidas - validVitorias;
+            const saldo = validVitorias - derrotas;
+            
+            const overall = Math.max(1, Math.min(100, baseOvr + saldo));
             const lvlInfo = getLevelInfo(overall);
             
+            // O Desempenho (0-100) é calculado pela % de vitórias
+            const des = partidas > 0 ? Math.round((validVitorias / partidas) * 100) : 0;
+            
             const playerObj = { 
-                name, atk, def, lev, overall, icon, destaque, vitorias,
+                name, atk, def, lev, partidas, des, overall, icon, destaque, vitorias: validVitorias,
                 type: lvlInfo.type,
                 updatedAt: Date.now() 
             };
@@ -540,6 +564,7 @@
             document.getElementById('statAtk').value = p.atk || 80;
             document.getElementById('statDef').value = p.def || 80;
             document.getElementById('statLev').value = p.lev || 80;
+            document.getElementById('statJogos').value = p.partidas || 0;
             document.getElementById('statVit').value = p.vitorias || 0;
             document.getElementById('playerIcon').value = p.icon || 'user';
             document.getElementById('playerDestaque').checked = !!p.destaque;
@@ -557,6 +582,7 @@
             document.getElementById('statAtk').value = '80';
             document.getElementById('statDef').value = '80';
             document.getElementById('statLev').value = '80';
+            document.getElementById('statJogos').value = '0';
             document.getElementById('statVit').value = '0';
             document.getElementById('playerIcon').value = 'user';
             document.getElementById('playerDestaque').checked = false;
@@ -574,9 +600,13 @@
             if (numTeams === 0) { showToast(`Selecione pelo menos ${size} jogadores para formar uma equipe!`, "error"); return; }
 
             const strategy = document.getElementById('draftStrategy').value;
-            
-            // Chamada da nova função unificada e justa
-            const result = generateBalancedTeams(activePlayers, size, strategy);
+            let result;
+
+            if (strategy === 'FORA') {
+                result = balanceStrongOutside(activePlayers, size);
+            } else {
+                result = balanceStrongInside(activePlayers, size);
+            }
 
             for (const t of drawnTeams) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', t.id));
 
@@ -592,75 +622,136 @@
             }
         };
 
-        // --- NOVA LÓGICA DE SORTEIO E BALANCEAMENTO (Justo e Rotativo) ---
-        function generateBalancedTeams(activePlayers, playersPerTeam, strategy) {
-            const numberOfTeams = Math.floor(activePlayers.length / playersPerTeam);
-            const waitlistSize = activePlayers.length % playersPerTeam;
+        // --- LÓGICA DO TEAM BALANCER (Fiel ao TeamBalancer.kt) ---
 
-            if (numberOfTeams === 0) return { teams: [], waitlist: [...activePlayers] };
+        function balanceStrongInside(playersList, playersPerTeam) {
+            const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
+            if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
 
-            let sortedPlayers = [...activePlayers].sort((a, b) => b.overall - a.overall);
-            let waitlist = [];
-            let playingPlayers = [...sortedPlayers];
-
-            // 1. Extrair a Lista de Espera de forma rotativa
-            if (waitlistSize > 0) {
-                // Cria um "pote" de candidatos para ficar de fora. 
-                // O tamanho do pote é a Lista de Espera + Número de Times (garante que roda entre os piores/melhores)
-                const poolSize = Math.min(sortedPlayers.length, waitlistSize + numberOfTeams);
-                let pool = [];
-
-                if (strategy === 'FORA') {
-                    // Fora Forte: Sorteia entre o pote dos MELHORES
-                    pool = sortedPlayers.slice(0, poolSize);
-                } else {
-                    // Dentro Forte: Sorteia entre o pote dos PIORES
-                    pool = sortedPlayers.slice(-poolSize);
-                }
-
-                // Embaralha o pote antes de escolher quem sai (Algoritmo Fisher-Yates)
-                for (let k = pool.length - 1; k > 0; k--) {
+            // Ordena e embaralha por nível (simulando shuffled().sortedByDescending sem gerar repetição)
+            let sortedPlayers = [...playersList].sort((a, b) => b.overall - a.overall);
+            let randomizedPlayers = [];
+            for (let i = 0; i < sortedPlayers.length; i += numberOfTeams) {
+                let chunk = sortedPlayers.slice(i, i + numberOfTeams);
+                for (let k = chunk.length - 1; k > 0; k--) {
                     const j = Math.floor(Math.random() * (k + 1));
-                    [pool[k], pool[j]] = [pool[j], pool[k]];
+                    [chunk[k], chunk[j]] = [chunk[j], chunk[k]];
                 }
-                
-                // Pega os coitados que vão sobrar
-                waitlist = pool.slice(0, waitlistSize);
-                
-                // Mantém apenas os que vão jogar (filtra os da waitlist)
-                playingPlayers = sortedPlayers.filter(p => !waitlist.some(w => w.id === p.id));
+                randomizedPlayers.push(...chunk);
             }
 
-            // 2. Ordena os que VÃO JOGAR por OVR
-            playingPlayers.sort((a, b) => b.overall - a.overall);
+            const activePlayersCount = numberOfTeams * playersPerTeam;
+            const activePlayers = randomizedPlayers.slice(0, activePlayersCount);
+            const waitlist = randomizedPlayers.slice(activePlayersCount);
 
             const teams = Array.from({ length: numberOfTeams }, () => []);
-            
-            // 3. Potes para balancear os times (Agrupa do mesmo nível e embaralha o grupo)
-            let randomizedPlayingPlayers = [];
-            for (let i = 0; i < playingPlayers.length; i += numberOfTeams) {
-                let pot = playingPlayers.slice(i, i + numberOfTeams);
-                
-                // Embaralha as pessoas do mesmo nível (ex: os 3 melhores mudam de ordem entre si)
-                for (let k = pot.length - 1; k > 0; k--) {
-                    const j = Math.floor(Math.random() * (k + 1));
-                    [pot[k], pot[j]] = [pot[j], pot[k]];
+            let direction = 1;
+            let currentTeamIndex = 0;
+
+            for (const player of activePlayers) {
+                teams[currentTeamIndex].push(player);
+                currentTeamIndex += direction;
+
+                if (currentTeamIndex >= numberOfTeams) {
+                    direction = -1;
+                    currentTeamIndex = numberOfTeams - 1;
+                } else if (currentTeamIndex < 0) {
+                    direction = 1;
+                    currentTeamIndex = 0;
                 }
-                randomizedPlayingPlayers.push(...pot);
             }
 
-            // 4. Distribuição Serpentina (Snake Draft) - Equilibra os times perfeitamente
+            return { teams, waitlist };
+        }
+
+        function balanceStrongOutside(playersList, playersPerTeam) {
+            const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
+            const waitlistSize = playersList.length % playersPerTeam;
+
+            if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
+
+            const bucketsCount = waitlistSize > 0 ? numberOfTeams + 1 : numberOfTeams;
+
+            // Ordena e embaralha por nível para evitar painéis iguais
+            let sortedPlayers = [...playersList].sort((a, b) => b.overall - a.overall);
+            let randomizedPlayers = [];
+            for (let i = 0; i < sortedPlayers.length; i += bucketsCount) {
+                let chunk = sortedPlayers.slice(i, i + bucketsCount);
+                for (let k = chunk.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [chunk[k], chunk[j]] = [chunk[j], chunk[k]];
+                }
+                randomizedPlayers.push(...chunk);
+            }
+
+            const teams = Array.from({ length: numberOfTeams }, () => []);
+            const waitlist = [];
+
+            const buckets = [...teams];
+            if (waitlistSize > 0) buckets.push(waitlist);
+
+            const capacities = buckets.map((_, i) => i < numberOfTeams ? playersPerTeam : waitlistSize);
+            const draftOrder = [];
+            const currentCaps = new Array(buckets.length).fill(0);
             let dir = 1;
             let cur = 0;
-            for (const player of randomizedPlayingPlayers) {
-                teams[cur].push(player);
-                cur += dir;
-                if (cur >= numberOfTeams) {
-                    dir = -1;
-                    cur = numberOfTeams - 1;
-                } else if (cur < 0) {
-                    dir = 1;
-                    cur = 0;
+
+            while (draftOrder.length < playersList.length) {
+                if (currentCaps[cur] < capacities[cur]) {
+                    draftOrder.push(cur);
+                    currentCaps[cur]++;
+                }
+
+                const next = cur + dir;
+                if (next >= buckets.length || next < 0) {
+                    dir *= -1;
+                } else {
+                    cur = next;
+                }
+            }
+
+            randomizedPlayers.forEach((player, index) => {
+                const bucketIndex = draftOrder[index];
+                buckets[bucketIndex].push(player);
+            });
+
+            // LÓGICA DE BALANCEAMENTO ALEATÓRIO PÓS-SORTEIO (EXATA DO KOTLIN)
+            if (waitlist.length > 0 && teams.length >= 2) {
+                let attempts = 0;
+                while (attempts < 5) {
+                    let weakestTeam = teams[0];
+                    let strongestTeam = teams[0];
+                    let minSum = Infinity;
+                    let maxSum = -Infinity;
+
+                    teams.forEach(t => {
+                        const sum = t.reduce((acc, p) => acc + p.overall, 0);
+                        if (sum < minSum) { minSum = sum; weakestTeam = t; }
+                        if (sum > maxSum) { maxSum = sum; strongestTeam = t; }
+                    });
+
+                    const diff = maxSum - minSum;
+                    if (diff <= 0) break;
+
+                    const weakestPlayer = weakestTeam.reduce((min, p) => p.overall < min.overall ? p : min, weakestTeam[0]);
+                    const maxWaitlistRating = Math.max(...waitlist.map(p => p.overall));
+
+                    // 1. Tem que ser melhor que o jogador fraco do time.
+                    // 2. Não pode ter a nota máxima da espera (protege o melhor jogador da espera).
+                    const candidates = waitlist.filter(p => p.overall > weakestPlayer.overall && p.overall !== maxWaitlistRating);
+
+                    if (candidates.length > 0) {
+                        const swapIn = candidates[Math.floor(Math.random() * candidates.length)];
+                        
+                        weakestTeam.splice(weakestTeam.indexOf(weakestPlayer), 1);
+                        waitlist.splice(waitlist.indexOf(swapIn), 1);
+
+                        weakestTeam.push(swapIn);
+                        waitlist.push(weakestPlayer);
+                    } else {
+                        break; // Não tem candidatos válidos para troca
+                    }
+                    attempts++;
                 }
             }
 
@@ -724,26 +815,94 @@
         function checkWinCondition() {
             // Lógica oficial: 21 pontos com pelo menos 2 pontos de vantagem
             if ((score1 >= 21 || score2 >= 21) && Math.abs(score1 - score2) >= 2) {
+                const select1 = document.getElementById('team1Select');
+                const select2 = document.getElementById('team2Select');
+                
                 let winnerName = "";
                 if (score1 > score2) {
-                    const select1 = document.getElementById('team1Select');
                     winnerName = select1.value && select1.selectedIndex > 0 ? select1.options[select1.selectedIndex].text : "TIME 1 (AZUL)";
                 } else {
-                    const select2 = document.getElementById('team2Select');
                     winnerName = select2.value && select2.selectedIndex > 0 ? select2.options[select2.selectedIndex].text : "TIME 2 (VERMELHO)";
                 }
                 
                 document.getElementById('victoryTeamName').innerText = winnerName;
+                
+                // Só permite contabilizar o Ranking se as equipas do Placar estiverem escolhidas corretamente
+                if (!select1.value || !select2.value || select1.value === select2.value) {
+                    document.getElementById('btnSaveResult').classList.add('hidden');
+                    document.getElementById('victoryTeamWarning').classList.remove('hidden');
+                } else {
+                    document.getElementById('btnSaveResult').classList.remove('hidden');
+                    document.getElementById('victoryTeamWarning').classList.add('hidden');
+                }
+
                 document.getElementById('victoryModal').classList.remove('hidden');
                 document.getElementById('victoryModal').classList.add('flex');
                 lucide.createIcons();
             }
         }
 
-        window.closeVictoryModal = () => {
+        window.saveAndCloseVictoryModal = async () => {
+            const val1 = document.getElementById('team1Select').value;
+            const val2 = document.getElementById('team2Select').value;
+
+            if (val1 && val2 && val1 !== val2) {
+                const btn = document.getElementById('btnSaveResult');
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = "SALVANDO...";
+
+                const team1 = drawnTeams.find(t => t.label === val1);
+                const team2 = drawnTeams.find(t => t.label === val2);
+                
+                const winnerLabel = score1 > score2 ? val1 : val2;
+                
+                const playersToUpdate = [];
+                if (team1) playersToUpdate.push({ team: team1, isWinner: winnerLabel === val1 });
+                if (team2) playersToUpdate.push({ team: team2, isWinner: winnerLabel === val2 });
+
+                try {
+                    for (const group of playersToUpdate) {
+                        for (const playerRef of group.team.players) {
+                            // Busca a ficha atualizada do jogador
+                            const p = players.find(x => x.id === playerRef.id);
+                            if (p) {
+                                const pJogos = (p.partidas || 0) + 1;
+                                const pVitorias = (p.vitorias || 0) + (group.isWinner ? 1 : 0);
+                                const pDerrotas = pJogos - pVitorias;
+                                const pSaldo = pVitorias - pDerrotas;
+                                
+                                const pDes = Math.round((pVitorias / pJogos) * 100);
+                                
+                                // Recalcula o Overall com o saldo de vitórias/derrotas (máx 100, mín 1)
+                                const baseOvr = Math.round(((p.atk || 80) + (p.def || 80) + (p.lev || 80)) / 3);
+                                const pOverall = Math.max(1, Math.min(100, baseOvr + pSaldo));
+                                const lvlInfo = getLevelInfo(pOverall);
+                                
+                                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', p.id), { 
+                                    partidas: pJogos, 
+                                    vitorias: pVitorias, 
+                                    des: pDes,
+                                    overall: pOverall,
+                                    type: lvlInfo.type
+                                });
+                            }
+                        }
+                    }
+                    showToast("Resultado salvo e Ranking atualizado!");
+                } catch (e) {
+                    showToast("Erro ao salvar resultado", "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }
+            closeVictoryModalOnly();
+        };
+
+        window.closeVictoryModalOnly = () => {
             document.getElementById('victoryModal').classList.add('hidden');
             document.getElementById('victoryModal').classList.remove('flex');
-            // Zera automaticamente o placar para iniciar um novo jogo
             score1 = 0;
             score2 = 0;
             document.getElementById('score1').innerText = score1;
@@ -886,9 +1045,10 @@
             const grid = document.getElementById('publicGrid');
             if (players.length === 0) { grid.innerHTML = `<p class="opacity-50 text-center w-full">Nenhum atleta cadastrado.</p>`; return; }
             
-            const nivel4 = players.filter(p => p.overall >= 90).sort((a,b) => b.overall - a.overall);
-            const nivel3 = players.filter(p => p.overall >= 78 && p.overall <= 89).sort((a,b) => b.overall - a.overall);
-            const nivel2 = players.filter(p => p.overall >= 51 && p.overall <= 77).sort((a,b) => b.overall - a.overall);
+            const nivel5 = players.filter(p => p.overall >= 81).sort((a,b) => b.overall - a.overall);
+            const nivel4 = players.filter(p => p.overall >= 71 && p.overall <= 80).sort((a,b) => b.overall - a.overall);
+            const nivel3 = players.filter(p => p.overall >= 61 && p.overall <= 70).sort((a,b) => b.overall - a.overall);
+            const nivel2 = players.filter(p => p.overall >= 51 && p.overall <= 60).sort((a,b) => b.overall - a.overall);
             const nivel1 = players.filter(p => p.overall <= 50).sort((a,b) => b.overall - a.overall);
 
             const renderGroup = (title, icon, colorClass, list) => {
@@ -906,10 +1066,15 @@
                             </div>
                             <div class="w-9 h-9 sm:w-12 sm:h-12 my-1.5 sm:my-2 flex items-center justify-center bg-black/10 rounded-full border-2 ${p.destaque ? 'border-yellow-400/60 shadow-[0_0_15px_rgba(250,204,21,0.3)] text-yellow-200' : 'border-black/10'} shrink-0"><i data-lucide="${p.icon || 'user'}" class="w-4 h-4 sm:w-6 sm:h-6 opacity-80"></i></div>
                             <div class="player-name ${p.destaque ? 'text-yellow-100 drop-shadow-md' : ''}">${p.name}</div>
-                            <div class="stats-grid">
-                                <div class="stat-item"><span class="stat-value">${p.atk || 0}</span><span class="stat-label">ATQ</span></div>
-                                <div class="stat-item"><span class="stat-value">${p.def || 0}</span><span class="stat-label">DEF</span></div>
-                                <div class="stat-item"><span class="stat-value">${p.lev || 0}</span><span class="stat-label">LEV</span></div>
+                            
+                            <div class="w-[90%] mt-1.5 sm:mt-2.5 flex flex-col items-center">
+                                <div class="flex justify-between w-full mb-1 px-1">
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest opacity-90">Desempenho</span>
+                                    <span class="text-[9px] sm:text-[10px] font-bold opacity-90">${p.des || 0}%</span>
+                                </div>
+                                <div class="w-full bg-black/30 rounded-full h-1.5 sm:h-2 border border-white/20 overflow-hidden relative shadow-inner">
+                                    <div class="bg-white h-full rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-1000" style="width: ${p.des || 0}%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -929,9 +1094,10 @@
             };
 
             grid.innerHTML = 
-                renderGroup('Nível 4', 'sparkles', 'text-yellow-500', nivel4) +
+                renderGroup('Nível 5', 'sparkles', 'text-yellow-500', nivel5) +
+                renderGroup('Nível 4', 'star', 'text-fuchsia-500', nivel4) +
                 renderGroup('Nível 3', 'chevrons-up', 'text-green-500', nivel3) +
-                renderGroup('Nível 2', 'minus', 'text-fuchsia-500', nivel2) +
+                renderGroup('Nível 2', 'minus', 'text-orange-500', nivel2) +
                 renderGroup('Nível 1', 'chevrons-down', 'text-red-500', nivel1);
 
             lucide.createIcons();
@@ -959,7 +1125,7 @@
                         ${p.destaque ? `<i data-lucide="crown" class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0"></i>` : ''}
                     </td>
                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center font-bold whitespace-nowrap">${p.overall}</td>
-                    <td class="px-3 sm:px-6 py-3 sm:py-4 text-center font-bold text-yellow-500 whitespace-nowrap">${p.vitorias || 0}</td>
+                    <td class="px-3 sm:px-6 py-3 sm:py-4 text-center font-bold text-yellow-500 whitespace-nowrap">${p.vitorias || 0} <span class="text-slate-500 text-xs font-normal">/ ${p.partidas || 0}</span></td>
                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">
                         <span class="px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-bold ${lvlInfo.bg} ${lvlInfo.text} border border-current opacity-70">${lvlInfo.label}</span>
                     </td>
@@ -999,7 +1165,7 @@
                                 <span class="flex items-center gap-1 sm:gap-2">
                                     <span class="w-2 h-2 rounded-full ${lvlInfo.dot}"></span>
                                     <i data-lucide="${p.icon || 'user'}" class="w-3 h-3 opacity-50 shrink-0"></i>
-                                    <span class="${lvlInfo.type === 'nivel4' || lvlInfo.type === 'nivel3' ? 'font-bold' : ''} ${p.destaque ? 'text-yellow-400' : 'text-slate-300'} truncate max-w-[120px] sm:max-w-[150px]">${p.name}</span>
+                                    <span class="${lvlInfo.type === 'nivel5' || lvlInfo.type === 'nivel4' ? 'font-bold' : ''} ${p.destaque ? 'text-yellow-400' : 'text-slate-300'} truncate max-w-[120px] sm:max-w-[150px]">${p.name}</span>
                                     ${p.destaque ? `<i data-lucide="crown" class="w-3 h-3 text-yellow-400 fill-yellow-400 shrink-0"></i>` : ''}
                                 </span>
                                 <span class="opacity-60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">${p.overall} OVR</span>
