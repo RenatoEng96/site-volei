@@ -2,6 +2,8 @@ import { state } from './state.js';
 import { db, appId, teamsRef, doc, addDoc, updateDoc, deleteDoc } from './firebase.js';
 import { showToast, openConfirmModal, closeMoveModal } from './ui.js';
 
+// --- Algoritmos de Balanceamento --- //
+
 export function balanceStrongInside(playersList, playersPerTeam) {
     const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
     if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
@@ -173,9 +175,11 @@ export function preventDoubleCabeças(result, mandatoryIds) {
     return { teams, waitlist };
 }
 
-// --- Funções de Controlo de Equipas --- //
+export const drawTeams = async () => {
+    // Recolhe o número de jogadores pretendido pelo administrador (Lotação Livre)
+    const sizeInput = document.getElementById('teamSize');
+    const size = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
 
-export const drawTeams = async (size) => {
     const activePlayers = state.players.filter(p => state.selectedPlayerIds.has(p.id));
     if (activePlayers.length === 0) { showToast("Selecione os atletas para o jogo!", "error"); return; }
 
@@ -241,10 +245,14 @@ export const redrawTeamWithWaitlist = async (teamId) => {
         const newUnassigned = activeSelected.filter(p => !allAssignedIds.has(p.id)).map(p => ({...p, isNew: true, waitlistRounds: 0})); 
         
         let pool = [...currentTeamPlayers, ...waitlistPlayers, ...newUnassigned];
-        const N = currentTeamPlayers.length;
+        
+        // Agora N não é o tamanho atual da equipa, mas sim o tamanho pretendido nas configurações!
+        // Isto assegura a reposição automática se faltar alguém.
+        const sizeInput = document.getElementById('teamSize');
+        const N = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
 
-        if (pool.length <= N) {
-            showToast("Não há jogadores suficientes na espera para realizar substituições.", "warning");
+        if (pool.length < N) {
+            showToast("Não há jogadores suficientes para formar um time completo.", "warning");
             return;
         }
 
@@ -375,7 +383,7 @@ export const redrawTeamWithWaitlist = async (teamId) => {
             } else if (newWaitlist.length > 0) {
                 await addDoc(teamsRef, { label: 'DE FORA', isWaitlist: true, players: newWaitlist });
             }
-            showToast("Substituição feita! Jogadores selecionados aleatoriamente.", "success");
+            showToast("Substituição feita e lotação corrigida!", "success");
         } catch(e) { console.error(e); showToast("Erro ao substituir equipe", "error"); }
     });
 };
