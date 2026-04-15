@@ -93,6 +93,9 @@ export const savePlayer = async () => {
     const deltaElo = parseInt(document.getElementById('statBonus').value) || 0;
     const icon = document.getElementById('playerIcon').value || 'user';
     const editId = document.getElementById('editId').value;
+    
+    // CAPTURA A FOTO
+    const photo = document.getElementById('photoData') ? document.getElementById('photoData').value : '';
 
     if (!name) { showToast("Preencha o nome!", "error"); return; }
     
@@ -110,14 +113,10 @@ export const savePlayer = async () => {
     const newElo = Math.max(0, currentElo + deltaElo);
     const lvlInfo = getLevelInfo(newElo);
     
-    // NOVA LINHA AQUI: Capturando a foto do HTML
-    const photo = document.getElementById('photoData') ? document.getElementById('photoData').value : '';
-    
-    // ADICIONANDO 'photo' DENTRO DO OBJETO AQUI:
     const playerObj = { 
         name, categoria, partidas, des, eloRating: newElo, icon, vitorias: validVitorias,
         streak,
-        photo, // <--- A foto entra aqui para ser enviada ao Firebase
+        photo, // SALVA NO FIREBASE
         type: lvlInfo.type,
         updatedAt: Date.now() 
     };
@@ -176,21 +175,25 @@ export const editPlayer = (id) => {
     document.getElementById('btnSave').innerHTML = `<i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5"></i> ATUALIZAR`;
     document.getElementById('btnCancel').classList.remove('hidden');
     
-    // --- LÓGICA DA FOTO (NOVA PARTE) COMEÇA AQUI ---
+    // CARREGA A FOTO SE EXISTIR
     const photoPreview = document.getElementById('photoPreview');
     const photoPlaceholder = document.getElementById('photoPlaceholder');
     const photoData = document.getElementById('photoData');
 
     if (p.photo) {
-        photoPreview.src = p.photo;
-        photoPreview.classList.remove('hidden');
-        photoPlaceholder.classList.add('hidden');
-        photoData.value = p.photo;
+        if(photoPreview) {
+            photoPreview.src = p.photo;
+            photoPreview.classList.remove('hidden');
+        }
+        if(photoPlaceholder) photoPlaceholder.classList.add('hidden');
+        if(photoData) photoData.value = p.photo;
     } else {
-        photoPreview.src = '';
-        photoPreview.classList.add('hidden');
-        photoPlaceholder.classList.remove('hidden');
-        photoData.value = '';
+        if(photoPreview) {
+            photoPreview.src = '';
+            photoPreview.classList.add('hidden');
+        }
+        if(photoPlaceholder) photoPlaceholder.classList.remove('hidden');
+        if(photoData) photoData.value = '';
     }
 
     lucide.createIcons();
@@ -210,6 +213,7 @@ export const resetForm = () => {
     document.getElementById('btnSave').innerHTML = `<i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5"></i> SALVAR`;
     document.getElementById('btnCancel').classList.add('hidden');
     
+    // LIMPA A FOTO
     if (document.getElementById('photoPreview')) {
         document.getElementById('photoPreview').src = '';
         document.getElementById('photoPreview').classList.add('hidden');
@@ -221,6 +225,41 @@ export const resetForm = () => {
     }
 
     lucide.createIcons();
+};
+
+// Função de Redimensionamento e Compressão para fotos leves
+window.handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const size = 150; // Tamanho compacto 150x150
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Desenha a imagem redimensionada no canvas
+            ctx.drawImage(img, 0, 0, size, size);
+            
+            // Converte para JPEG com qualidade 0.7 (Equilíbrio entre peso e visual)
+            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Atualiza o preview e o campo oculto
+            if (document.getElementById('photoPreview')) {
+                document.getElementById('photoPreview').src = base64;
+                document.getElementById('photoPreview').classList.remove('hidden');
+                document.getElementById('photoPlaceholder').classList.add('hidden');
+                document.getElementById('photoData').value = base64;
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 };
 
 // --- Bindings Globais --- //
