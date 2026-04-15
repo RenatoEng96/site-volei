@@ -4,179 +4,119 @@ import { showToast, openConfirmModal, closeMoveModal } from './ui.js';
 
 // --- Algoritmos de Balanceamento --- //
 
-export function balanceStrongInside(playersList, playersPerTeam) {
-    const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
-    if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
+// NOVO MOTOR DE SORTEIO: Distribui iterativamente com base na menor soma atual 
+// e aplica o desempate pelo nível máximo do jogador caso as somas sejam iguais.
+function distributePlayersSmartly(playersList, capacities) {
+    let buckets = capacities.map(() => []);
 
-    // Adiciona uma semente aleatória para garantir variabilidade entre jogadores do mesmo nível
+    // 1. Aleatoriedade total entre jogadores do mesmo nível
     let shuffledPlayers = [...playersList].map(p => ({...p, _rand: Math.random()}));
-    
-    let sortedPlayers = shuffledPlayers.sort((a, b) => {
-        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
-        if (catDiff !== 0) return catDiff;
-        return a._rand - b._rand; 
-    });
-    
-    const activePlayersCount = numberOfTeams * playersPerTeam;
-    const activePlayers = sortedPlayers.slice(0, activePlayersCount);
-    const waitlist = sortedPlayers.slice(activePlayersCount).map(p => ({ ...p, waitlistRounds: 0 }));
-    
-    const teams = Array.from({ length: numberOfTeams }, () => []);
-    let direction = 1, currentTeamIndex = 0;
-    
-    for (const player of activePlayers) {
-        teams[currentTeamIndex].push({ ...player, waitlistRounds: 0 });
-        currentTeamIndex += direction;
-        
-        if (currentTeamIndex >= numberOfTeams) {
-            direction = -1;
-            currentTeamIndex = numberOfTeams - 1;
-        } else if (currentTeamIndex < 0) {
-            direction = 1;
-            currentTeamIndex = 0;
-        }
-    }
-    return { teams, waitlist };
-}
-
-export function balanceStrongOutside(playersList, playersPerTeam) {
-    const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
-    const waitlistSize = playersList.length % playersPerTeam;
-    if (numberOfTeams === 0) return { teams: [], waitlist: [...playersList] };
-
-    let shuffledPlayers = [...playersList].map(p => ({...p, _rand: Math.random()}));
-    
     let sortedPlayers = shuffledPlayers.sort((a, b) => {
         const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
         if (catDiff !== 0) return catDiff;
         return a._rand - b._rand;
     });
 
-    const teams = Array.from({ length: numberOfTeams }, () => []);
-    const waitlist = [];
-    
-    const buckets = [...teams];
-    if (waitlistSize > 0) buckets.push(waitlist);
-    
-    const capacities = buckets.map((_, i) => i < numberOfTeams ? playersPerTeam : waitlistSize);
-    const draftOrder = [];
-    const currentCaps = new Array(buckets.length).fill(0);
-    let dir = 1, cur = 0;
-    
-    while (draftOrder.length < playersList.length) {
-        if (currentCaps[cur] < capacities[cur]) { draftOrder.push(cur); currentCaps[cur]++; }
-        const next = cur + dir;
-        if (next >= buckets.length || next < 0) { dir *= -1; } else { cur = next; }
-    }
-    
-    sortedPlayers.forEach((player, index) => { 
-        const bucketIndex = draftOrder[index]; 
-        buckets[bucketIndex].push({ ...player, waitlistRounds: 0 }); 
-    });
-
-    // Pós-balanceamento da espera
-    if (waitlist.length > 0 && teams.length >= 2) {
-        let attempts = 0;
-        while (attempts < 5) {
-            let weakestTeam = teams[0], strongestTeam = teams[0], minSum = Infinity, maxSum = -Infinity;
-
-            teams.forEach(t => {
-                const sum = t.reduce((acc, p) => acc + (parseInt(p.categoria) || 1), 0);
-                if (sum < minSum) { minSum = sum; weakestTeam = t; }
-                if (sum > maxSum) { maxSum = sum; strongestTeam = t; }
-            });
-
-            if (maxSum - minSum <= 0) break; 
-
-            let weakestPlayer = weakestTeam[0], minRating = Infinity;
-            weakestTeam.forEach(p => {
-                const r = parseInt(p.categoria) || 1;
-                if (r < minRating) { minRating = r; weakestPlayer = p; }
-            });
-
-            let maxWaitlistRating = -Infinity;
-            waitlist.forEach(p => {
-                const r = parseInt(p.categoria) || 1;
-                if (r > maxWaitlistRating) { maxWaitlistRating = r; }
-            });
-
-            const weakestPlayerRating = parseInt(weakestPlayer.categoria) || 1;
-            const candidates = waitlist.filter(p => {
-                const r = parseInt(p.categoria) || 1;
-                return r > weakestPlayerRating && r !== maxWaitlistRating;
-            });
-
-            if (candidates.length > 0) {
-                // Seleção puramente aleatória dentre os válidos
-                const swapIn = candidates[Math.floor(Math.random() * candidates.length)];
-                weakestTeam.splice(weakestTeam.indexOf(weakestPlayer), 1);
-                waitlist.splice(waitlist.indexOf(swapIn), 1);
-                weakestTeam.push(swapIn);
-                waitlist.push(weakestPlayer);
-            } else { break; }
-            attempts++;
+    // 2. Distribuição Iterativa
+    for (let p of sortedPlayers) {
+        let eligibleIndices = [];
+        for (let i = 0; i < buckets.length; i++) {
+            if (buckets[i].length < capacities[i]) {
+                eligibleIndices.push(i);
+            }
         }
+        if (eligibleIndices.length === 0) break; 
+
+        // Embaralha os índices elegíveis para garantir aleatoriedade em empates absolutos
+        eligibleIndices.sort(() => Math.random() - 0.5);
+
+        let bestBucketIndex = eligibleIndices[0];
+
+        for (let i = 1; i < eligibleIndices.length; i++) {
+            let candidateIndex = eligibleIndices[i];
+            let bestBucket = buckets[bestBucketIndex];
+            let candidateBucket = buckets[candidateIndex];
+
+            let sumBest = bestBucket.reduce((acc, val) => acc + (parseInt(val.categoria) || 1), 0);
+            let sumCand = candidateBucket.reduce((acc, val) => acc + (parseInt(val.categoria) || 1), 0);
+
+            if (sumCand < sumBest) {
+                bestBucketIndex = candidateIndex; // Candidato tem soma menor
+            } else if (sumCand === sumBest) {
+                // Desempate de qualidade: Quem tem menos jogadores de nível muito alto recebe o próximo
+                let sortedBest = [...bestBucket].map(x => parseInt(x.categoria) || 1).sort((a,b) => b - a);
+                let sortedCand = [...candidateBucket].map(x => parseInt(x.categoria) || 1).sort((a,b) => b - a);
+                
+                let candWins = false;
+                for (let j = 0; j < Math.max(sortedBest.length, sortedCand.length); j++) {
+                    let bVal = sortedBest[j] || 0;
+                    let cVal = sortedCand[j] || 0;
+                    if (cVal < bVal) {
+                        candWins = true; // O candidato tem um top-player mais fraco, ganha a prioridade
+                        break;
+                    } else if (cVal > bVal) {
+                        break; // O melhor atual mantém a prioridade
+                    }
+                }
+                if (candWins) {
+                    bestBucketIndex = candidateIndex;
+                }
+            }
+        }
+        
+        let { _rand, ...cleanPlayer } = p;
+        buckets[bestBucketIndex].push({ ...cleanPlayer, waitlistRounds: 0 });
     }
-    return { teams, waitlist };
+    return buckets;
 }
 
-export function preventDoubleCabeças(result, mandatoryIds) {
-    let teams = result.teams.map(t => [...t]);
-    let waitlist = [...result.waitlist];
-    
-    for (let i = 0; i < teams.length; i++) {
-        let team = teams[i];
-        let cabecas = team.filter(p => parseInt(p.categoria) === 5);
-        
-        while (cabecas.length > 1) {
-            let toMoveIndex = cabecas.findIndex(p => !mandatoryIds.has(p.id));
-            let toMove = toMoveIndex !== -1 ? cabecas.splice(toMoveIndex, 1)[0] : cabecas.pop();
-            let swapped = false;
-            
-            let teamWithZeroIndex = teams.findIndex(t => t.filter(p => parseInt(p.categoria) === 5).length === 0);
-            if (teamWithZeroIndex !== -1) {
-                let otherTeam = teams[teamWithZeroIndex];
-                // Sorteio aleatório entre cabeças de chave disponíveis
-                let nonCabecas = otherTeam.filter(p => parseInt(p.categoria) !== 5)
-                    .map(p => ({...p, _rand: Math.random()}))
-                    .sort((a, b) => {
-                        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
-                        if (catDiff !== 0) return catDiff;
-                        return a._rand - b._rand;
-                    });
+export function balanceStrongInside(playersList, playersPerTeam) {
+    const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
+    if (numberOfTeams === 0) return { teams: [], waitlist: playersList.map(p => ({...p, waitlistRounds: 0})) };
 
-                if (nonCabecas.length > 0) {
-                    let swapTarget = nonCabecas[0];
-                    team.splice(team.indexOf(toMove), 1, swapTarget);
-                    otherTeam.splice(otherTeam.indexOf(swapTarget), 1, toMove);
-                    swapped = true;
-                }
-            }
-            
-            if (!swapped && waitlist.length > 0) {
-                let nonCabecasWait = waitlist.filter(p => parseInt(p.categoria) !== 5)
-                    .map(p => ({...p, _rand: Math.random()}))
-                    .sort((a, b) => {
-                        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
-                        if (catDiff !== 0) return catDiff;
-                        return a._rand - b._rand;
-                    });
-                    
-                if (nonCabecasWait.length > 0) {
-                    let swapTarget = nonCabecasWait[0];
-                    team.splice(team.indexOf(toMove), 1, swapTarget);
-                    waitlist.splice(waitlist.indexOf(swapTarget), 1, toMove);
-                    swapped = true;
-                }
-            }
-            if (!swapped) break; 
-        }
+    // Sorteia a ordem da lista toda para não viciar quem vai ficar de fora em caso de empate de nível
+    let shuffledPlayers = [...playersList].map(p => ({...p, _rand: Math.random()}));
+    let sortedPlayers = shuffledPlayers.sort((a, b) => {
+        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
+        if (catDiff !== 0) return catDiff;
+        return a._rand - b._rand;
+    });
+
+    const activePlayersCount = numberOfTeams * playersPerTeam;
+    // Dentro Forte: Pega apenas os necessários para fechar os times completos
+    const activePlayers = sortedPlayers.slice(0, activePlayersCount);
+    // Os que sobraram vão direto para a espera
+    const waitlistPlayers = sortedPlayers.slice(activePlayersCount).map(p => {
+        let { _rand, ...clean } = p;
+        return { ...clean, waitlistRounds: 0 };
+    });
+
+    const capacities = Array(numberOfTeams).fill(playersPerTeam);
+    const teams = distributePlayersSmartly(activePlayers, capacities);
+
+    return { teams, waitlist: waitlistPlayers };
+}
+
+export function balanceStrongOutside(playersList, playersPerTeam) {
+    const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
+    const waitlistSize = playersList.length % playersPerTeam;
+    if (numberOfTeams === 0) return { teams: [], waitlist: playersList.map(p => ({...p, waitlistRounds: 0})) };
+
+    const capacities = Array(numberOfTeams).fill(playersPerTeam);
+    if (waitlistSize > 0) {
+        capacities.push(waitlistSize); // A lista de espera vira um "time/bucket" durante o sorteio
     }
+
+    // Fora Forte: Distribui todo mundo entre times e o "time" da lista de espera
+    const buckets = distributePlayersSmartly(playersList, capacities);
+
+    const teams = buckets.slice(0, numberOfTeams);
+    const waitlist = waitlistSize > 0 ? buckets[numberOfTeams] : [];
+
     return { teams, waitlist };
 }
 
 export const drawTeams = async () => {
-    // Recolhe o número de jogadores pretendido pelo administrador (Lotação Livre)
     const sizeInput = document.getElementById('teamSize');
     const size = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
 
@@ -188,7 +128,6 @@ export const drawTeams = async () => {
 
     const strategy = document.getElementById('draftStrategy').value;
     let result = strategy === 'FORA' ? balanceStrongOutside(activePlayers, size) : balanceStrongInside(activePlayers, size);
-    result = preventDoubleCabeças(result, new Set());
 
     openConfirmModal("Sorteio Geral", "Todas as equipes atuais serão desfeitas e os contadores zerados.", async () => {
         try {
@@ -246,8 +185,6 @@ export const redrawTeamWithWaitlist = async (teamId) => {
         
         let pool = [...currentTeamPlayers, ...waitlistPlayers, ...newUnassigned];
         
-        // Agora N não é o tamanho atual da equipa, mas sim o tamanho pretendido nas configurações!
-        // Isto assegura a reposição automática se faltar alguém.
         const sizeInput = document.getElementById('teamSize');
         const N = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
 
@@ -279,7 +216,6 @@ export const redrawTeamWithWaitlist = async (teamId) => {
 
         let limitedPool = remainingPool;
         
-        // Embaralha o pool de candidatos para que a geração de combinações não vicie os primeiros da lista
         for (let i = limitedPool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [limitedPool[i], limitedPool[j]] = [limitedPool[j], limitedPool[i]];
@@ -347,7 +283,6 @@ export const redrawTeamWithWaitlist = async (teamId) => {
             }
         }
 
-        // Seleciona aleatoriamente entre os times empatados tecnicamente
         let bestTeam = bestCombos.length > 0 
             ? bestCombos[Math.floor(Math.random() * bestCombos.length)] 
             : baseTeam;
@@ -440,6 +375,7 @@ export const createWaitlist = () => {
                 if (updatedWaitlist.length > 0) {
                     updatePromises.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id), { players: updatedWaitlist }));
                 } else {
+                    // CORREÇÃO: O parêntese faltante estava aqui!
                     updatePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id)));
                 }
             } else if (updatedWaitlist.length > 0) {
@@ -455,7 +391,6 @@ export const createWaitlist = () => {
     });
 };
 
-// NOVA FUNÇÃO: Confirmar a movimentação manual de um jogador
 export const confirmMovePlayer = async () => {
     const destTeamId = document.getElementById('moveDestination').value;
     const { sourceTeamId, playerId } = state.moveData;
@@ -473,20 +408,16 @@ export const confirmMovePlayer = async () => {
     const playerIndex = sourceTeam.players.findIndex(p => p.id === playerId);
     if (playerIndex === -1) return;
 
-    // Retira o jogador da equipe de origem
     const playerToMove = sourceTeam.players.splice(playerIndex, 1)[0];
 
-    // Ajuste de "Rounds de Espera" com base no destino
     if (destTeam.isWaitlist) {
         playerToMove.waitlistRounds = (playerToMove.waitlistRounds || 0) + 1;
     } else if (sourceTeam.isWaitlist) {
         playerToMove.waitlistRounds = 0;
     }
 
-    // Adiciona o jogador à equipe de destino
     destTeam.players.push(playerToMove);
 
-    // Função de ordenação
     const sortFn = (a, b) => {
         if (destTeam.isWaitlist || sourceTeam.isWaitlist) {
             if (b.waitlistRounds !== a.waitlistRounds) return (b.waitlistRounds || 0) - (a.waitlistRounds || 0);
@@ -504,7 +435,6 @@ export const confirmMovePlayer = async () => {
         const updates = [];
 
         if (sourceTeam.players.length === 0) {
-            // Se a equipe ficou vazia, ela é deletada do banco de dados
             updates.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', sourceTeamId)));
         } else {
             updates.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', sourceTeamId), { players: sourceTeam.players }));
@@ -550,7 +480,6 @@ export function calculateEloPreview() {
     const team2 = state.drawnTeams.find(t => t.label === select2.value);
     if (!team1 || !team2) return null;
 
-    // NOVO: Busca o Elo sempre da lista principal de jogadores e não da "foto" da equipa
     const getTeamElo = (team) => {
         if (team.players.length === 0) return 150;
         const sum = team.players.reduce((acc, p) => {
@@ -596,7 +525,6 @@ export function checkWinCondition() {
             btnSaveResult.classList.remove('hidden'); 
             warning.classList.add('hidden'); 
             
-            // Renderiza a prévia do Elo na tela de vitória!
             const preview = calculateEloPreview();
             if (preview && eloInfoDiv) {
                 const winChange = preview.isTeam1Winner ? preview.changeT1 : preview.changeT2;
@@ -655,7 +583,6 @@ export const saveAndCloseVictoryModal = async () => {
     try {
         const updatePromises = [];
 
-        // Atualiza Time 1
         team1.players.forEach(p => {
             const dbPlayer = state.players.find(x => x.id === p.id);
             if (dbPlayer) {
@@ -678,7 +605,6 @@ export const saveAndCloseVictoryModal = async () => {
             }
         });
 
-        // Atualiza Time 2
         team2.players.forEach(p => {
             const dbPlayer = state.players.find(x => x.id === p.id);
             if (dbPlayer) {
