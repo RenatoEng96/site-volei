@@ -182,7 +182,21 @@
                         <input type="hidden" id="editId" value="">
                         <div class="space-y-4">
                             <input type="text" id="playerName" placeholder="Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-green-500">
-                            
+
+                            <div class="mb-4 flex flex-col items-center">
+    <label class="relative cursor-pointer group flex flex-col items-center">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-900 border-2 border-dashed border-slate-600 flex items-center justify-center overflow-hidden group-hover:border-green-500 transition-colors">
+            <div id="photoPlaceholder" class="text-slate-500 flex flex-col items-center">
+                <i data-lucide="camera" class="w-6 h-6 sm:w-8 sm:h-8 mb-1"></i>
+                <span class="text-[9px] sm:text-[10px] font-bold uppercase">Foto</span>
+            </div>
+            <img id="photoPreview" class="w-full h-full object-cover hidden" src="" alt="Preview">
+        </div>
+        <input type="file" id="playerPhoto" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+        <input type="hidden" id="photoData" value="">
+    </label>
+</div>      
+            
                             <div class="mb-4">
                                 <label class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 block">Categoria</label>
                                 <select id="statCategoria" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 sm:p-3 text-sm sm:text-base font-bold text-slate-200 outline-none focus:ring-2 focus:ring-green-500">

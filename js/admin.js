@@ -110,9 +110,14 @@ export const savePlayer = async () => {
     const newElo = Math.max(0, currentElo + deltaElo);
     const lvlInfo = getLevelInfo(newElo);
     
+    // NOVA LINHA AQUI: Capturando a foto do HTML
+    const photo = document.getElementById('photoData') ? document.getElementById('photoData').value : '';
+    
+    // ADICIONANDO 'photo' DENTRO DO OBJETO AQUI:
     const playerObj = { 
         name, categoria, partidas, des, eloRating: newElo, icon, vitorias: validVitorias,
         streak,
+        photo, // <--- A foto entra aqui para ser enviada ao Firebase
         type: lvlInfo.type,
         updatedAt: Date.now() 
     };
@@ -171,6 +176,23 @@ export const editPlayer = (id) => {
     document.getElementById('btnSave').innerHTML = `<i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5"></i> ATUALIZAR`;
     document.getElementById('btnCancel').classList.remove('hidden');
     
+    // --- LÓGICA DA FOTO (NOVA PARTE) COMEÇA AQUI ---
+    const photoPreview = document.getElementById('photoPreview');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+    const photoData = document.getElementById('photoData');
+
+    if (p.photo) {
+        photoPreview.src = p.photo;
+        photoPreview.classList.remove('hidden');
+        photoPlaceholder.classList.add('hidden');
+        photoData.value = p.photo;
+    } else {
+        photoPreview.src = '';
+        photoPreview.classList.add('hidden');
+        photoPlaceholder.classList.remove('hidden');
+        photoData.value = '';
+    }
+
     lucide.createIcons();
     document.getElementById('admin-form-anchor').scrollIntoView({ behavior: 'smooth' });
 };
@@ -188,6 +210,16 @@ export const resetForm = () => {
     document.getElementById('btnSave').innerHTML = `<i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5"></i> SALVAR`;
     document.getElementById('btnCancel').classList.add('hidden');
     
+    if (document.getElementById('photoPreview')) {
+        document.getElementById('photoPreview').src = '';
+        document.getElementById('photoPreview').classList.add('hidden');
+        document.getElementById('photoPlaceholder').classList.remove('hidden');
+        document.getElementById('photoData').value = '';
+        
+        const fileInput = document.getElementById('playerPhoto');
+        if(fileInput) fileInput.value = ''; // Limpa a seleção do arquivo
+    }
+
     lucide.createIcons();
 };
 
