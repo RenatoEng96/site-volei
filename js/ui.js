@@ -131,13 +131,13 @@ export const renderPublic = () => {
             const lvlInfo = getLevelInfo(p.eloRating ?? 150), ptsValue = p.eloRating ?? 150, desPerc = p.des || 0;
             const isDestaque = ptsValue === maxElo && maxElo > 150;
             
-            // CARD HTML CORRIGIDO: Foto com tamanho intermediário "26" no PC (w-[104px]) e margens reajustadas
+            // CARD HTML COM ELO AUMENTADO E FOTO DESCOLADA PARA CELULAR
             const innerCard = `<div class="fifa-card card-${lvlInfo.type} ${isDestaque ? '!w-full !h-full m-0' : 'w-full mx-auto !h-[330px] sm:!h-[350px]'}">
                 <div class="flex flex-col items-center justify-center">
-                    <span class="overall !text-3xl sm:!text-5xl drop-shadow-md">${ptsValue}</span>
+                    <span class="overall !text-4xl sm:!text-5xl drop-shadow-md">${ptsValue}</span>
                     <span class="font-bold text-[8px] sm:text-[10px] opacity-90 tracking-[0.15em] -mt-1 sm:mt-0">ELO</span>
                 </div>
-                <div class="w-24 h-24 sm:w-[104px] sm:h-[104px] my-1 sm:my-1.5 flex items-center justify-center bg-black/10 rounded-full border-2 ${isDestaque ? 'border-yellow-400/60 shadow-[0_0_15px_rgba(250,204,21,0.3)] text-yellow-200' : 'border-black/10'} shrink-0 overflow-hidden">
+                <div class="w-24 h-24 sm:w-[104px] sm:h-[104px] mt-3 mb-1 sm:my-1.5 flex items-center justify-center bg-black/10 rounded-full border-2 ${isDestaque ? 'border-yellow-400/60 shadow-[0_0_15px_rgba(250,204,21,0.3)] text-yellow-200' : 'border-black/10'} shrink-0 overflow-hidden">
                     ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-12 h-12 sm:w-14 sm:h-14 opacity-80"></i>`}
                 </div>
                 <div class="player-name ${isDestaque ? 'text-yellow-100 drop-shadow-md' : ''}">${p.name}</div>
