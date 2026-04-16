@@ -322,13 +322,13 @@
         </section>
 
         <section id="view-placar" class="hidden-view animate-in zoom-in-95 duration-500">
-            <div class="max-w-5xl mx-auto bg-slate-800/40 p-2 sm:p-6 md:p-12 landscape:p-2 md:landscape:p-12 rounded-3xl border border-slate-700 shadow-2xl text-center">
-                <h2 class="text-xl sm:text-3xl landscape:text-lg md:landscape:text-3xl font-bold mb-4 sm:mb-10 landscape:mb-2 md:landscape:mb-10 flex items-center justify-center gap-2 sm:gap-3 text-white">
-                    <i data-lucide="monitor-play" class="w-5 h-5 sm:w-8 sm:h-8 landscape:w-4 landscape:h-4 md:landscape:w-8 md:landscape:h-8 text-green-500"></i> Placar do Jogo
-                </h2>
+            <!-- Removida a caixa de fundo (bg-slate-800/40) e o padding excessivo para ganhar espaço -->
+            <div class="max-w-6xl mx-auto text-center px-1 sm:px-4 flex flex-col items-center">
+                
+                <!-- Título Removido -->
 
                 <!-- QUADRA DE VÔLEI -->
-                <div class="relative w-full flex flex-row border-2 sm:border-4 border-slate-300/80 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.5)] overflow-hidden bg-slate-800">
+                <div class="relative w-full flex flex-row border-2 sm:border-4 border-slate-300/80 rounded-xl sm:rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden bg-slate-800 mt-2 sm:mt-4">
                     
                     <!-- REDE NO MEIO -->
                     <div class="absolute z-30 flex items-center justify-center pointer-events-none left-1/2 top-0 bottom-0 -translate-x-1/2 w-4 sm:w-6 md:w-8 h-full">
@@ -337,14 +337,18 @@
                     </div>
 
                     <!-- METADE 1 (AZUL) -->
-                    <div class="flex-1 relative bg-blue-900/30 hover:bg-blue-900/40 transition-colors p-2 sm:p-10 md:p-14 landscape:p-2 md:landscape:p-14 min-h-[220px] sm:min-h-[450px] md:min-h-[550px] landscape:min-h-[200px] md:landscape:min-h-[550px] flex flex-col items-center justify-center">
-                        <div class="w-full relative mb-2 sm:mb-6 landscape:mb-1 md:landscape:mb-6 bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-3 border border-blue-500/30 backdrop-blur-sm z-20">
+                    <!-- Trocado justify-center por justify-between para empurrar o Selecione para cima -->
+                    <div class="flex-1 relative bg-blue-900/30 hover:bg-blue-900/40 transition-colors p-2 pt-3 sm:p-8 md:p-12 landscape:p-2 landscape:pt-3 md:landscape:p-10 min-h-[260px] sm:min-h-[500px] md:min-h-[600px] landscape:min-h-[210px] md:landscape:min-h-[600px] flex flex-col items-center justify-between">
+                        <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-3 border border-blue-500/30 backdrop-blur-sm z-20">
                             <select id="team1Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-[10px] sm:text-2xl md:text-3xl landscape:text-xs md:landscape:text-3xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-4 flex items-center text-blue-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-6 sm:h-6 landscape:w-3 landscape:h-3 md:landscape:w-6 md:landscape:h-6"></i></div>
                         </div>
-                        <span id="score1" class="text-6xl sm:text-8xl md:text-[130px] landscape:text-5xl md:landscape:text-[130px] font-black text-white mb-2 sm:mb-8 landscape:mb-2 md:landscape:mb-8 font-['Oswald'] drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all leading-none relative z-10">0</span>
+                        
+                        <!-- NÚMEROS GIGANTES -->
+                        <span id="score1" class="text-[100px] sm:text-[150px] md:text-[200px] landscape:text-[85px] md:landscape:text-[180px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all leading-none relative z-10 my-auto -mt-2 sm:mt-auto">0</span>
+                        
                         <div class="flex gap-1 sm:gap-4 md:gap-6 w-full max-w-[200px] sm:max-w-[280px] md:max-w-[320px] relative z-20">
                             <button onclick="updateScore(1, -1)" class="flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-4 landscape:py-1 md:landscape:py-4 rounded-md sm:rounded-2xl text-xs sm:text-2xl landscape:text-xs md:landscape:text-2xl transition-all border border-slate-600/50 shadow-lg active:scale-95 backdrop-blur-md">-1</button>
                             <button onclick="updateScore(1, 1)" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black py-1.5 sm:py-4 landscape:py-1 md:landscape:py-4 rounded-md sm:rounded-2xl text-base sm:text-4xl landscape:text-sm md:landscape:text-4xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95">+1</button>
@@ -352,14 +356,17 @@
                     </div>
 
                     <!-- METADE 2 (VERMELHO) -->
-                    <div class="flex-1 relative bg-red-900/30 hover:bg-red-900/40 transition-colors p-2 sm:p-10 md:p-14 landscape:p-2 md:landscape:p-14 min-h-[220px] sm:min-h-[450px] md:min-h-[550px] landscape:min-h-[200px] md:landscape:min-h-[550px] flex flex-col items-center justify-center">
-                        <div class="w-full relative mb-2 sm:mb-6 landscape:mb-1 md:landscape:mb-6 bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-3 border border-red-500/30 backdrop-blur-sm z-20">
+                    <div class="flex-1 relative bg-red-900/30 hover:bg-red-900/40 transition-colors p-2 pt-3 sm:p-8 md:p-12 landscape:p-2 landscape:pt-3 md:landscape:p-10 min-h-[260px] sm:min-h-[500px] md:min-h-[600px] landscape:min-h-[210px] md:landscape:min-h-[600px] flex flex-col items-center justify-between">
+                        <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-3 border border-red-500/30 backdrop-blur-sm z-20">
                             <select id="team2Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-[10px] sm:text-2xl md:text-3xl landscape:text-xs md:landscape:text-3xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-4 flex items-center text-red-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-6 sm:h-6 landscape:w-3 landscape:h-3 md:landscape:w-6 md:landscape:h-6"></i></div>
                         </div>
-                        <span id="score2" class="text-6xl sm:text-8xl md:text-[130px] landscape:text-5xl md:landscape:text-[130px] font-black text-white mb-2 sm:mb-8 landscape:mb-2 md:landscape:mb-8 font-['Oswald'] drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] transition-all leading-none relative z-10">0</span>
+                        
+                        <!-- NÚMEROS GIGANTES -->
+                        <span id="score2" class="text-[100px] sm:text-[150px] md:text-[200px] landscape:text-[85px] md:landscape:text-[180px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(239,68,68,0.6)] transition-all leading-none relative z-10 my-auto -mt-2 sm:mt-auto">0</span>
+                        
                         <div class="flex gap-1 sm:gap-4 md:gap-6 w-full max-w-[200px] sm:max-w-[280px] md:max-w-[320px] relative z-20">
                             <button onclick="updateScore(2, -1)" class="flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-4 landscape:py-1 md:landscape:py-4 rounded-md sm:rounded-2xl text-xs sm:text-2xl landscape:text-xs md:landscape:text-2xl transition-all border border-slate-600/50 shadow-lg active:scale-95 backdrop-blur-md">-1</button>
                             <button onclick="updateScore(2, 1)" class="flex-[2] bg-red-600 hover:bg-red-500 text-white font-black py-1.5 sm:py-4 landscape:py-1 md:landscape:py-4 rounded-md sm:rounded-2xl text-base sm:text-4xl landscape:text-sm md:landscape:text-4xl transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] border border-red-400/50 active:scale-95">+1</button>
@@ -367,23 +374,16 @@
                     </div>
                 </div>
 
-                <div id="liveEloPreview" class="w-full mt-4 md:mt-6 max-w-3xl mx-auto hidden bg-slate-900/60 p-3 sm:p-5 landscape:p-2 md:landscape:p-5 rounded-xl border border-slate-700 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-8 landscape:gap-2 md:landscape:gap-8 transition-all animate-in fade-in"></div>
+                <div id="liveEloPreview" class="w-full mt-4 sm:mt-6 max-w-3xl mx-auto hidden bg-slate-900/80 p-3 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-8 transition-all animate-in fade-in"></div>
 
-                <button onclick="resetScore()" class="mt-6 sm:mt-12 landscape:mt-4 md:landscape:mt-12 bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 sm:px-8 md:px-10 py-2 sm:py-3 landscape:py-1.5 md:landscape:py-3 rounded-full text-xs sm:text-base landscape:text-xs md:landscape:text-base font-bold inline-flex items-center justify-center gap-2 transition-colors border border-slate-600 active:scale-95">
-                    <i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-5 sm:h-5 landscape:w-3 landscape:h-3 md:landscape:w-5 md:landscape:h-5"></i> ZERAR PLACAR
+                <!-- Botão Zerar isolado fora da quadra -->
+                <button onclick="resetScore()" class="mt-6 sm:mt-8 bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 sm:px-10 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 transition-all border border-slate-700 shadow-lg active:scale-95 w-full max-w-[250px]">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5"></i> ZERAR PLACAR
                 </button>
             </div>
 
             <!-- Times Sorteados Movidos para a Página de Placar -->
-            <div id="placarTeamsSection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 hidden max-w-7xl mx-auto">
-                <header class="mb-6 sm:mb-10 text-center">
-                    <h2 class="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-                        <i data-lucide="users" class="text-green-500 w-6 h-6 sm:w-8 sm:h-8"></i> Times Sorteados
-                    </h2>
-                </header>
-                <div id="placarTeamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
-            </div>
-
+            <div id="placarTeamsSection" class="mt-10 sm:mt-16 border-t border-slate-800 pt-8 sm:pt-12 hidden max-w-7xl mx-auto">
             <!-- Histórico de Partidas (Acordeão) -->
             <div id="historySection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 max-w-4xl mx-auto text-left mb-16">
                 <div class="bg-slate-800/60 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
