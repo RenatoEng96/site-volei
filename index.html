@@ -158,7 +158,7 @@
                             <input type="number" id="teamSize" value="4" min="2" max="10" class="w-6 sm:w-8 bg-transparent py-2 px-0 text-sm sm:text-base font-bold text-white text-center outline-none appearance-none m-0 pointer-events-none">
                             <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.min(10, parseInt(t.value) + 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">+</button>
                         </div>
-                        <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-slate-700 hover:bg-slate-600 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-3 h-3 sm:w-4 sm:h-4"></i> SORTEAR TIMES</button>
+                        <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-slate-700 hover:bg-slate-600 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-3 h-3 sm:w-4 sm:h-4"></i> SORTEAR GERAL</button>
                     </div>
 
                     <div class="flex gap-2 w-full sm:w-auto justify-between sm:justify-start mt-2 sm:mt-0">
@@ -174,7 +174,7 @@
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700 lg:sticky top-24 transition-all">
                         <div class="flex justify-between items-center cursor-pointer select-none" onclick="document.getElementById('formContent').classList.toggle('hidden'); document.getElementById('formToggleIcon').classList.toggle('rotate-180');">
                             <h2 id="formTitle" class="text-lg sm:text-xl font-bold flex items-center gap-2 text-green-400">
-                                <i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> NOVO JOGADOR
+                                <i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> Novo Atleta
                             </h2>
                             <i data-lucide="chevron-up" id="formToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180"></i>
                         </div>
@@ -295,48 +295,48 @@
         </section>
 
         <section id="view-placar" class="hidden-view animate-in zoom-in-95 duration-500">
-            <div class="max-w-5xl mx-auto bg-slate-800/40 p-4 sm:p-6 md:p-12 rounded-3xl border border-slate-700 shadow-2xl text-center">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-10 flex items-center justify-center gap-2 sm:gap-3 text-white">
-                    <i data-lucide="monitor-play" class="w-6 h-6 sm:w-8 sm:h-8 text-green-500"></i> Placar do Jogo
+            <div class="max-w-5xl mx-auto bg-slate-800/40 p-4 sm:p-6 md:p-12 landscape:p-4 rounded-3xl border border-slate-700 shadow-2xl text-center">
+                <h2 class="text-2xl sm:text-3xl landscape:text-xl font-bold mb-6 sm:mb-10 landscape:mb-4 flex items-center justify-center gap-2 sm:gap-3 text-white">
+                    <i data-lucide="monitor-play" class="w-6 h-6 sm:w-8 sm:h-8 landscape:w-5 landscape:h-5 text-green-500"></i> Placar do Jogo
                 </h2>
 
-                <div class="flex flex-col md:flex-row gap-4 sm:gap-8 justify-center items-stretch md:items-center">
-                    <div class="flex-1 w-full bg-blue-900/20 border-2 border-blue-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 flex flex-col items-center relative">
-                        <div class="w-full relative mb-4 sm:mb-6">
-                            <select id="team1Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-blue-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
+                <div class="flex flex-col md:flex-row landscape:flex-row gap-4 sm:gap-8 landscape:gap-3 justify-center items-stretch md:items-center landscape:items-center">
+                    <div class="flex-1 w-full bg-blue-900/20 border-2 border-blue-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 landscape:p-3 flex flex-col items-center relative">
+                        <div class="w-full relative mb-4 sm:mb-6 landscape:mb-2">
+                            <select id="team1Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl landscape:text-base font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-blue-500 w-full transition-colors cursor-pointer appearance-none pb-2 landscape:pb-1 text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-sm text-slate-300">SELECIONE</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6"></i></div>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6 landscape:w-4 landscape:h-4"></i></div>
                         </div>
-                        <span id="score1" class="text-6xl sm:text-8xl md:text-9xl font-black text-white mb-4 sm:mb-8 font-['Oswald'] drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all leading-none">0</span>
+                        <span id="score1" class="text-6xl sm:text-8xl md:text-9xl landscape:text-5xl font-black text-white mb-4 sm:mb-8 landscape:mb-3 font-['Oswald'] drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all leading-none">0</span>
                         <div class="flex gap-2 sm:gap-4 w-full">
-                            <button onclick="updateScore(1, -1)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xl sm:text-2xl transition-all border border-slate-600 active:scale-95">-1</button>
-                            <button onclick="updateScore(1, 1)" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black py-3 sm:py-4 rounded-xl sm:rounded-2xl text-3xl sm:text-4xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] active:scale-95">+1</button>
+                            <button onclick="updateScore(1, -1)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 sm:py-4 landscape:py-1.5 rounded-xl sm:rounded-2xl text-xl sm:text-2xl landscape:text-lg transition-all border border-slate-600 active:scale-95">-1</button>
+                            <button onclick="updateScore(1, 1)" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black py-3 sm:py-4 landscape:py-1.5 rounded-xl sm:rounded-2xl text-3xl sm:text-4xl landscape:text-2xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] active:scale-95">+1</button>
                         </div>
                     </div>
 
-                    <div class="text-3xl sm:text-4xl md:text-6xl font-black text-slate-600 italic font-['Oswald'] py-1 sm:py-4">VS</div>
+                    <div class="text-3xl sm:text-4xl md:text-6xl landscape:text-3xl font-black text-slate-600 italic font-['Oswald'] py-1 sm:py-4 landscape:py-0">VS</div>
 
-                    <div class="flex-1 w-full bg-red-900/20 border-2 border-red-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 flex flex-col items-center relative">
-                        <div class="w-full relative mb-4 sm:mb-6">
-                            <select id="team2Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-red-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
+                    <div class="flex-1 w-full bg-red-900/20 border-2 border-red-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 landscape:p-3 flex flex-col items-center relative">
+                        <div class="w-full relative mb-4 sm:mb-6 landscape:mb-2">
+                            <select id="team2Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl landscape:text-base font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-red-500 w-full transition-colors cursor-pointer appearance-none pb-2 landscape:pb-1 text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-sm text-slate-300">SELECIONE</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-red-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6"></i></div>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-red-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6 landscape:w-4 landscape:h-4"></i></div>
                         </div>
-                        <span id="score2" class="text-6xl sm:text-8xl md:text-9xl font-black text-white mb-4 sm:mb-8 font-['Oswald'] drop-shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all leading-none">0</span>
+                        <span id="score2" class="text-6xl sm:text-8xl md:text-9xl landscape:text-5xl font-black text-white mb-4 sm:mb-8 landscape:mb-3 font-['Oswald'] drop-shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all leading-none">0</span>
                         <div class="flex gap-2 sm:gap-4 w-full">
-                            <button onclick="updateScore(2, -1)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xl sm:text-2xl transition-all border border-slate-600 active:scale-95">-1</button>
-                            <button onclick="updateScore(2, 1)" class="flex-[2] bg-red-600 hover:bg-red-500 text-white font-black py-3 sm:py-4 rounded-xl sm:rounded-2xl text-3xl sm:text-4xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-95">+1</button>
+                            <button onclick="updateScore(2, -1)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 sm:py-4 landscape:py-1.5 rounded-xl sm:rounded-2xl text-xl sm:text-2xl landscape:text-lg transition-all border border-slate-600 active:scale-95">-1</button>
+                            <button onclick="updateScore(2, 1)" class="flex-[2] bg-red-600 hover:bg-red-500 text-white font-black py-3 sm:py-4 landscape:py-1.5 rounded-xl sm:rounded-2xl text-3xl sm:text-4xl landscape:text-2xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-95">+1</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- ELO em disputa (Atualizado dinamicamente) -->
-                <div id="liveEloPreview" class="w-full mt-6 max-w-3xl mx-auto hidden bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-8 transition-all animate-in fade-in"></div>
+                <div id="liveEloPreview" class="w-full mt-6 landscape:mt-4 max-w-3xl mx-auto hidden bg-slate-900/60 p-4 sm:p-5 landscape:p-2 rounded-2xl border border-slate-700 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-8 landscape:gap-2 transition-all animate-in fade-in"></div>
 
-                <button onclick="resetScore()" class="mt-8 sm:mt-12 bg-slate-700 hover:bg-slate-600 text-slate-300 px-6 sm:px-8 py-3 rounded-full text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 transition-colors border border-slate-600 active:scale-95">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5"></i> ZERAR PLACAR
+                <button onclick="resetScore()" class="mt-8 sm:mt-12 landscape:mt-4 bg-slate-700 hover:bg-slate-600 text-slate-300 px-6 sm:px-8 py-3 landscape:py-2 rounded-full text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 transition-colors border border-slate-600 active:scale-95">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5 landscape:w-4 landscape:h-4"></i> ZERAR PLACAR
                 </button>
             </div>
 
