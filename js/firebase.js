@@ -15,34 +15,16 @@ const firebaseConfig = {
     appId: "1:290138844370:web:19a4c9b36fc8297668d10b"
 };
 
-const appId = 'app-volei-34f53'; 
+export const appId = 'app-volei-34f53'; 
 
 // 3. Inicialização
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // 4. Referências das Coleções Principais
-const playersRef = collection(db, 'artifacts', appId, 'public', 'data', 'players');
-const teamsRef = collection(db, 'artifacts', appId, 'public', 'data', 'teams');
+export const playersRef = collection(db, 'artifacts', appId, 'public', 'data', 'players');
+export const teamsRef = collection(db, 'artifacts', appId, 'public', 'data', 'teams');
+export const matchHistoryRef = collection(db, 'artifacts', appId, 'public', 'data', 'matchHistory'); // Nova Referência para o histórico
 
-// 5. Exportação de Variáveis e Funções para os outros módulos
-export {
-    app,
-    auth,
-    db,
-    appId,
-    playersRef,
-    teamsRef,
-    // Re-exportamos as funções do Firestore para que os outros ficheiros não precisem do link CDN
-    doc,
-    setDoc,
-    collection,
-    onSnapshot,
-    deleteDoc,
-    addDoc,
-    updateDoc,
-    // Autenticação
-    signInAnonymously,
-    onAuthStateChanged
-};
+export { doc, setDoc, collection, onSnapshot, deleteDoc, addDoc, updateDoc, signInAnonymously, onAuthStateChanged };

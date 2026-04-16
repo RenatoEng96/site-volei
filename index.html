@@ -115,15 +115,6 @@
             </header>
 
             <div id="publicGrid" class="flex flex-col w-full gap-4 justify-center mb-16"></div>
-            
-            <div id="publicTeamsSection" class="border-t border-slate-800 pt-8 sm:pt-12 hidden">
-                <header class="mb-6 sm:mb-10 text-center">
-                    <h2 class="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-                        <i data-lucide="users" class="text-green-500 w-6 h-6 sm:w-8 sm:h-8"></i> Times Sorteados
-                    </h2>
-                </header>
-                <div id="publicTeamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-16"></div>
-            </div>
 
             <div id="rankingSection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 max-w-4xl mx-auto">
                 <header class="mb-6 sm:mb-10 text-center">
@@ -167,7 +158,7 @@
                             <input type="number" id="teamSize" value="4" min="2" max="10" class="w-6 sm:w-8 bg-transparent py-2 px-0 text-sm sm:text-base font-bold text-white text-center outline-none appearance-none m-0 pointer-events-none">
                             <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.min(10, parseInt(t.value) + 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">+</button>
                         </div>
-                        <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-slate-700 hover:bg-slate-600 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-3 h-3 sm:w-4 sm:h-4"></i> SORTEAR GERAL</button>
+                        <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-slate-700 hover:bg-slate-600 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-3 h-3 sm:w-4 sm:h-4"></i> SORTEAR TIMES</button>
                     </div>
 
                     <div class="flex gap-2 w-full sm:w-auto justify-between sm:justify-start mt-2 sm:mt-0">
@@ -179,13 +170,19 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div class="lg:col-span-1">
-                    <div class="bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700 lg:sticky top-24">
-                        <h2 id="formTitle" class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2 text-green-400"><i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> Novo Atleta</h2>
-                        <input type="hidden" id="editId" value="">
-                        <div class="space-y-4">
+                    <!-- Formulário Colapsável com Acordeão -->
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700 lg:sticky top-24 transition-all">
+                        <div class="flex justify-between items-center cursor-pointer select-none" onclick="document.getElementById('formContent').classList.toggle('hidden'); document.getElementById('formToggleIcon').classList.toggle('rotate-180');">
+                            <h2 id="formTitle" class="text-lg sm:text-xl font-bold flex items-center gap-2 text-green-400">
+                                <i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> NOVO JOGADOR
+                            </h2>
+                            <i data-lucide="chevron-up" id="formToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180"></i>
+                        </div>
+                        
+                        <div id="formContent" class="space-y-4 mt-4 sm:mt-6 transition-all hidden">
+                            <input type="hidden" id="editId" value="">
                             <input type="text" id="playerName" placeholder="Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-green-500">
                             
-                            <!-- UPLOAD E REMOÇÃO DA FOTO AQUI -->
                             <div class="mb-2 mt-4 flex flex-col items-center">
                                 <label class="relative cursor-pointer group flex flex-col items-center">
                                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-900 border-2 border-dashed border-slate-600 flex items-center justify-center overflow-hidden group-hover:border-green-500 transition-colors">
@@ -198,7 +195,6 @@
                                     <input type="file" id="playerPhoto" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                                     <input type="hidden" id="photoData" value="">
                                 </label>
-                                <!-- BOTÃO REMOVER FOTO -->
                                 <button type="button" id="btnRemovePhoto" onclick="removePhoto()" class="mt-2 text-xs text-red-400 hover:text-red-300 font-bold hidden flex items-center gap-1 transition-colors">
                                     <i data-lucide="trash-2" class="w-3 h-3"></i> Remover Foto
                                 </button>
@@ -307,7 +303,7 @@
                 <div class="flex flex-col md:flex-row gap-4 sm:gap-8 justify-center items-stretch md:items-center">
                     <div class="flex-1 w-full bg-blue-900/20 border-2 border-blue-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 flex flex-col items-center relative">
                         <div class="w-full relative mb-4 sm:mb-6">
-                            <select id="team1Select" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-blue-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
+                            <select id="team1Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-blue-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-sm text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6"></i></div>
@@ -323,7 +319,7 @@
 
                     <div class="flex-1 w-full bg-red-900/20 border-2 border-red-500/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 flex flex-col items-center relative">
                         <div class="w-full relative mb-4 sm:mb-6">
-                            <select id="team2Select" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-red-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
+                            <select id="team2Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none focus:border-b border-red-500 w-full transition-colors cursor-pointer appearance-none pb-2 text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-sm text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-red-400"><i data-lucide="chevron-down" class="w-5 h-5 sm:w-6 sm:h-6"></i></div>
@@ -336,9 +332,39 @@
                     </div>
                 </div>
 
+                <!-- ELO em disputa (Atualizado dinamicamente) -->
+                <div id="liveEloPreview" class="w-full mt-6 max-w-3xl mx-auto hidden bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-8 transition-all animate-in fade-in"></div>
+
                 <button onclick="resetScore()" class="mt-8 sm:mt-12 bg-slate-700 hover:bg-slate-600 text-slate-300 px-6 sm:px-8 py-3 rounded-full text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 transition-colors border border-slate-600 active:scale-95">
                     <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5"></i> ZERAR PLACAR
                 </button>
+            </div>
+
+            <!-- Times Sorteados Movidos para a Página de Placar -->
+            <div id="placarTeamsSection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 hidden max-w-7xl mx-auto">
+                <header class="mb-6 sm:mb-10 text-center">
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center gap-3">
+                        <i data-lucide="users" class="text-green-500 w-6 h-6 sm:w-8 sm:h-8"></i> Times Sorteados
+                    </h2>
+                </header>
+                <div id="placarTeamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+            </div>
+
+            <!-- Histórico de Partidas (Acordeão) -->
+            <div id="historySection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 max-w-4xl mx-auto text-left mb-16">
+                <div class="bg-slate-800/60 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
+                    <div class="p-4 sm:p-5 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center cursor-pointer select-none hover:bg-slate-800 transition-colors" onclick="document.getElementById('historyContent').classList.toggle('hidden'); document.getElementById('historyToggleIcon').classList.toggle('rotate-180');">
+                        <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-slate-200">
+                            <i data-lucide="history" class="w-5 h-5 text-blue-400"></i> Histórico de Partidas
+                        </h2>
+                        <i data-lucide="chevron-down" id="historyToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="historyContent" class="hidden p-4 sm:p-6 transition-all bg-slate-800/30">
+                        <div id="historyList" class="space-y-6">
+                            <!-- Preenchido via JS -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -347,12 +373,8 @@
                 <i data-lucide="trophy" class="w-16 h-16 sm:w-20 sm:h-20 text-yellow-400 mb-4 animate-bounce"></i>
                 <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 uppercase tracking-wider">Fim de Jogo!</h2>
                 <p class="text-slate-300 mb-4 sm:mb-6 text-base sm:text-lg">A equipe vencedora é:</p>
-                
                 <div id="victoryTeamName" class="text-2xl sm:text-4xl font-black text-yellow-400 mb-3 px-4 sm:px-6 py-3 bg-slate-900 rounded-2xl border border-yellow-500/30 w-full truncate">EQUIPE 1</div>
-                
-                <div id="victoryEloInfo" class="w-full text-sm sm:text-base mb-6 hidden bg-slate-900 p-3 rounded-xl border border-slate-700 shadow-inner">
-                </div>
-
+                <div id="victoryEloInfo" class="w-full text-sm sm:text-base mb-6 hidden bg-slate-900 p-3 rounded-xl border border-slate-700 shadow-inner"></div>
                 <p id="victoryTeamWarning" class="text-xs text-red-400 mb-4 hidden">Para contabilizar o ranking, os times precisam estar selecionados no placar.</p>
                 <div class="flex flex-col sm:flex-row gap-3 w-full">
                     <button onclick="closeVictoryModalOnly()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 sm:py-4 rounded-xl text-xs sm:text-sm transition-all active:scale-95">APENAS ZERAR</button>
@@ -380,13 +402,10 @@
                 <i data-lucide="arrow-right-left" class="w-10 h-10 text-blue-500 mx-auto mb-4"></i>
                 <h3 class="text-xl font-bold text-white mb-2">Mover Jogador</h3>
                 <p id="movePlayerName" class="text-slate-300 mb-4 text-sm font-bold bg-slate-900 py-2 rounded-lg border border-slate-700"></p>
-
                 <div class="mb-6 text-left">
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Transferir para:</label>
-                    <select id="moveDestination" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                        </select>
+                    <select id="moveDestination" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"></select>
                 </div>
-
                 <div class="flex gap-3 w-full">
                     <button onclick="closeMoveModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-colors text-sm">Cancelar</button>
                     <button onclick="confirmMovePlayer()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-[0_0_15px_rgba(59,130,246,0.4)]">Transferir</button>

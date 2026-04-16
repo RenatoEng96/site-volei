@@ -1,6 +1,6 @@
 /**
  * js/state.js
- * * Objeto central que guarda o estado global da aplicação.
+ * Objeto central que guarda o estado global da aplicação.
  * Encapsular o estado num objeto permite que diferentes módulos (ui, admin, logic)
  * possam ler e modificar estes valores de forma partilhada e reativa.
  */
@@ -9,6 +9,7 @@ export const state = {
     // Dados provenientes do Firebase
     players: [],
     drawnTeams: [],
+    matchHistory: [], // NOVO: Histórico de partidas
     
     // Controlo de seleção (checkboxes) e fluxo
     selectedPlayerIds: new Set(),
@@ -27,6 +28,6 @@ export const state = {
     
     confirmActionCallback: null,
     
-    // Novo estado para o Modal de Transferência Manual
+    // Estado para o Modal de Transferência Manual
     moveData: { sourceTeamId: null, playerId: null }
 };
