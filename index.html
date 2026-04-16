@@ -163,7 +163,9 @@
                     <div class="flex gap-2 w-full sm:w-auto items-center">
                         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex-1 sm:flex-none">
                             <span class="pl-3 pr-1 py-2 text-xs sm:text-sm font-bold text-slate-400 whitespace-nowrap">Time de:</span>
-                            <input type="number" id="teamSize" value="4" min="2" max="10" class="w-12 bg-transparent py-2 pr-2 text-sm sm:text-base font-bold text-white text-center outline-none">
+                            <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.max(2, parseInt(t.value) - 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">-</button>
+                            <input type="number" id="teamSize" value="4" min="2" max="10" class="w-6 sm:w-8 bg-transparent py-2 px-0 text-sm sm:text-base font-bold text-white text-center outline-none appearance-none m-0 pointer-events-none">
+                            <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.min(10, parseInt(t.value) + 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">+</button>
                         </div>
                         <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-slate-700 hover:bg-slate-600 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-3 h-3 sm:w-4 sm:h-4"></i> SORTEAR GERAL</button>
                     </div>
@@ -278,9 +280,13 @@
                     
                     <div id="adminTeamsSection" class="hidden animate-in fade-in">
                          <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden">
-                            <div class="p-4 sm:p-6 border-b border-slate-700 bg-green-500/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="p-4 sm:p-6 border-b border-slate-700 bg-green-500/10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                                 <h2 class="text-lg sm:text-xl font-bold text-green-400">Equipes Atuais</h2>
-                                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                    <select id="waitlistStrategy" class="flex-1 sm:flex-none bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-[10px] sm:text-xs text-slate-300 outline-none font-bold">
+                                        <option value="BALANCEADO" selected>Sortear Time de Fora</option>
+                                        <option value="FORCAR">Time Fora Sempre Entra</option>
+                                    </select>
                                     <button onclick="createWaitlist()" class="flex-1 sm:flex-none bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 px-3 py-2 rounded-lg text-xs sm:text-sm font-bold border border-blue-500/30 flex items-center justify-center gap-2 transition-colors"><i data-lucide="clock" class="w-3 h-3 sm:w-4 sm:h-4"></i> ATUALIZAR ESPERA</button>
                                     <button onclick="clearTeams()" class="flex-1 sm:flex-none bg-red-500/20 hover:bg-red-500/40 text-red-400 px-3 py-2 rounded-lg text-xs sm:text-sm font-bold border border-red-500/30 flex items-center justify-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i> LIMPAR TODAS</button>
                                 </div>

@@ -197,7 +197,11 @@ export const redrawTeamWithWaitlist = async (teamId) => {
             targetSum = pool.reduce((acc, p) => acc + (parseInt(p.categoria) || 1), 0) * (N / pool.length);
         }
 
-        let mandatory = pool.filter(p => p.isFromWaitlist && (p.waitlistRounds >= 1));
+        // LÓGICA DA ESTRATÉGIA DA ESPERA
+        const wlStrategy = document.getElementById('waitlistStrategy') ? document.getElementById('waitlistStrategy').value : 'BALANCEADO';
+        
+        // Se a estratégia for "FORCAR", todos da espera tornam-se obrigatórios (até ao limite N)
+        let mandatory = pool.filter(p => p.isFromWaitlist && (wlStrategy === 'FORCAR' ? true : p.waitlistRounds >= 1));
         
         mandatory.sort((a, b) => {
             if (b.waitlistRounds !== a.waitlistRounds) return b.waitlistRounds - a.waitlistRounds;
@@ -375,7 +379,7 @@ export const createWaitlist = () => {
                 if (updatedWaitlist.length > 0) {
                     updatePromises.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id), { players: updatedWaitlist }));
                 } else {
-                    // CORREÇÃO: O parêntese faltante estava aqui!
+                    // Correção do Bug do Parêntese
                     updatePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id)));
                 }
             } else if (updatedWaitlist.length > 0) {
@@ -411,7 +415,8 @@ export const confirmMovePlayer = async () => {
     const playerToMove = sourceTeam.players.splice(playerIndex, 1)[0];
 
     if (destTeam.isWaitlist) {
-        playerToMove.waitlistRounds = (playerToMove.waitlistRounds || 0) + 1;
+        // CORREÇÃO: Ao mover manualmente para a espera, o contador é zerado
+        playerToMove.waitlistRounds = 0;
     } else if (sourceTeam.isWaitlist) {
         playerToMove.waitlistRounds = 0;
     }
@@ -650,6 +655,110 @@ export const saveAndCloseVictoryModal = async () => {
     }
 };
 
+// --- NOVA FUNÇÃO: Promover Lista de Espera para Time --- //
+export const promoteWaitlistToTeam = async (waitlistTeamId) => {
+    openConfirmModal("Promover Lista de Espera", "Deseja criar um novo time equilibrado usando os jogadores da lista de espera?", async () => {
+        const waitlistDoc = state.drawnTeams.find(t => t.id === waitlistTeamId && t.isWaitlist);
+        if (!waitlistDoc) return;
+
+        const sizeInput = document.getElementById('teamSize');
+        const N = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
+
+        if (waitlistDoc.players.length < N) {
+            showToast(`A lista precisa ter pelo menos ${N} jogadores.`, "warning");
+            return;
+        }
+
+        // 1. Calcula a força média dos times já existentes
+        const existingTeams = state.drawnTeams.filter(t => !t.isWaitlist);
+        let targetSum = 0;
+        if (existingTeams.length > 0) {
+            const totalSum = existingTeams.reduce((acc, t) => acc + t.players.reduce((sum, p) => sum + (parseInt(p.categoria) || 1), 0), 0);
+            targetSum = totalSum / existingTeams.length;
+        } else {
+            targetSum = waitlistDoc.players.reduce((acc, p) => acc + (parseInt(p.categoria) || 1), 0) * (N / waitlistDoc.players.length);
+        }
+
+        // 2. Prepara a lista e gera combinações possíveis para achar a mais equilibrada
+        let pool = [...waitlistDoc.players];
+        // Embaralha para garantir aleatoriedade no desempate
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        function getCombinations(arr, k) {
+            if (k === 0) return [[]];
+            if (arr.length === 0) return [];
+            const results = [];
+            function helper(start, combo) {
+                if (combo.length === k) { results.push([...combo]); return; }
+                for (let i = start; i < arr.length; i++) {
+                    combo.push(arr[i]); helper(i + 1, combo); combo.pop();
+                }
+            }
+            helper(0, []);
+            return results;
+        }
+
+        const combos = getCombinations(pool, N);
+        let bestCombos = [];
+        let minDiff = Infinity;
+
+        for (const combo of combos) {
+            const sum = combo.reduce((acc, p) => acc + (parseInt(p.categoria) || 1), 0);
+            const diff = Math.abs(sum - targetSum);
+            if (diff < minDiff) {
+                minDiff = diff;
+                bestCombos = [combo];
+            } else if (diff === minDiff) {
+                bestCombos.push(combo);
+            }
+        }
+
+        // 3. Escolhe a combinação que mais se aproxima da média dos outros times
+        let bestTeam = bestCombos[Math.floor(Math.random() * bestCombos.length)];
+
+        const newTeamPlayers = bestTeam.map(p => ({...p, waitlistRounds: 0})).sort((a, b) => {
+            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
+            if (catDiff !== 0) return catDiff;
+            return a.name.localeCompare(b.name);
+        });
+
+        // 4. Quem sobrou continua na espera
+        const newTeamIds = new Set(newTeamPlayers.map(p => p.id));
+        const remainingWaitlist = pool.filter(p => !newTeamIds.has(p.id));
+
+        const sortedWaitlist = remainingWaitlist.sort((a, b) => {
+            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
+            if (catDiff !== 0) return catDiff;
+            return a.name.localeCompare(b.name);
+        });
+
+        try {
+            // Calcula qual será o número do novo time (maior número existente + 1)
+            const existingTeams = state.drawnTeams.filter(t => !t.isWaitlist);
+            let nextLabelNumber = 1;
+            if (existingTeams.length > 0) {
+                const maxLabel = Math.max(...existingTeams.map(t => parseInt(t.label) || 0));
+                nextLabelNumber = maxLabel + 1;
+            }
+
+            await addDoc(teamsRef, { label: nextLabelNumber.toString(), players: newTeamPlayers });
+
+            if (sortedWaitlist.length > 0) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistDoc.id), { players: sortedWaitlist });
+            } else {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistDoc.id));
+            }
+            showToast("Nova equipe formada a partir da espera!", "success");
+        } catch (e) {
+            console.error(e);
+            showToast("Erro ao promover lista de espera.", "error");
+        }
+    });
+};
+
 window.drawTeams = drawTeams;
 window.redrawTeamWithWaitlist = redrawTeamWithWaitlist;
 window.createWaitlist = createWaitlist;
@@ -659,3 +768,4 @@ window.updateScore = updateScore;
 window.resetScore = resetScore;
 window.confirmMovePlayer = confirmMovePlayer;
 window.saveAndCloseVictoryModal = saveAndCloseVictoryModal;
+window.promoteWaitlistToTeam = promoteWaitlistToTeam;
