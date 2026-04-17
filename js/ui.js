@@ -1,34 +1,36 @@
 import { state } from './state.js';
-import { calculateEloPreview } from './logic.js';
-
-// --- Funções Auxiliares de UI --- //
 
 export const getDailyPlayerStats = () => {
     const today = new Date().toLocaleDateString('pt-BR');
-    const todaysMatches = (state.matchHistory || []).filter(m => m.dateString === today || new Date(m.timestamp).toLocaleDateString('pt-BR') === today);
+    const todaysMatches = (state.matchHistory || []).filter(m => 
+        m.dateString === today || new Date(m.timestamp).toLocaleDateString('pt-BR') === today
+    );
     
     const stats = {};
+    
     todaysMatches.forEach(m => {
-        const t1Won = m.winner === 1;
+        const t1Won = m.winner === 1; 
         const t2Won = m.winner === 2;
+        
         if (m.team1 && m.team1.players) {
-            m.team1.players.forEach(name => {
-                if (!stats[name]) stats[name] = { wins: 0, losses: 0 };
-                if (t1Won) stats[name].wins++; else stats[name].losses++;
+            m.team1.players.forEach(name => { 
+                if (!stats[name]) stats[name] = { wins: 0, losses: 0 }; 
+                if (t1Won) stats[name].wins++; else stats[name].losses++; 
             });
         }
+        
         if (m.team2 && m.team2.players) {
-            m.team2.players.forEach(name => {
-                if (!stats[name]) stats[name] = { wins: 0, losses: 0 };
-                if (t2Won) stats[name].wins++; else stats[name].losses++;
+            m.team2.players.forEach(name => { 
+                if (!stats[name]) stats[name] = { wins: 0, losses: 0 }; 
+                if (t2Won) stats[name].wins++; else stats[name].losses++; 
             });
         }
     });
     
     let maxWins = 0, maxLosses = 0;
-    Object.values(stats).forEach(s => {
-        if (s.wins > maxWins) maxWins = s.wins;
-        if (s.losses > maxLosses) maxLosses = s.losses;
+    Object.values(stats).forEach(s => { 
+        if (s.wins > maxWins) maxWins = s.wins; 
+        if (s.losses > maxLosses) maxLosses = s.losses; 
     });
     
     const craques = new Set(), bagres = new Set();
@@ -60,208 +62,321 @@ export const getCategoryInfo = (cat) => {
 export const getTeamName = (team) => {
     if (!team.players || team.players.length === 0) return `EQUIPE ${team.label}`;
     const headPlayer = team.players.reduce((max, p) => (parseInt(p.categoria) || 1) > (parseInt(max.categoria) || 1) ? p : max, team.players[0]);
-    const firstName = headPlayer.name.split(' ')[0].toUpperCase();
-    return `TIME DE ${firstName}`;
+    return `TIME DE ${headPlayer.name.split(' ')[0].toUpperCase()}`;
 };
 
 export const showToast = (msg, type = 'success') => {
     const toast = document.getElementById('toast');
     document.getElementById('toastMsg').innerText = msg;
-    toast.className = `fixed bottom-5 right-5 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-2xl transition-transform duration-300 flex items-center gap-2 sm:gap-3 z-[60] text-sm sm:text-base max-w-[90vw]`;
+    
+    let bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+    toast.className = `fixed bottom-5 right-5 ${bgColor} text-white px-4 py-2 rounded-xl shadow-2xl transition-transform duration-300 flex items-center gap-2 z-[60] text-sm`;
     toast.classList.remove('translate-y-24');
+    
     setTimeout(() => toast.classList.add('translate-y-24'), 3500);
 };
 
 export const openConfirmModal = (title, message, callback) => {
-    document.getElementById('confirmTitle').innerText = title;
+    document.getElementById('confirmTitle').innerText = title; 
     document.getElementById('confirmMessage').innerText = message;
     state.confirmActionCallback = callback;
-    document.getElementById('confirmModal').classList.remove('hidden');
-    document.getElementById('confirmModal').classList.add('flex');
+    document.getElementById('confirmModal').classList.remove('hidden'); 
+    document.getElementById('confirmModal').classList.add('flex'); 
     lucide.createIcons();
 };
 
-export const closeConfirmModal = () => {
-    document.getElementById('confirmModal').classList.add('hidden');
-    document.getElementById('confirmModal').classList.remove('flex');
-    state.confirmActionCallback = null;
+export const closeConfirmModal = () => { 
+    document.getElementById('confirmModal').classList.add('hidden'); 
+    document.getElementById('confirmModal').classList.remove('flex'); 
+    state.confirmActionCallback = null; 
 };
 
 export const openMoveModal = (teamId, playerId) => {
     state.moveData = { sourceTeamId: teamId, playerId: playerId };
-    const team = state.drawnTeams.find(t => t.id === teamId);
-    const player = team.players.find(p => p.id === playerId);
+    const player = state.drawnTeams.find(t => t.id === teamId).players.find(p => p.id === playerId);
     document.getElementById('movePlayerName').innerText = player.name;
-    const select = document.getElementById('moveDestination');
+    
     let options = '';
     const sortedTeams = [...state.drawnTeams].sort((a,b) => a.isWaitlist ? 1 : (b.isWaitlist ? -1 : parseInt(a.label) - parseInt(b.label)));
+    
     sortedTeams.forEach(t => {
         if (t.id !== teamId) {
-            const teamName = t.isWaitlist ? "Lista de Espera" : getTeamName(t);
-            options += `<option value="${t.id}">${teamName}</option>`;
+            options += `<option value="${t.id}">${t.isWaitlist ? "Lista de Espera" : getTeamName(t)}</option>`;
         }
     });
-    select.innerHTML = options;
-    document.getElementById('movePlayerModal').classList.remove('hidden');
+    
+    document.getElementById('moveDestination').innerHTML = options;
+    document.getElementById('movePlayerModal').classList.remove('hidden'); 
     document.getElementById('movePlayerModal').classList.add('flex');
 };
 
-export const closeMoveModal = () => {
-    document.getElementById('movePlayerModal').classList.add('hidden');
-    document.getElementById('movePlayerModal').classList.remove('flex');
-    state.moveData = { sourceTeamId: null, playerId: null };
+export const closeMoveModal = () => { 
+    document.getElementById('movePlayerModal').classList.add('hidden'); 
+    document.getElementById('movePlayerModal').classList.remove('flex'); 
+    state.moveData = { sourceTeamId: null, playerId: null }; 
 };
 
-export const closeVictoryModalOnly = () => {
-    document.getElementById('victoryModal').classList.add('hidden');
-    document.getElementById('victoryModal').classList.remove('flex');
-    state.score1 = 0;
-    state.score2 = 0;
-    document.getElementById('score1').innerText = state.score1;
-    document.getElementById('score2').innerText = state.score2;
+export const closeVictoryModalOnly = () => { 
+    document.getElementById('victoryModal').classList.add('hidden'); 
+    document.getElementById('victoryModal').classList.remove('flex'); 
+    state.score1 = 0; 
+    state.score2 = 0; 
+    document.getElementById('score1').innerText = 0; 
+    document.getElementById('score2').innerText = 0; 
 };
 
 export const switchView = (view) => {
-    ['public', 'login', 'admin', 'placar'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden-view'));
-    ['btn-public', 'btn-admin', 'btn-placar'].forEach(b => document.getElementById(b).classList.remove('active'));
+    ['public', 'sorteio', 'login', 'admin', 'placar'].forEach(v => { 
+        const e = document.getElementById(`view-${v}`); 
+        if(e) e.classList.add('hidden-view'); 
+    });
+    
+    ['btn-public', 'btn-sorteio', 'btn-admin', 'btn-placar'].forEach(b => { 
+        const e = document.getElementById(b); 
+        if(e) e.classList.remove('active'); 
+    });
+    
     if (view === 'public') { 
         document.getElementById('view-public').classList.remove('hidden-view'); 
         document.getElementById('btn-public').classList.add('active'); 
+    } else if (view === 'sorteio') { 
+        document.getElementById('view-sorteio').classList.remove('hidden-view'); 
+        document.getElementById('btn-sorteio').classList.add('active'); 
     } else if (view === 'placar') { 
         document.getElementById('view-placar').classList.remove('hidden-view'); 
         document.getElementById('btn-placar').classList.add('active'); 
     } else { 
         document.getElementById('btn-admin').classList.add('active'); 
-        state.isAuthenticated ? document.getElementById('view-admin').classList.remove('hidden-view') : document.getElementById('view-login').classList.remove('hidden-view'); 
+        if (state.isAuthenticated) {
+            document.getElementById('view-admin').classList.remove('hidden-view');
+        } else {
+            document.getElementById('view-login').classList.remove('hidden-view');
+        }
     }
+    
     renderAll();
 };
 
-// --- Renderização de Secções --- //
-
 export const renderPublic = () => {
     const grid = document.getElementById('publicGrid');
-    if (state.players.length === 0) { grid.innerHTML = `<p class="opacity-50 text-center w-full">Nenhum atleta cadastrado.</p>`; return; }
+    if (state.players.length === 0) { 
+        grid.innerHTML = `<p class="opacity-50 text-center w-full">Nenhum atleta cadastrado.</p>`; 
+        return; 
+    }
     
     const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
-    const dailyData = typeof getDailyPlayerStats === 'function' ? getDailyPlayerStats() : { stats: {}, craques: new Set(), bagres: new Set() };
     
-    // ORDENAÇÃO: Elo primeiro, depois alfabético
-    const sortFn = (a, b) => {
-        const eloDiff = (b.eloRating ?? 150) - (a.eloRating ?? 150);
-        if (eloDiff !== 0) return eloDiff;
-        return (a.name || '').localeCompare(b.name || '');
+    const sortFn = (a, b) => { 
+        const eloDiff = (b.eloRating ?? 150) - (a.eloRating ?? 150); 
+        if (eloDiff !== 0) return eloDiff; 
+        return (a.name || '').localeCompare(b.name || ''); 
     };
-
-    const mestre = state.players.filter(p => (p.eloRating ?? 150) >= 800).sort(sortFn);
-    const diamante = state.players.filter(p => (p.eloRating ?? 150) >= 650 && (p.eloRating ?? 150) < 800).sort(sortFn);
-    const platina = state.players.filter(p => (p.eloRating ?? 150) >= 550 && (p.eloRating ?? 150) < 650).sort(sortFn);
-    const ouro = state.players.filter(p => (p.eloRating ?? 150) >= 450 && (p.eloRating ?? 150) < 550).sort(sortFn);
-    const prata = state.players.filter(p => (p.eloRating ?? 150) >= 350 && (p.eloRating ?? 150) < 450).sort(sortFn);
-    const bronze = state.players.filter(p => (p.eloRating ?? 150) < 350).sort(sortFn);
-
+    
     const renderGroup = (title, icon, colorClass, list) => {
         if (list.length === 0) return '';
+        
         const cardsHTML = list.map(p => {
-            const lvlInfo = getLevelInfo(p.eloRating ?? 150), ptsValue = p.eloRating ?? 150;
+            const lvlInfo = getLevelInfo(p.eloRating ?? 150);
+            const ptsValue = p.eloRating ?? 150;
             const isDestaque = ptsValue === maxElo && maxElo > 150;
             const vitorias = p.vitorias || 0;
             const derrotas = (p.partidas || 0) - vitorias;
-            const isCraque = dailyData.craques.has(p.name);
-            const isBagre = dailyData.bagres.has(p.name);
-
-            const innerCard = `<div class="fifa-card card-${lvlInfo.type} ${isDestaque ? '!w-full !h-full m-0' : 'w-full mx-auto !h-[330px] sm:!h-[350px]'}">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="overall !text-4xl sm:!text-5xl drop-shadow-md">${ptsValue}</span>
-                    <span class="font-bold text-[8px] sm:text-[10px] opacity-90 tracking-[0.15em] -mt-1 sm:mt-0">ELO</span>
-                </div>
-                <div class="w-24 h-24 sm:w-[104px] sm:h-[104px] mt-3 mb-1 sm:my-1.5 flex items-center justify-center bg-black/10 rounded-full border-2 ${isDestaque ? 'border-yellow-400/60 shadow-[0_0_15px_rgba(250,204,21,0.3)] text-yellow-200' : 'border-black/10'} shrink-0 overflow-hidden">
-                    ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-12 h-12 sm:w-14 sm:h-14 opacity-80"></i>`}
-                </div>
-                <div class="player-name ${isDestaque ? 'text-yellow-100 drop-shadow-md' : ''}">${p.name}</div>
-                <div class="w-full mt-2 sm:mt-3 flex justify-evenly items-center px-4">
-                    <div class="flex flex-col items-center">
-                        <span class="text-base sm:text-lg font-black drop-shadow-md leading-none text-white">${vitorias}</span>
-                        <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest opacity-80 mt-1">Vit</span>
+            
+            const innerCard = `
+                <div class="fifa-card card-${lvlInfo.type} ${isDestaque ? '!w-full !h-full m-0' : 'w-full mx-auto !h-[330px]'}">
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="overall !text-4xl">${ptsValue}</span>
+                        <span class="font-bold text-[8px] opacity-90 tracking-[0.15em]">ELO</span>
                     </div>
-                    <div class="w-px h-6 bg-white/30"></div>
-                    <div class="flex flex-col items-center">
-                        <span class="text-base sm:text-lg font-black drop-shadow-md leading-none text-white">${derrotas}</span>
-                        <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest opacity-80 mt-1">Der</span>
+                    <div class="w-24 h-24 mt-3 mb-1 flex items-center justify-center bg-black/10 rounded-full border-2 ${isDestaque ? 'border-yellow-400/60 text-yellow-200' : 'border-black/10'} shrink-0 overflow-hidden">
+                        ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-12 h-12 opacity-80"></i>`}
                     </div>
+                    <div class="player-name ${isDestaque ? 'text-yellow-100' : ''}">${p.name}</div>
+                    <div class="w-full mt-2 flex justify-evenly items-center px-4">
+                        <div class="flex flex-col items-center">
+                            <span class="text-base font-black text-white">${vitorias}</span>
+                            <span class="text-[8px] font-bold uppercase opacity-80">Vit</span>
+                        </div>
+                        <div class="w-px h-6 bg-white/30"></div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-base font-black text-white">${derrotas}</span>
+                            <span class="text-[8px] font-bold uppercase opacity-80">Der</span>
+                        </div>
+                    </div>
+                </div>`;
+                
+            return `
+                <div class="relative flex justify-center w-full sm:w-[210px] group ${isDestaque ? 'winner-frame-container' : ''}">
+                    ${isDestaque ? `<div class="winner-frame-wrapper !h-[340px]">${innerCard}</div>` : innerCard}
+                </div>`;
+        }).join('');
+        
+        return `
+            <div class="w-full flex flex-col items-center mb-10">
+                <h3 class="text-lg sm:text-2xl font-bold mb-4 flex items-center gap-2 ${colorClass} border-b border-slate-700/50 pb-2 px-8 uppercase tracking-wider">
+                    <i data-lucide="${icon}" class="w-5 h-5"></i> ${title}
+                </h3>
+                <div class="grid grid-cols-[repeat(2,minmax(130px,180px))] sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-center w-full mx-auto px-1 sm:px-0">
+                    ${cardsHTML}
                 </div>
             </div>`;
-            
-            // SELOS CORRIGIDOS PARA APARECER NO TOPO
-            const craqueBadge = isCraque ? `<div class="absolute -top-3 -right-2 sm:-top-4 sm:-right-3 z-50 bg-yellow-500 text-slate-900 text-[10px] sm:text-xs font-black px-2 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-yellow-500/50 border border-yellow-300 animate-bounce" title="Craque do Dia!"><i data-lucide="crown" class="w-3 h-3 sm:w-4 sm:h-4"></i> CRAQUE</div>` : '';
-            const bagreBadge = isBagre ? `<div class="absolute -top-3 ${isCraque ? 'right-20 sm:right-24' : '-right-2 sm:-right-3'} z-50 bg-emerald-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-emerald-500/50 border border-emerald-300" title="Bagre do Dia"><i data-lucide="fish" class="w-3 h-3 sm:w-4 sm:h-4"></i> BAGRE</div>` : '';
-
-            return `<div class="relative flex justify-center w-full sm:w-[210px] group ${isDestaque ? 'winner-frame-container' : ''}">${(p.streak || 0) >= 3 ? `<div class="absolute -top-3 -left-2 sm:-top-4 sm:-left-3 z-50 bg-orange-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-orange-500/50 border border-orange-300 animate-bounce" title="${p.streak} Vitórias Seguidas!"><i data-lucide="flame" class="w-3 h-3 sm:w-4 sm:h-4 fill-white"></i> ${p.streak}</div>` : ''}${(p.streak || 0) <= -3 ? `<div class="absolute -top-3 -left-2 sm:-top-4 sm:-left-3 z-50 bg-blue-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-blue-500/50 border border-blue-300" title="${Math.abs(p.streak)} Derrotas Seguidas"><i data-lucide="snowflake" class="w-3 h-3 sm:w-4 sm:h-4 fill-white"></i> ${Math.abs(p.streak)}</div>` : ''}${craqueBadge}${bagreBadge}${isDestaque ? `<div class="winner-frame-wrapper !h-[340px] sm:!h-[360px]">${innerCard}</div>` : innerCard}</div>`;
-        }).join('');
-        return `<div class="w-full flex flex-col items-center mb-10"><h3 class="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center gap-2 ${colorClass} border-b border-slate-700/50 pb-2 px-8 uppercase tracking-wider"><i data-lucide="${icon}" class="w-5 h-5 sm:w-6 h-6"></i> ${title}</h3><div class="grid grid-cols-[repeat(2,minmax(130px,180px))] sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-center w-full max-w-[390px] sm:max-w-none mx-auto px-1 sm:px-0">${cardsHTML}</div></div>`;
     };
 
-    grid.innerHTML = renderGroup('Mestre', 'flame', 'text-red-500', mestre) + renderGroup('Diamante', 'gem', 'text-fuchsia-500', diamante) + renderGroup('Platina', 'shield', 'text-cyan-500', platina) + renderGroup('Ouro', 'award', 'text-yellow-500', ouro) + renderGroup('Prata', 'medal', 'text-slate-400', prata) + renderGroup('Bronze', 'medal', 'text-orange-500', bronze);
+    grid.innerHTML = 
+        renderGroup('Mestre', 'flame', 'text-red-500', state.players.filter(p => (p.eloRating ?? 150) >= 800).sort(sortFn)) + 
+        renderGroup('Diamante', 'gem', 'text-fuchsia-500', state.players.filter(p => (p.eloRating ?? 150) >= 650 && (p.eloRating ?? 150) < 800).sort(sortFn)) + 
+        renderGroup('Platina', 'shield', 'text-cyan-500', state.players.filter(p => (p.eloRating ?? 150) >= 550 && (p.eloRating ?? 150) < 650).sort(sortFn)) + 
+        renderGroup('Ouro', 'award', 'text-yellow-500', state.players.filter(p => (p.eloRating ?? 150) >= 450 && (p.eloRating ?? 150) < 550).sort(sortFn)) + 
+        renderGroup('Prata', 'medal', 'text-slate-400', state.players.filter(p => (p.eloRating ?? 150) >= 350 && (p.eloRating ?? 150) < 450).sort(sortFn)) + 
+        renderGroup('Bronze', 'medal', 'text-orange-500', state.players.filter(p => (p.eloRating ?? 150) < 350).sort(sortFn));
+        
     lucide.createIcons();
 };
 
 export const renderRanking = () => {
     const list = document.getElementById('rankingList');
     
-    // ORDENAÇÃO: Vitórias primeiro, depois alfabético
-    const sortedPlayers = [...state.players].sort((a,b) => {
-        const vitDiff = (b.vitorias || 0) - (a.vitorias || 0);
-        if (vitDiff !== 0) return vitDiff;
-        return (a.name || '').localeCompare(b.name || '');
+    const sortedPlayers = [...state.players].sort((a,b) => { 
+        const vitDiff = (b.vitorias || 0) - (a.vitorias || 0); 
+        if (vitDiff !== 0) return vitDiff; 
+        return (a.name || '').localeCompare(b.name || ''); 
     });
     
-    if (sortedPlayers.length === 0) { list.innerHTML = `<p class="opacity-50 text-sm text-center py-4">Aguardando resultados dos jogos...</p>`; return; }
+    if (sortedPlayers.length === 0) { 
+        list.innerHTML = `<p class="opacity-50 text-sm text-center py-4">Aguardando resultados...</p>`; 
+        return; 
+    }
     
-    const top3 = sortedPlayers.slice(0, 3), rest = sortedPlayers.slice(3);
+    const top3 = sortedPlayers.slice(0, 3);
     let podiumHTML = '<div class="flex justify-center items-end gap-1 sm:gap-6 mb-8 mt-6">';
+    
     [1, 0, 2].forEach(pos => {
         if (top3[pos]) {
-            const p = top3[pos], heightClass = pos === 0 ? 'h-32 sm:h-40' : (pos === 1 ? 'h-24 sm:h-32' : 'h-20 sm:h-28');
-            const isGold = pos === 0, isSilver = pos === 1;
+            const p = top3[pos];
+            const heightClass = pos === 0 ? 'h-32' : (pos === 1 ? 'h-24' : 'h-20');
+            const isGold = pos === 0;
+            const isSilver = pos === 1;
             const bgClass = isGold ? 'bg-gradient-to-t from-yellow-600/20 to-yellow-500/40 border-yellow-500' : (isSilver ? 'bg-gradient-to-t from-slate-500/20 to-slate-400/40 border-slate-400' : 'bg-gradient-to-t from-amber-700/20 to-amber-600/40 border-amber-600');
-            const borderColor = isGold ? 'border-yellow-500' : (isSilver ? 'border-slate-400' : 'border-amber-600');
-            const textColor = isGold ? 'text-yellow-500' : (isSilver ? 'text-slate-300' : 'text-amber-600'), medal = isGold ? '🥇' : (isSilver ? '🥈' : '🥉');
+            const textColor = isGold ? 'text-yellow-500' : (isSilver ? 'text-slate-300' : 'text-amber-600');
+            const medal = isGold ? '🥇' : (isSilver ? '🥈' : '🥉');
             
-            podiumHTML += `<div class="flex flex-col items-center w-20 sm:w-32 relative group"><div class="relative mb-2 sm:mb-3 flex flex-col items-center transition-transform group-hover:-translate-y-2"><div class="w-10 h-10 sm:w-16 sm:h-16 rounded-full bg-slate-900 flex items-center justify-center border-2 ${borderColor} shadow-[0_0_15px_currentColor] ${textColor} z-10 overflow-hidden">${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-5 h-5 sm:w-8 sm:h-8"></i>`}</div><span class="font-bold text-[10px] sm:text-sm text-center mt-1 sm:mt-2 text-slate-200 truncate w-full px-1 flex items-center justify-center gap-1">${medal} <span class="truncate">${p.name}</span></span></div><div class="w-full ${heightClass} ${bgClass} border-t-4 rounded-t-lg flex flex-col items-center pt-2 sm:pt-4 shadow-[inset_0_10px_20px_rgba(0,0,0,0.3)] relative overflow-hidden"><span class="text-2xl sm:text-4xl font-black ${textColor}">${p.vitorias || 0}</span><span class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400 mt-1">VITÓRIAS</span></div></div>`;
+            podiumHTML += `
+                <div class="flex flex-col items-center w-20 relative group">
+                    <div class="relative mb-2 flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center border-2 shadow-[0_0_15px_currentColor] ${textColor} z-10 overflow-hidden">
+                            ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-5 h-5"></i>`}
+                        </div>
+                        <span class="font-bold text-[10px] text-center mt-1 text-slate-200 truncate w-full px-1 flex justify-center gap-1">
+                            ${medal} <span class="truncate">${p.name}</span>
+                        </span>
+                    </div>
+                    <div class="w-full ${heightClass} ${bgClass} border-t-4 rounded-t-lg flex flex-col items-center pt-2 shadow-[inset_0_10px_20px_rgba(0,0,0,0.3)] relative overflow-hidden">
+                        <span class="text-2xl font-black ${textColor}">${p.vitorias || 0}</span>
+                    </div>
+                </div>`;
         }
     });
-    podiumHTML += '</div>';
     
-    let restHTML = '';
-    if (rest.length > 0) {
-        const listItems = rest.map((p, index) => {
-            const rank = index + 4, lvlInfo = getLevelInfo(p.eloRating ?? 150);
-            return `<div class="p-3 sm:p-4 rounded-xl flex items-center justify-between border border-slate-700 bg-slate-800/50 hover:bg-slate-700/80 transition-colors"><div class="flex items-center gap-3 sm:gap-4"><span class="text-lg sm:text-xl w-8 text-center text-slate-500 font-bold">#${rank}</span><div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center border border-slate-600 shrink-0 overflow-hidden">${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-5 h-5 text-slate-400"></i>`}</div><div><p class="text-base sm:text-lg font-bold text-slate-300 truncate max-w-[120px] sm:max-w-none">${p.name}</p><p class="text-[10px] uppercase tracking-widest text-slate-500">${p.eloRating ?? 150} ELO • ${lvlInfo.label}</p></div></div><div class="text-right"><span class="text-xl sm:text-2xl font-bold text-slate-300">${p.vitorias || 0}</span><p class="text-[9px] uppercase font-bold text-slate-500">VITÓRIAS</p></div></div>`;
-        }).join('');
-        restHTML = `<div class="mt-8 text-center border-t border-slate-700/50 pt-6"><button onclick="toggleRanking()" class="text-xs sm:text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-700 transition-all border border-slate-600 rounded-full px-4 sm:px-6 py-2">${state.showAllRanking ? 'OCULTAR LISTA' : 'VER TODOS (' + rest.length + ')'}</button></div><div class="flex flex-col gap-3 mt-4 sm:mt-6 ${state.showAllRanking ? 'animate-in fade-in slide-in-from-top-4' : 'hidden'}">${listItems}</div>`;
-    }
-    list.innerHTML = podiumHTML + restHTML; 
+    podiumHTML += '</div>';
+    list.innerHTML = podiumHTML; 
     lucide.createIcons();
 };
 
-export const renderAdmin = () => {
-    const tbody = document.getElementById('adminTableBody');
-    document.getElementById('playerCount').innerText = `${state.selectedPlayerIds.size} / ${state.players.length} Selecionados`;
-    const selectAllCheckbox = document.getElementById('selectAll');
-    if(selectAllCheckbox) selectAllCheckbox.checked = state.players.length > 0 && state.players.every(p => state.selectedPlayerIds.has(p.id));
-    const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
+export const renderSorteioTable = () => {
+    const tbody = document.getElementById('sorteioTableBody');
+    if(!tbody) return;
     
-    const sortedPlayersForAdmin = [...state.players].sort((a, b) => { 
-        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1); 
-        if (catDiff !== 0) return catDiff; 
+    const countElement = document.getElementById('playerCountSorteio');
+    if(countElement) {
+        countElement.innerText = `${state.selectedPlayerIds.size} / ${state.players.length} Selecionados`;
+    }
+    
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if(selectAllCheckbox) {
+        selectAllCheckbox.checked = state.players.length > 0 && state.players.every(p => state.selectedPlayerIds.has(p.id));
+    }
+    
+    const sorted = [...state.players].sort((a, b) => { 
+        const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
+        if(c !== 0) return c; 
         return a.name.localeCompare(b.name); 
     });
+    
+    tbody.innerHTML = sorted.map(p => {
+        const lvlInfo = getLevelInfo(p.eloRating ?? 150);
+        const catInfo = getCategoryInfo(p.categoria);
+        const isSelected = state.selectedPlayerIds.has(p.id);
+        
+        return `
+            <tr class="hover:bg-slate-700/30 transition-colors cursor-pointer" onclick="togglePlayerSelection('${p.id}', !state.selectedPlayerIds.has('${p.id}')); renderSorteioTable();">
+                <td class="px-2 py-3 text-center" onclick="event.stopPropagation()">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="togglePlayerSelection('${p.id}', this.checked); renderSorteioTable();" class="w-4 h-4 accent-green-500 cursor-pointer">
+                </td>
+                <td class="px-3 py-3 font-bold text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                    <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+                        ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-3 h-3 text-slate-400"></i>`}
+                    </div>
+                    ${p.name}
+                </td>
+                <td class="px-3 py-3 text-center whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-md text-[9px] font-bold ${catInfo.bg} ${catInfo.text} opacity-90">${catInfo.label}</span>
+                </td>
+                <td class="px-3 py-3 text-center whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-md text-[9px] font-bold ${lvlInfo.bg} ${lvlInfo.text} opacity-70">${lvlInfo.label}</span>
+                </td>
+            </tr>`;
+    }).join('');
+    
+    lucide.createIcons();
+};
 
-    tbody.innerHTML = sortedPlayersForAdmin.map(p => {
-        const lvlInfo = getLevelInfo(p.eloRating ?? 150), catInfo = getCategoryInfo(p.categoria);
-        const isDestaque = (p.eloRating ?? 150) === maxElo && maxElo > 150;
-        return `<tr class="hover:bg-slate-700/30 transition-colors"><td class="px-2 sm:px-4 py-3 sm:py-4 text-center"><input type="checkbox" ${state.selectedPlayerIds.has(p.id) ? 'checked' : ''} onclick="togglePlayerSelection('${p.id}', this.checked)" class="w-3 h-3 sm:w-4 sm:h-4 accent-green-500 cursor-pointer"></td><td class="px-3 sm:px-6 py-3 sm:py-4 font-bold text-slate-200 flex items-center gap-2 sm:gap-3 whitespace-nowrap"><div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-slate-600 bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-3 h-3 sm:w-4 sm:h-4 opacity-50 text-slate-400"></i>`}</div>${p.name}${isDestaque ? `<i data-lucide="star" class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0" title="MVP (Líder)"></i>` : ''}</td><td class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap"><span class="px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-bold ${catInfo.bg} ${catInfo.text} border ${catInfo.border} opacity-90">${catInfo.label}</span></td><td class="px-3 sm:px-6 py-3 sm:py-4 text-center font-bold text-yellow-500 whitespace-nowrap">${p.vitorias || 0} <span class="text-slate-500 text-xs font-normal">/ ${p.partidas || 0}</span>${(p.streak || 0) >= 3 ? `<span class="ml-1 text-orange-500 text-[10px] font-bold" title="${p.streak} Vitórias Seguidas"><i data-lucide="flame" class="w-3 h-3 inline fill-orange-500"></i>${p.streak}</span>` : ''}${(p.streak || 0) <= -3 ? `<span class="ml-1 text-blue-500 text-[10px] font-bold" title="${Math.abs(p.streak)} Derrotas Seguidas"><i data-lucide="snowflake" class="w-3 h-3 inline fill-blue-500"></i>${Math.abs(p.streak)}</span>` : ''}</td><td class="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap"><span class="px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-bold ${lvlInfo.bg} ${lvlInfo.text} border border-current opacity-70">${lvlInfo.label}</span></td><td class="px-3 sm:px-6 py-3 py-4 text-right flex justify-end gap-1 sm:gap-2 whitespace-nowrap"><button onclick="editPlayer('${p.id}')" class="p-1.5 sm:p-2 hover:bg-blue-500/20 text-blue-400 rounded-lg"><i data-lucide="edit-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button><button onclick="deletePlayer('${p.id}')" class="p-1.5 sm:p-2 hover:bg-red-500/20 text-red-400 rounded-lg"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button></td></tr>`;
-    }).join(''); 
+export const renderAdminTable = () => {
+    const tbody = document.getElementById('adminTableBody');
+    if(!tbody) return;
+    
+    // Organiza por Categoria e depois pelo Nome, para os "Cabeças de Chave" ficarem agrupados no topo
+    const sorted = [...state.players].sort((a, b) => { 
+        const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
+        if(c !== 0) return c; 
+        return a.name.localeCompare(b.name); 
+    });
+    
+    tbody.innerHTML = sorted.map(p => {
+        const lvlInfo = getLevelInfo(p.eloRating ?? 150);
+        const catInfo = getCategoryInfo(p.categoria);
+        
+        return `
+            <tr class="hover:bg-slate-700/30 transition-colors">
+                <td class="px-3 py-3 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 border-2 ${catInfo.border}">
+                            ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${p.icon || 'user'}" class="w-4 h-4 ${catInfo.text}"></i>`}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-slate-200">${p.name}</span>
+                            <span class="text-[9px] font-black ${catInfo.text} tracking-wider uppercase mt-0.5">${catInfo.label}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-3 py-3 text-center font-bold text-yellow-500 whitespace-nowrap">
+                    ${p.vitorias || 0} <span class="text-slate-500 text-xs">/ ${p.partidas || 0}</span>
+                </td>
+                <td class="px-3 py-3 text-center whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-md text-[9px] font-bold ${lvlInfo.bg} ${lvlInfo.text} opacity-70">${lvlInfo.label}</span>
+                </td>
+                <td class="px-3 py-3 text-right whitespace-nowrap">
+                    <div class="flex justify-end gap-1">
+                        <button onclick="editPlayer('${p.id}')" class="p-1.5 hover:bg-blue-500/20 text-blue-400 rounded-lg">
+                            <i data-lucide="edit-2" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="deletePlayer('${p.id}')" class="p-1.5 hover:bg-red-500/20 text-red-400 rounded-lg">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+    }).join('');
+    
     lucide.createIcons();
 };
 
@@ -276,203 +391,112 @@ export const renderTeams = () => {
     }
     
     sections.forEach(s => { if(s) s.classList.remove('hidden'); });
-    const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
-    const dailyData = typeof getDailyPlayerStats === 'function' ? getDailyPlayerStats() : { stats: {}, craques: new Set(), bagres: new Set() };
-
+    
     const sortedTeams = state.drawnTeams.sort((a,b) => a.isWaitlist ? 1 : (b.isWaitlist ? -1 : parseInt(a.label) - parseInt(b.label)));
-
-    // 1. CONTEÚDO PARA O PLACAR (Cards Grandes, Bonitos e Dinâmicos com Vit/Der)
-    const contentPlacar = sortedTeams.map(t => {
-        const teamName = t.isWaitlist ? '<i data-lucide="clock" class="inline w-4 h-4 sm:w-5 sm:h-5 mr-1 mb-1"></i> Lista de Espera' : getTeamName(t);
-        const playersSorted = [...t.players].sort((a, b) => { 
-            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1); 
-            if (catDiff !== 0) return catDiff; 
+    
+    const content = sortedTeams.map(t => {
+        const teamName = t.isWaitlist ? '<i data-lucide="clock" class="inline w-4 h-4 mr-1"></i> Lista de Espera' : getTeamName(t);
+        const pSorted = [...t.players].sort((a,b) => { 
+            const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
+            if(c !== 0) return c; 
             return a.name.localeCompare(b.name); 
         });
         
-        return `<div class="team-container w-full sm:w-[350px] p-4 sm:p-5 rounded-xl border relative shadow-lg transition-colors ${t.isWaitlist ? 'bg-slate-800/40 border-slate-600' : 'border-slate-700 bg-slate-800/80'}">
-            ${state.isAuthenticated && !t.isWaitlist ? `<div class="absolute top-3 right-3 flex gap-1.5 sm:gap-2"><button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/30 transition-all" title="Sortear com Lista de Espera"><i data-lucide="refresh-cw" class="w-4 h-4 sm:w-4 sm:h-4"></i></button><button onclick="deleteTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-all" title="Remover Equipe"><i data-lucide="trash-2" class="w-4 h-4 sm:w-4 sm:h-4"></i></button></div>` : ''}
-            ${state.isAuthenticated && t.isWaitlist ? `<div class="absolute top-3 right-3 flex gap-2">
-            ${t.players.length >= (document.getElementById('teamSize') ? parseInt(document.getElementById('teamSize').value) || 4 : 4) ? `<button onclick="promoteWaitlistToTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/30 transition-all" title="Formar Novo Time com a Espera"><i data-lucide="arrow-up-circle" class="w-4 h-4 sm:w-4 sm:h-4"></i></button>` : ''}
-            <button onclick="deleteTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-all" title="Remover Equipe"><i data-lucide="trash-2" class="w-4 h-4 sm:w-4 sm:h-4"></i></button>
-            </div>` : ''}
-            <h3 class="font-bold ${t.isWaitlist ? 'text-slate-400' : 'text-green-500'} text-base sm:text-lg mb-3 uppercase w-3/4">${teamName}</h3>
-            <div class="space-y-2 mt-2">
-            ${playersSorted.map(p => {
-                const dbPlayer = state.players.find(x => x.id === p.id) || p;
-                const catInfo = getCategoryInfo(dbPlayer.categoria || p.categoria), ptsValue = dbPlayer.eloRating ?? 150;
-                const isDestaque = ptsValue === maxElo && maxElo > 150;
-                const waitlistBadge = (p.waitlistRounds && p.waitlistRounds > 0) ? `<span class="ml-1 px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded text-[9px] font-bold border border-slate-600 whitespace-nowrap" title="${p.waitlistRounds} rodada(s) na espera">⏳ ${p.waitlistRounds}</span>` : '';
-                
-                const pStats = dailyData.stats[dbPlayer.name] || { wins: 0, losses: 0 };
-                const isCraque = dailyData.craques.has(dbPlayer.name);
-                const isBagre = dailyData.bagres.has(dbPlayer.name);
+        const controlsHTML = !t.isWaitlist ? `
+            <div class="absolute top-3 right-3 flex gap-1">
+                <button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                </button>
+                <button onclick="deleteTeam('${t.id}')" class="p-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
+            </div>` : '';
 
-               return `<div class="flex justify-between items-center text-xs sm:text-sm border-b border-slate-700/50 pb-1.5 last:border-0 last:pb-0 group"><span class="flex items-center gap-1 sm:gap-2"><span class="w-2 h-2 rounded-full ${catInfo.dot} shrink-0"></span><div class="w-5 h-5 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center overflow-hidden shrink-0">${dbPlayer.photo ? `<img src="${dbPlayer.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${dbPlayer.icon || 'user'}" class="w-3 h-3 ${catInfo.text} opacity-80"></i>`}</div><span class="font-bold ${catInfo.text} truncate max-w-[110px] sm:max-w-[130px] ml-1">${dbPlayer.name}</span><span class="text-[9px] font-bold text-slate-500 shrink-0 mx-0.5" title="Vitórias/Derrotas Diárias">(${pStats.wins}V ${pStats.losses}D)</span>${waitlistBadge}${(dbPlayer.streak || 0) >= 3 ? `<i data-lucide="flame" class="w-3 h-3 text-orange-500 fill-orange-500 shrink-0" title="${dbPlayer.streak} Vitórias Seguidas!"></i>` : ''}${(dbPlayer.streak || 0) <= -3 ? `<i data-lucide="snowflake" class="w-3 h-3 text-blue-500 fill-blue-500 shrink-0" title="${Math.abs(dbPlayer.streak)} Derrotas Seguidas"></i>` : ''}${isCraque ? `<i data-lucide="crown" class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0" title="Craque do Dia!"></i>` : ''}${isBagre ? `<i data-lucide="fish" class="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 shrink-0" title="Bagre do Dia"></i>` : ''}${isDestaque ? `<i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400 shrink-0" title="MVP (Líder)"></i>` : ''}</span><div class="flex items-center gap-1 sm:gap-2"><span class="opacity-60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">${ptsValue} ELO</span>${state.isAuthenticated ? `<button onclick="openMoveModal('${t.id}', '${p.id}')" class="p-1 text-slate-400 hover:text-blue-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity focus:opacity-100" title="Transferir Jogador"><i data-lucide="arrow-right-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i></button>` : ''}</div></div>`;
-            }).join('')}
-            </div>
-        </div>`;
-    }).join('');
-
-    // 2. CONTEÚDO PARA ADMIN (Formatação EXATA do amigo, compacta e focada em listagem visual limpa)
-    const contentAdmin = sortedTeams.map(t => {
-        const teamName = t.isWaitlist ? '<i data-lucide="clock" class="inline w-4 h-4 sm:w-5 sm:h-5 mr-1 mb-1"></i> Lista de Espera' : getTeamName(t);
-        const playersSorted = [...t.players].sort((a, b) => { 
-            const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1); 
-            if (catDiff !== 0) return catDiff; 
-            return a.name.localeCompare(b.name); 
-        });
-        
-        return `<div class="team-container p-4 sm:p-5 rounded-xl border relative shadow-lg transition-colors ${t.isWaitlist ? 'bg-slate-800/40 border-slate-600' : 'border-slate-700 bg-slate-800/80'}">${state.isAuthenticated && !t.isWaitlist ? `<div class="absolute top-3 right-3 flex gap-1.5 sm:gap-2"><button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/30 transition-all" title="Sortear com Lista de Espera"><i data-lucide="refresh-cw" class="w-4 h-4 sm:w-4 sm:h-4"></i></button><button onclick="deleteTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-all" title="Remover Equipe"><i data-lucide="trash-2" class="w-4 h-4 sm:w-4 sm:h-4"></i></button></div>` : ''}${state.isAuthenticated && t.isWaitlist ? `<div class="absolute top-3 right-3 flex gap-2">
-            ${t.players.length >= (document.getElementById('teamSize') ? parseInt(document.getElementById('teamSize').value) || 4 : 4) ? `<button onclick="promoteWaitlistToTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/30 transition-all" title="Formar Novo Time com a Espera"><i data-lucide="arrow-up-circle" class="w-4 h-4 sm:w-4 sm:h-4"></i></button>` : ''}
-            <button onclick="deleteTeam('${t.id}')" class="p-1.5 sm:p-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-all" title="Remover Equipe"><i data-lucide="trash-2" class="w-4 h-4 sm:w-4 sm:h-4"></i></button>
-        </div>` : ''}<h3 class="font-bold ${t.isWaitlist ? 'text-slate-400' : 'text-green-500'} text-base sm:text-lg mb-3 uppercase w-3/4">${teamName}</h3><div class="space-y-2 mt-2">${playersSorted.map(p => {
+        const playersHTML = pSorted.map(p => {
             const dbPlayer = state.players.find(x => x.id === p.id) || p;
-            const catInfo = getCategoryInfo(dbPlayer.categoria || p.categoria), ptsValue = dbPlayer.eloRating ?? 150;
-            const isDestaque = ptsValue === maxElo && maxElo > 150;
-            const waitlistBadge = (p.waitlistRounds && p.waitlistRounds > 0) ? `<span class="ml-1 px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded text-[9px] font-bold border border-slate-600 whitespace-nowrap" title="${p.waitlistRounds} rodada(s) na espera">⏳ ${p.waitlistRounds}</span>` : '';
+            const catInfo = getCategoryInfo(dbPlayer.categoria);
+            const ptsValue = dbPlayer.eloRating ?? 150;
+            return `
+                <div class="flex justify-between items-center text-xs border-b border-slate-700/50 pb-1.5">
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full ${catInfo.dot}"></span>
+                        <span class="font-bold ${catInfo.text} ml-1">${dbPlayer.name}</span>
+                    </span>
+                    <span class="opacity-60 text-[10px]">${ptsValue} ELO</span>
+                </div>`;
+        }).join('');
 
-            return `<div class="flex justify-between items-center text-xs sm:text-sm border-b border-slate-700/50 pb-1.5 last:border-0 last:pb-0 group"><span class="flex items-center gap-1 sm:gap-2"><span class="w-2 h-2 rounded-full ${catInfo.dot} shrink-0"></span><div class="w-5 h-5 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center overflow-hidden shrink-0">${dbPlayer.photo ? `<img src="${dbPlayer.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${dbPlayer.icon || 'user'}" class="w-3 h-3 ${catInfo.text} opacity-80"></i>`}</div><span class="font-bold ${catInfo.text} truncate max-w-[110px] sm:max-w-[130px] ml-1">${dbPlayer.name}</span>${waitlistBadge}${(dbPlayer.streak || 0) >= 3 ? `<i data-lucide="flame" class="w-3 h-3 text-orange-500 fill-orange-500 shrink-0" title="${dbPlayer.streak} Vitórias Seguidas!"></i>` : ''}${(dbPlayer.streak || 0) <= -3 ? `<i data-lucide="snowflake" class="w-3 h-3 text-blue-500 fill-blue-500 shrink-0" title="${Math.abs(dbPlayer.streak)} Derrotas Seguidas"></i>` : ''}${isDestaque ? `<i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400 shrink-0" title="MVP (Líder)"></i>` : ''}</span><div class="flex items-center gap-1 sm:gap-2"><span class="opacity-60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">${ptsValue} ELO</span>${state.isAuthenticated ? `<button onclick="openMoveModal('${t.id}', '${p.id}')" class="p-1 text-slate-400 hover:text-blue-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity focus:opacity-100" title="Transferir Jogador"><i data-lucide="arrow-right-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i></button>` : ''}</div></div>`;
-        }).join('')}</div></div>`;
+        return `
+            <div class="team-container w-full p-4 rounded-xl border relative shadow-lg ${t.isWaitlist ? 'bg-slate-800/40 border-slate-600' : 'border-slate-700 bg-slate-800/80'}">
+                ${controlsHTML}
+                <h3 class="font-bold ${t.isWaitlist ? 'text-slate-400' : 'text-green-500'} text-base mb-3 uppercase w-3/4">${teamName}</h3>
+                <div class="space-y-2 mt-2">
+                    ${playersHTML}
+                </div>
+            </div>`;
     }).join('');
     
-    if (adminGrid) adminGrid.innerHTML = contentAdmin;
-    if (placarGrid) placarGrid.innerHTML = contentPlacar; 
+    if (adminGrid) adminGrid.innerHTML = content;
+    if (placarGrid) placarGrid.innerHTML = content; 
+    
     lucide.createIcons();
 };
 
 export const renderPlacarTeams = () => {
-    const select1 = document.getElementById('team1Select'), select2 = document.getElementById('team2Select');
+    const select1 = document.getElementById('team1Select');
+    const select2 = document.getElementById('team2Select');
+    
     if (!select1 || !select2) return;
-    const val1 = select1.value, val2 = select2.value;
-    let optionsHTML1 = '<option value="" class="bg-slate-800 text-sm text-slate-400">SELECIONE</option>';
-    let optionsHTML2 = optionsHTML1;
-    const validTeams = state.drawnTeams.filter(t => !t.isWaitlist).sort((a,b) => parseInt(a.label) - parseInt(b.label));
     
-    validTeams.forEach(t => { 
-        const teamName = getTeamName(t); 
-        const opt = `<option value="${t.label}" class="bg-slate-800 text-sm text-white">${teamName}</option>`; 
-        optionsHTML1 += opt; 
-        optionsHTML2 += opt; 
-    });
+    const val1 = select1.value;
+    const val2 = select2.value;
     
-    select1.innerHTML = optionsHTML1; 
-    select2.innerHTML = optionsHTML2;
-    if (validTeams.find(t => t.label === val1)) select1.value = val1;
-    if (validTeams.find(t => t.label === val2)) select2.value = val2;
-
-    if (typeof updateLiveEloPreview === 'function') updateLiveEloPreview();
+    let optHTML = '<option value="" class="bg-slate-800 text-sm text-slate-400">SELECIONE</option>';
+    
+    state.drawnTeams
+        .filter(t => !t.isWaitlist)
+        .sort((a,b) => parseInt(a.label) - parseInt(b.label))
+        .forEach(t => { 
+            optHTML += `<option value="${t.label}" class="bg-slate-800 text-sm text-white">${getTeamName(t)}</option>`; 
+        });
+        
+    select1.innerHTML = optHTML; 
+    select2.innerHTML = optHTML;
+    
+    select1.value = val1; 
+    select2.value = val2;
 };
 
-// NOVO: Exibição do ELO no placar
-export const updateLiveEloPreview = () => {
-    const previewContainer = document.getElementById('liveEloPreview');
-    if (!previewContainer) return;
-
-    const preview = calculateEloPreview();
-    if (!preview) {
-        previewContainer.setAttribute('style', 'display: none !important;');
-        return;
-    }
-
-    previewContainer.removeAttribute('style');
-    previewContainer.innerHTML = `
-        <div class="flex-1 flex flex-col items-center w-full">
-            <span class="text-[10px] sm:text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 border-b border-blue-500/30 pb-1 px-4">Em caso de Vitória Azul</span>
-            <div class="flex items-center gap-2 sm:gap-3 w-full justify-center">
-                <span class="text-green-400 font-black text-xs sm:text-sm flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3 sm:w-4 sm:h-4"></i> +${preview.winT1} Azul</span>
-                <span class="text-slate-500">|</span>
-                <span class="text-red-400 font-black text-xs sm:text-sm flex items-center gap-1"><i data-lucide="trending-down" class="w-3 h-3 sm:w-4 sm:h-4"></i> ${preview.loseT2} Verm</span>
-            </div>
-        </div>
-        <div class="w-full sm:w-px h-px sm:h-12 bg-slate-700"></div>
-        <div class="flex-1 flex flex-col items-center w-full">
-            <span class="text-[10px] sm:text-xs font-bold text-red-400 uppercase tracking-widest mb-2 border-b border-red-500/30 pb-1 px-4">Em caso de Vitória Vermelha</span>
-            <div class="flex items-center gap-2 sm:gap-3 w-full justify-center">
-                <span class="text-red-400 font-black text-xs sm:text-sm flex items-center gap-1"><i data-lucide="trending-down" class="w-3 h-3 sm:w-4 sm:h-4"></i> ${preview.loseT1} Azul</span>
-                <span class="text-slate-500">|</span>
-                <span class="text-green-400 font-black text-xs sm:text-sm flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3 sm:w-4 sm:h-4"></i> +${preview.winT2} Verm</span>
-            </div>
-        </div>
-    `;
-    previewContainer.classList.remove('hidden');
-    lucide.createIcons();
-};
-
-// NOVO: Histórico de Partidas
 export const renderMatchHistory = () => {
     const container = document.getElementById('historyList');
     if (!container) return;
-
-    if (!state.matchHistory || state.matchHistory.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 text-center text-sm py-4">Nenhuma partida registrada ainda.</p>`;
-        return;
-    }
-
-    // Ordenar do mais recente para o mais antigo
-    const sortedHistory = [...state.matchHistory].sort((a, b) => b.timestamp - a.timestamp);
     
-    // Agrupar por data
-    const grouped = sortedHistory.reduce((acc, match) => {
-        const date = match.dateString || new Date(match.timestamp).toLocaleDateString('pt-BR');
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(match);
-        return acc;
-    }, {});
-
-    let html = '';
-    for (const [date, matches] of Object.entries(grouped)) {
-        html += `<div class="mb-6 last:mb-0">
-            <h3 class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-1 flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> ${date}</h3>
-            <div class="space-y-3">`;
-
-        matches.forEach(m => {
-            const t1Win = m.winner === 1;
-            const t2Win = m.winner === 2;
-            html += `
-            <div class="bg-slate-900/50 border border-slate-700/50 rounded-xl p-3 sm:p-4 flex flex-col md:flex-row items-center gap-3 sm:gap-4 hover:bg-slate-800/50 transition-colors">
-                <div class="flex-1 w-full flex flex-col items-center md:items-end text-center md:text-right">
-                    <span class="font-bold text-sm sm:text-base ${t1Win ? 'text-blue-400' : 'text-slate-400'}">${m.team1.name}</span>
-                    <span class="text-[9px] sm:text-[10px] text-slate-500 max-w-[200px] line-clamp-2" title="${m.team1.players.join(', ')}">${m.team1.players.join(', ')}</span>
-                </div>
-                <div class="shrink-0 flex items-center justify-center gap-2 sm:gap-3 bg-slate-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border border-slate-800">
-                    <span class="text-lg sm:text-xl font-black ${t1Win ? 'text-blue-500 drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]' : 'text-slate-500'}">${m.team1.score}</span>
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-600">X</span>
-                    <span class="text-lg sm:text-xl font-black ${t2Win ? 'text-red-500 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]' : 'text-slate-500'}">${m.team2.score}</span>
-                </div>
-                <div class="flex-1 w-full flex flex-col items-center md:items-start text-center md:text-left">
-                    <span class="font-bold text-sm sm:text-base ${t2Win ? 'text-red-400' : 'text-slate-400'}">${m.team2.name}</span>
-                    <span class="text-[9px] sm:text-[10px] text-slate-500 max-w-[200px] line-clamp-2" title="${m.team2.players.join(', ')}">${m.team2.players.join(', ')}</span>
-                </div>
-            </div>`;
-        });
-        html += `</div></div>`;
+    if (!state.matchHistory || state.matchHistory.length === 0) { 
+        container.innerHTML = `<p class="text-slate-500 text-center text-sm py-4">Nenhuma partida registrada.</p>`; 
+        return; 
     }
-
-    container.innerHTML = html;
-    lucide.createIcons();
+    
+    container.innerHTML = state.matchHistory
+        .sort((a,b) => b.timestamp - a.timestamp)
+        .map(m => {
+            const t1Color = m.winner === 1 ? 'text-blue-400' : 'text-slate-400';
+            const t2Color = m.winner === 2 ? 'text-red-400' : 'text-slate-400';
+            
+            return `
+                <div class="bg-slate-900/50 border border-slate-700/50 rounded-xl p-3 flex justify-between items-center">
+                    <div class="flex-1 text-right font-bold text-sm ${t1Color}">${m.team1.name}</div>
+                    <div class="px-3 font-black text-lg">${m.team1.score} x ${m.team2.score}</div>
+                    <div class="flex-1 text-left font-bold text-sm ${t2Color}">${m.team2.name}</div>
+                </div>`;
+        }).join('');
 };
 
-export const renderAll = () => {
-    renderPublic();
-    renderAdmin();
-    renderTeams();
-    renderRanking();
-    renderPlacarTeams();
-    renderMatchHistory();
-};
-
-// --- Bindings Globais para o HTML --- //
-window.showToast = showToast;
-window.switchView = switchView;
-window.openConfirmModal = openConfirmModal;
-window.closeConfirmModal = closeConfirmModal;
-window.closeVictoryModalOnly = closeVictoryModalOnly;
-window.openMoveModal = openMoveModal;
-window.closeMoveModal = closeMoveModal;
-window.updateLiveEloPreview = updateLiveEloPreview;
-
-window.toggleRanking = () => {
-    state.showAllRanking = !state.showAllRanking;
-    renderRanking();
+export const renderAll = () => { 
+    renderPublic(); 
+    renderSorteioTable(); 
+    renderAdminTable(); 
+    renderTeams(); 
+    renderRanking(); 
+    renderPlacarTeams(); 
+    renderMatchHistory(); 
 };

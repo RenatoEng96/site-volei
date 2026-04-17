@@ -1,45 +1,84 @@
-/**
- * js/main.js
- * Ponto de entrada principal da aplicação TimeCerto.
- * Este ficheiro importa todos os módulos necessários para o funcionamento do site.
- * Como usamos "type=module" no HTML, basta importar os ficheiros para que o seu 
- * código seja executado e as funções anexadas ao "window" fiquem disponíveis.
- */
-
-// 1. Inicializa o Firebase e exporta referências
-import './firebase.js';
-
-// 2. Cria o estado global da aplicação e importa-o para ser usado
 import { state } from './state.js';
+import { switchView, showToast, openConfirmModal, closeConfirmModal, openMoveModal, closeMoveModal, closeVictoryModalOnly, renderSorteioTable } from './ui.js';
+import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer } from './logic.js';
+import { toggleEloSystem, handleLogin, handleLogout, togglePlayerSelection, toggleAllPlayers, savePlayer, deletePlayer, editPlayer, resetForm } from './admin.js';
 
-// 3. Carrega as funções visuais e importa as funções necessárias
-import { closeConfirmModal, renderAdmin, renderAll } from './ui.js';
+export const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('photoPreview').src = e.target.result;
+            document.getElementById('photoPreview').classList.remove('hidden');
+            document.getElementById('photoPlaceholder').classList.add('hidden');
+            document.getElementById('photoData').value = e.target.result;
+            document.getElementById('btnRemovePhoto').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-// Garante que as funções de renderização estão disponíveis globalmente
-// Isto resolve o problema do botão "Selecionar Todos" não atualizar a interface
-window.renderAdmin = renderAdmin;
-window.renderAll = renderAll;
+export const removePhoto = () => {
+    document.getElementById('photoPreview').src = '';
+    document.getElementById('photoPreview').classList.add('hidden');
+    document.getElementById('photoPlaceholder').classList.remove('hidden');
+    document.getElementById('photoData').value = '';
+    document.getElementById('playerPhoto').value = '';
+    document.getElementById('btnRemovePhoto').classList.add('hidden');
+};
 
-// 4. Carrega as regras de negócio (sorteios, pontuações, placar)
-import './logic.js';
+export const adjustBonus = (val) => {
+    const el = document.getElementById('statBonus');
+    el.value = (parseInt(el.value) || 0) + val;
+};
 
-// 5. Carrega o painel administrativo, CRUD e Sincronização em tempo real
-import './admin.js';
+// Vinculando todas as funções globalmente para que o index.html consiga chamá-las através dos onlicks
+Object.assign(window, {
+    switchView, 
+    toggleEloSystem, 
+    handleLogin, 
+    handleLogout, 
+    drawTeams, 
+    clearTeams, 
+    deleteTeam, 
+    createWaitlist, 
+    redrawTeamWithWaitlist, 
+    updateScore, 
+    resetScore, 
+    saveAndCloseVictoryModal, 
+    closeVictoryModalOnly, 
+    toggleAllPlayers, 
+    togglePlayerSelection, 
+    renderSorteioTable, 
+    savePlayer, 
+    deletePlayer, 
+    editPlayer, 
+    resetForm, 
+    closeConfirmModal, 
+    openMoveModal, 
+    closeMoveModal, 
+    updateLiveEloPreview, 
+    handleImageUpload, 
+    removePhoto, 
+    adjustBonus, 
+    confirmMovePlayer
+});
 
-// (Opcional) Log de inicialização para garantir que tudo carregou
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("🏐 TimeCerto: Todos os módulos foram carregados com sucesso (Separados)!");
-    
-    // Garante que o botão de confirmação genérico funciona corretamente
     const btnConfirm = document.getElementById('btnConfirmAction');
+    
     if (btnConfirm) {
-        btnConfirm.addEventListener('click', () => {
-            // Executa a função de callback guardada no estado
-            if (state && state.confirmActionCallback) {
-                state.confirmActionCallback();
-            }
-            // Fecha o modal após confirmar
-            closeConfirmModal();
+        btnConfirm.addEventListener('click', () => { 
+            if (state.confirmActionCallback) state.confirmActionCallback(); 
+            closeConfirmModal(); 
         });
+    }
+    
+    // Inicia na view correta
+    switchView('public');
+    
+    // Inicia os ícones Lucide
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
 });

@@ -1,14 +1,11 @@
-/* Importação de Fontes */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
 
-/* Estilos Globais */
 body {
     background-color: #0f172a;
     font-family: 'Roboto Condensed', sans-serif;
     color: #f1f5f9;
 }
 
-/* Formato do Card FIFA */
 .fifa-card {
     position: relative;
     width: 210px;
@@ -25,11 +22,13 @@ body {
     overflow: hidden;
 }
 
-/* Efeito de Luz Estática */
 .fifa-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.40) 0%, rgba(255,255,255,0.05) 30%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.2) 100%);
     pointer-events: none;
     z-index: 0;
@@ -40,12 +39,13 @@ body {
     z-index: 10;
 }
 
-/* Efeito de Raio de Luz Animado */
 .fifa-card::after {
     content: '';
     position: absolute;
-    top: 0; left: -150%;
-    width: 60%; height: 100%;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
     background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
     transform: skewX(-25deg);
     transition: all 0.6s ease;
@@ -56,37 +56,85 @@ body {
 .group:hover .fifa-card {
     transform: translateY(-8px) scale(1.02);
 }
+
 .group:hover .fifa-card::after {
     left: 200%;
 }
 
-/* Cores Dinâmicas (Elo) */
-.card-nivel6 { background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%); border: 4px solid #f87171; color: white; }
-.group:hover .card-nivel6 { box-shadow: 0 15px 35px rgba(153, 27, 27, 0.65); border-color: #fca5a5; }
+.card-nivel6 {
+    background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%);
+    border: 4px solid #f87171;
+    color: white;
+}
 
-.card-nivel5 { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 50%, #4c1d95 100%); border: 4px solid #c084fc; color: white; }
-.group:hover .card-nivel5 { box-shadow: 0 15px 35px rgba(168, 85, 247, 0.65); border-color: #e9d5ff; }
+.group:hover .card-nivel6 {
+    box-shadow: 0 15px 35px rgba(153, 27, 27, 0.65);
+    border-color: #fca5a5;
+}
 
-.card-nivel4 { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #164e63 100%); border: 4px solid #22d3ee; color: white; }
-.group:hover .card-nivel4 { box-shadow: 0 15px 35px rgba(6, 182, 212, 0.65); border-color: #a5f3fc; }
+.card-nivel5 {
+    background: linear-gradient(135deg, #a855f7 0%, #7e22ce 50%, #4c1d95 100%);
+    border: 4px solid #c084fc;
+    color: white;
+}
 
-.card-nivel3 { background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #713f12 100%); border: 4px solid #fde047; color: #2e1a05; }
-.group:hover .card-nivel3 { box-shadow: 0 15px 35px rgba(234, 179, 8, 0.65); border-color: #fef08a; }
+.group:hover .card-nivel5 {
+    box-shadow: 0 15px 35px rgba(168, 85, 247, 0.65);
+    border-color: #e9d5ff;
+}
 
-.card-nivel2 { background: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #334155 100%); border: 4px solid #cbd5e1; color: white; }
-.group:hover .card-nivel2 { box-shadow: 0 15px 35px rgba(148, 163, 184, 0.65); border-color: #f1f5f9; }
+.card-nivel4 {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #164e63 100%);
+    border: 4px solid #22d3ee;
+    color: white;
+}
 
-.card-nivel1 { background: linear-gradient(135deg, #c2410c 0%, #9a3412 50%, #431407 100%); border: 4px solid #fdba74; color: white; }
-.group:hover .card-nivel1 { box-shadow: 0 15px 35px rgba(194, 65, 12, 0.65); border-color: #fed7aa; }
+.group:hover .card-nivel4 {
+    box-shadow: 0 15px 35px rgba(6, 182, 212, 0.65);
+    border-color: #a5f3fc;
+}
 
-/* Moldura Animada para o Maior Vencedor */
+.card-nivel3 {
+    background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #713f12 100%);
+    border: 4px solid #fde047;
+    color: #2e1a05;
+}
+
+.group:hover .card-nivel3 {
+    box-shadow: 0 15px 35px rgba(234, 179, 8, 0.65);
+    border-color: #fef08a;
+}
+
+.card-nivel2 {
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #334155 100%);
+    border: 4px solid #cbd5e1;
+    color: white;
+}
+
+.group:hover .card-nivel2 {
+    box-shadow: 0 15px 35px rgba(148, 163, 184, 0.65);
+    border-color: #f1f5f9;
+}
+
+.card-nivel1 {
+    background: linear-gradient(135deg, #c2410c 0%, #9a3412 50%, #431407 100%);
+    border: 4px solid #fdba74;
+    color: white;
+}
+
+.group:hover .card-nivel1 {
+    box-shadow: 0 15px 35px rgba(194, 65, 12, 0.65);
+    border-color: #fed7aa;
+}
+
 .winner-frame-container {
     filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.7));
     animation: pulseFrameGlow 2s infinite alternate;
     z-index: 15;
 }
+
 .winner-frame-wrapper {
-    padding: 5px; 
+    padding: 5px;
     background: linear-gradient(135deg, #FDE047 0%, #D97706 25%, #FEF08A 50%, #D97706 75%, #FDE047 100%);
     background-size: 200% 200%;
     animation: shimmerFrame 3s infinite linear;
@@ -97,96 +145,192 @@ body {
 }
 
 @media (min-width: 640px) {
-    .winner-frame-wrapper { width: 220px; height: 310px; }
+    .winner-frame-wrapper {
+        width: 220px;
+        height: 310px;
+    }
 }
+
 @media (max-width: 639px) {
-    .winner-frame-wrapper { width: 100%; aspect-ratio: 210 / 300; }
+    .winner-frame-wrapper {
+        width: 100%;
+        aspect-ratio: 210 / 300;
+    }
 }
 
 @keyframes shimmerFrame {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-@keyframes pulseFrameGlow {
-    0% { filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.4)); }
-    100% { filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1)); }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-/* Tipografia do Card */
-.overall { font-family: 'Oswald', sans-serif; font-size: 58px; font-weight: 700; line-height: 0.9; margin-top: 0; }
+@keyframes pulseFrameGlow {
+    0% {
+        filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.4));
+    }
+    100% {
+        filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1));
+    }
+}
+
+.overall {
+    font-family: 'Oswald', sans-serif;
+    font-size: 58px;
+    font-weight: 700;
+    line-height: 0.9;
+    margin-top: 0;
+}
 
 .player-name {
-    font-family: 'Oswald', sans-serif; font-size: 19px; text-transform: uppercase;
-    margin-top: 4px; text-align: center; width: 95%; border-bottom: 2px solid currentColor;
-    padding-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    font-family: 'Oswald', sans-serif;
+    font-size: 19px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    text-align: center;
+    width: 95%;
+    border-bottom: 2px solid currentColor;
+    padding-bottom: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-/* Stats e Grid */
-.stats-grid { 
-    display: grid; 
-    grid-template-columns: repeat(3, max-content); 
-    justify-content: center; 
-    gap: 6px 16px; 
-    margin-top: 12px; 
-    width: 100%; 
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: center;
+    gap: 6px 16px;
+    margin-top: 12px;
+    width: 100%;
 }
 
-.stat-item { display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
-.stat-value { font-weight: 700; font-size: 15px; }
-.stat-label { font-weight: 400; opacity: 0.8; font-size: 10px; }
+.stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+}
 
-/* Navegação e Estados */
-.nav-btn.active { background-color: #334155; color: #22c55e; border-bottom: 2px solid #22c55e; }
-.hidden-view { display: none !important; }
+.stat-value {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.stat-label {
+    font-weight: 400;
+    opacity: 0.8;
+    font-size: 10px;
+}
+
+.nav-btn.active {
+    background-color: #334155;
+    color: #22c55e;
+    border-bottom: 2px solid #22c55e;
+}
+
+.hidden-view {
+    display: none !important;
+}
 
 .ranking-item {
     background: rgba(30, 41, 59, 0.5);
     border: 1px solid rgba(71, 85, 105, 0.3);
     transition: all 0.3s ease;
 }
-.ranking-item:hover { background: rgba(30, 41, 59, 0.8); transform: scale(1.02); }
 
-/* Ajustes Responsivos Móveis */
+.ranking-item:hover {
+    background: rgba(30, 41, 59, 0.8);
+    transform: scale(1.02);
+}
+
 @media (max-width: 640px) {
-    .fifa-card { width: 100%; height: auto; aspect-ratio: 210 / 300; padding: 16% 4% 8% 4%; }
-    .overall { font-size: 42px; }
-    .player-name { font-size: 15px; margin-top: 2px; width: 98%; border-bottom-width: 1px; padding-bottom: 2px; }
-    .stat-value { font-size: 13px; }
-    .stat-label { font-size: 8px; }
-    .stats-grid { gap: 4px 8px; margin-top: 8px; } 
-    .stat-item { gap: 3px; }
+    .fifa-card {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 210 / 300;
+        padding: 16% 4% 8% 4%;
+    }
+    .overall {
+        font-size: 42px;
+    }
+    .player-name {
+        font-size: 15px;
+        margin-top: 2px;
+        width: 98%;
+        border-bottom-width: 1px;
+        padding-bottom: 2px;
+    }
+    .stat-value {
+        font-size: 13px;
+    }
+    .stat-label {
+        font-size: 8px;
+    }
+    .stats-grid {
+        gap: 4px 8px;
+        margin-top: 8px;
+    }
+    .stat-item {
+        gap: 3px;
+    }
 }
 
-/* Loader */
 .loader {
-    border: 4px solid #1e293b; border-top: 4px solid #22c55e;
-    border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+    border: 4px solid #1e293b;
+    border-top: 4px solid #22c55e;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* Reset de inputs numéricos */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 input[type=number] {
     -moz-appearance: textfield;
 }
 
-/* Estilo da Foto do Jogador */
 .player-photo-wrapper {
-    width: 100%; 
-    height: 100%; 
-    border-radius: 50%; 
-    overflow: hidden; 
-    display: flex; 
-    align-items: center; 
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
     justify-content: center;
 }
-.player-photo-wrapper img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
+
+.player-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
