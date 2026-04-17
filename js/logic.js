@@ -10,11 +10,17 @@ function distributePlayersSmartly(playersList, capacities) {
     let buckets = capacities.map(() => []);
 
     // 1. Aleatoriedade total entre jogadores do mesmo nível
-    let shuffledPlayers = [...playersList].map(p => ({...p, _rand: Math.random()}));
-    let sortedPlayers = shuffledPlayers.sort((a, b) => {
-        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
-        if (catDiff !== 0) return catDiff;
-        return a._rand - b._rand;
+    let sortedPlayers = [...playersList];
+    
+    // Embaralha perfeitamente a lista inteira primeiro (Fisher-Yates)
+    for (let i = sortedPlayers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sortedPlayers[i], sortedPlayers[j]] = [sortedPlayers[j], sortedPlayers[i]];
+    }
+
+    // Ordena por categoria. O JS mantém a ordem aleatória para quem empatar na categoria!
+    sortedPlayers.sort((a, b) => {
+        return (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
     });
 
     // 2. Distribuição Iterativa
@@ -67,8 +73,7 @@ function distributePlayersSmartly(playersList, capacities) {
             }
         }
         
-        let { _rand, ...cleanPlayer } = p;
-        buckets[bestBucketIndex].push({ ...cleanPlayer, waitlistRounds: 0 });
+        buckets[bestBucketIndex].push({ ...p, waitlistRounds: 0 });
     }
     return buckets;
 }
@@ -77,22 +82,23 @@ export function balanceStrongInside(playersList, playersPerTeam) {
     const numberOfTeams = Math.floor(playersList.length / playersPerTeam);
     if (numberOfTeams === 0) return { teams: [], waitlist: playersList.map(p => ({...p, waitlistRounds: 0})) };
 
-    // Sorteia a ordem da lista toda para não viciar quem vai ficar de fora em caso de empate de nível
-    let shuffledPlayers = [...playersList].map(p => ({...p, _rand: Math.random()}));
-    let sortedPlayers = shuffledPlayers.sort((a, b) => {
-        const catDiff = (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
-        if (catDiff !== 0) return catDiff;
-        return a._rand - b._rand;
+    // Sorteia a ordem da lista toda (Fisher-Yates) para não viciar quem vai ficar de fora
+    let sortedPlayers = [...playersList];
+    
+    for (let i = sortedPlayers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sortedPlayers[i], sortedPlayers[j]] = [sortedPlayers[j], sortedPlayers[i]];
+    }
+
+    sortedPlayers.sort((a, b) => {
+        return (parseInt(b.categoria) || 1) - (parseInt(a.categoria) || 1);
     });
 
     const activePlayersCount = numberOfTeams * playersPerTeam;
     // Dentro Forte: Pega apenas os necessários para fechar os times completos
     const activePlayers = sortedPlayers.slice(0, activePlayersCount);
     // Os que sobraram vão direto para a espera
-    const waitlistPlayers = sortedPlayers.slice(activePlayersCount).map(p => {
-        let { _rand, ...clean } = p;
-        return { ...clean, waitlistRounds: 0 };
-    });
+    const waitlistPlayers = sortedPlayers.slice(activePlayersCount).map(p => ({ ...p, waitlistRounds: 0 }));
 
     const capacities = Array(numberOfTeams).fill(playersPerTeam);
     const teams = distributePlayersSmartly(activePlayers, capacities);
