@@ -123,6 +123,10 @@ export const closeVictoryModalOnly = () => {
     state.score2 = 0; 
     document.getElementById('score1').innerText = 0; 
     document.getElementById('score2').innerText = 0; 
+    // NOVO: Limpa os selects e esconde a preview de Elo
+    document.getElementById('team1Select').value = ''; 
+    document.getElementById('team2Select').value = ''; 
+    if (typeof updateLiveEloPreview === 'function') updateLiveEloPreview();
 };
 
 export const switchView = (view) => {

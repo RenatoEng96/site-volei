@@ -1,11 +1,9 @@
 import { state } from './state.js';
 import { showToast, openConfirmModal, closeMoveModal, getTeamName } from './ui.js';
-import { db, teamsRef, matchHistoryRef, playersRef } from './firebase.js';
+import { db, appId, teamsRef, matchHistoryRef, playersRef } from './firebase.js';
 
-// AQUI ESTAVA O ERRO: Importando as funções do banco de dados diretamente da nuvem do Google (CDN)
+// Importando as ferramentas do banco corretamente direto do Google
 import { doc, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-const appId = 'app-volei-teste'; // Necessário para salvar os dados no caminho correto
 
 // --- Algoritmos de Balanceamento (Nossa Lógica Original Restaurada) --- //
 
@@ -573,6 +571,13 @@ export const checkWinCondition = () => {
         if (!select1.value || !select2.value || select1.value === select2.value) { 
             btnSaveResult.classList.add('hidden'); 
             warning.classList.remove('hidden'); 
+            warning.innerText = "Selecione duas equipes válidas e diferentes.";
+            if(eloInfoDiv) eloInfoDiv.classList.add('hidden');
+        } else if (!state.isAuthenticated && !state.eloEnabled) {
+            // NOVO: Aplica de facto a trava do Placar Aberto
+            btnSaveResult.classList.add('hidden'); 
+            warning.classList.remove('hidden'); 
+            warning.innerText = "O Placar Público está fechado. Apenas o administrador pode salvar os resultados.";
             if(eloInfoDiv) eloInfoDiv.classList.add('hidden');
         } else { 
             btnSaveResult.classList.remove('hidden'); 
