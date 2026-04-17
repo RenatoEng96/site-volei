@@ -34,7 +34,7 @@ export const setupSync = () => {
     // NOVO: Sync do Histórico
     onSnapshot(matchHistoryRef, (snapshot) => { 
         state.matchHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
-        if (typeof window.renderMatchHistory === 'function') window.renderMatchHistory(); 
+        renderAll(); // Garante que craques/bagres e histórico sejam atualizados em todas as abas
     });
 };
 
