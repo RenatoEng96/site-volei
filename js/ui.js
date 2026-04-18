@@ -123,7 +123,6 @@ export const closeVictoryModalOnly = () => {
     state.score2 = 0; 
     document.getElementById('score1').innerText = 0; 
     document.getElementById('score2').innerText = 0; 
-    // NOVO: Limpa os selects e esconde a preview de Elo
     document.getElementById('team1Select').value = ''; 
     document.getElementById('team2Select').value = ''; 
     if (typeof updateLiveEloPreview === 'function') updateLiveEloPreview();
@@ -168,7 +167,6 @@ export const renderPublic = () => {
         return; 
     }
     
-    // NOVO: Puxa as estatísticas para saber quem é craque, bagre e as streaks
     const { stats, craques, bagres } = getDailyPlayerStats();
     const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
     
@@ -188,23 +186,23 @@ export const renderPublic = () => {
             const vitorias = p.vitorias || 0;
             const derrotas = (p.partidas || 0) - vitorias;
             
-            // NOVO: Cálculo dos selos do jogador
             const isCraque = craques.has(p.name);
             const isBagre = bagres.has(p.name);
             const streak = p.streak || 0;
-            // Ajustado para ficar na lateral superior esquerda (top-6 left-4) acompanhando o corte do card
-            const badgesHTML = `
-                <div class="absolute top-6 left-4 flex flex-col gap-2 z-30 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)]">
-                    ${streak >= 3 ? `<i data-lucide="flame" class="w-5 h-5 text-orange-500 fill-orange-500" title="${streak} Vitórias Seguidas!"></i>` : ''}
-                    ${streak <= -3 ? `<i data-lucide="snowflake" class="w-5 h-5 text-blue-500 fill-blue-500" title="${Math.abs(streak)} Derrotas Seguidas"></i>` : ''}
-                    ${isCraque ? `<i data-lucide="crown" class="w-5 h-5 text-yellow-400 fill-yellow-400" title="Craque do Dia!"></i>` : ''}
-                    ${isBagre ? `<i data-lucide="fish" class="w-5 h-5 text-emerald-400" title="Bagre do Dia"></i>` : ''}
+            
+            // Selos posicionados fora do card, na lateral superior esquerda, empilhados com número
+            const hasBadges = streak >= 3 || streak <= -3 || isCraque || isBagre;
+            const badgesHTML = hasBadges ? `
+                <div class="absolute -top-2 -left-2 sm:-left-4 flex flex-col gap-1.5 z-40 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] items-start">
+                    ${streak >= 3 ? `<div class="bg-slate-900/90 p-1 sm:p-1.5 rounded-full border border-orange-500/50 flex items-center gap-1"><i data-lucide="flame" class="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 fill-orange-500" title="${streak} Vitórias Seguidas!"></i><span class="text-orange-500 font-black text-xs sm:text-sm pr-1.5">${streak}</span></div>` : ''}
+                    ${streak <= -3 ? `<div class="bg-slate-900/90 p-1 sm:p-1.5 rounded-full border border-blue-500/50 flex items-center gap-1"><i data-lucide="snowflake" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 fill-blue-500" title="${Math.abs(streak)} Derrotas Seguidas"></i><span class="text-blue-500 font-black text-xs sm:text-sm pr-1.5">${Math.abs(streak)}</span></div>` : ''}
+                    ${isCraque ? `<div class="bg-slate-900/90 p-1.5 rounded-full border border-yellow-400/50 flex items-center justify-center"><i data-lucide="crown" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400" title="Craque do Dia!"></i></div>` : ''}
+                    ${isBagre ? `<div class="bg-slate-900/90 p-1.5 rounded-full border border-emerald-400/50 flex items-center justify-center"><i data-lucide="fish" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" title="Bagre do Dia"></i></div>` : ''}
                 </div>
-            `;
+            ` : '';
             
             const innerCard = `
                 <div class="fifa-card card-${lvlInfo.type} ${isDestaque ? '!w-full !h-full m-0' : 'w-full mx-auto !h-[330px]'}">
-                    ${badgesHTML}
                     <div class="flex flex-col items-center justify-center">
                         <span class="overall !text-4xl">${ptsValue}</span>
                         <span class="font-bold text-[8px] opacity-90 tracking-[0.15em]">ELO</span>
@@ -227,7 +225,8 @@ export const renderPublic = () => {
                 </div>`;
                 
             return `
-                <div class="relative flex justify-center w-full sm:w-[210px] group ${isDestaque ? 'winner-frame-container' : ''}">
+                <div class="relative flex justify-center w-full sm:w-[210px] mt-4 group ${isDestaque ? 'winner-frame-container' : ''}">
+                    ${badgesHTML}
                     ${isDestaque ? `<div class="winner-frame-wrapper !h-[340px]">${innerCard}</div>` : innerCard}
                 </div>`;
         }).join('');
@@ -237,7 +236,7 @@ export const renderPublic = () => {
                 <h3 class="text-lg sm:text-2xl font-bold mb-4 flex items-center gap-2 ${colorClass} border-b border-slate-700/50 pb-2 px-8 uppercase tracking-wider">
                     <i data-lucide="${icon}" class="w-5 h-5"></i> ${title}
                 </h3>
-                <div class="grid grid-cols-[repeat(2,minmax(130px,180px))] sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-center w-full mx-auto px-1 sm:px-0">
+                <div class="grid grid-cols-[repeat(2,minmax(130px,180px))] sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-center w-full mx-auto px-1 sm:px-0 pt-4">
                     ${cardsHTML}
                 </div>
             </div>`;
@@ -355,7 +354,6 @@ export const renderAdminTable = () => {
     const tbody = document.getElementById('adminTableBody');
     if(!tbody) return;
     
-    // Organiza por Categoria e depois pelo Nome, para os "Cabeças de Chave" ficarem agrupados no topo
     const sorted = [...state.players].sort((a, b) => { 
         const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
         if(c !== 0) return c; 
@@ -415,7 +413,6 @@ export const renderTeams = () => {
     
     const sortedTeams = state.drawnTeams.sort((a,b) => a.isWaitlist ? 1 : (b.isWaitlist ? -1 : parseInt(a.label) - parseInt(b.label)));
     
-    // NOVO: Recupera as estatísticas diárias e calcula o Elo máximo
     const { stats, craques, bagres } = getDailyPlayerStats();
     const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
     
@@ -427,7 +424,6 @@ export const renderTeams = () => {
             return a.name.localeCompare(b.name); 
         });
         
-        // NOVO: Restaura o botão de promover a lista de espera
         const controlsHTML = !t.isWaitlist ? `
             <div class="absolute top-3 right-3 flex gap-1">
                 <button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400" title="Substituir Pela Espera">
@@ -443,7 +439,6 @@ export const renderTeams = () => {
                 </button>
             </div>`;
 
-        // NOVO: Restaura as informações de vitórias/derrotas, selos e o botão de troca de jogadores
         const playersHTML = pSorted.map(p => {
             const dbPlayer = state.players.find(x => x.id === p.id) || p;
             const catInfo = getCategoryInfo(dbPlayer.categoria);
@@ -465,8 +460,8 @@ export const renderTeams = () => {
                         <span class="font-bold ${catInfo.text} truncate max-w-[110px] sm:max-w-[130px] ml-1">${dbPlayer.name}</span>
                         <span class="text-[9px] font-bold text-slate-500 shrink-0 mx-0.5" title="Vitórias/Derrotas Diárias">(${pStats.wins}V ${pStats.losses}D)</span>
                         ${waitlistBadge}
-                        ${(dbPlayer.streak || 0) >= 3 ? `<i data-lucide="flame" class="w-3 h-3 text-orange-500 fill-orange-500 shrink-0" title="${dbPlayer.streak} Vitórias Seguidas!"></i>` : ''}
-                        ${(dbPlayer.streak || 0) <= -3 ? `<i data-lucide="snowflake" class="w-3 h-3 text-blue-500 fill-blue-500 shrink-0" title="${Math.abs(dbPlayer.streak)} Derrotas Seguidas"></i>` : ''}
+                        ${(dbPlayer.streak || 0) >= 3 ? `<span class="flex items-center" title="${dbPlayer.streak} Vitórias Seguidas!"><i data-lucide="flame" class="w-3 h-3 text-orange-500 fill-orange-500 shrink-0"></i><span class="text-[9px] font-black text-orange-500 ml-0.5">${dbPlayer.streak}</span></span>` : ''}
+                        ${(dbPlayer.streak || 0) <= -3 ? `<span class="flex items-center" title="${Math.abs(dbPlayer.streak)} Derrotas Seguidas"><i data-lucide="snowflake" class="w-3 h-3 text-blue-500 fill-blue-500 shrink-0"></i><span class="text-[9px] font-black text-blue-500 ml-0.5">${Math.abs(dbPlayer.streak)}</span></span>` : ''}
                         ${isCraque ? `<i data-lucide="crown" class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0" title="Craque do Dia!"></i>` : ''}
                         ${isBagre ? `<i data-lucide="fish" class="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 shrink-0" title="Bagre do Dia"></i>` : ''}
                         ${isDestaque ? `<i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400 shrink-0" title="MVP (Líder)"></i>` : ''}
@@ -525,7 +520,6 @@ export const renderMatchHistory = () => {
     const container = document.getElementById('historyList');
     const btnClear = document.getElementById('btnClearHistory');
     
-    // NOVO: Controla se o botão de limpar histórico aparece ou não
     if (btnClear) {
         if (state.isAuthenticated && state.matchHistory && state.matchHistory.length > 0) {
             btnClear.classList.remove('hidden');
