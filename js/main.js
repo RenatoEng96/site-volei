@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { switchView, showToast, openConfirmModal, closeConfirmModal, openMoveModal, closeMoveModal, closeVictoryModalOnly, renderSorteioTable } from './ui.js';
-import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer } from './logic.js';
+import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer, promoteWaitlistToTeam, clearMatchHistory } from './logic.js';
 import { toggleEloSystem, handleLogin, handleLogout, togglePlayerSelection, toggleAllPlayers, savePlayer, deletePlayer, editPlayer, resetForm } from './admin.js';
 
 export const handleImageUpload = (event) => {
@@ -61,7 +61,8 @@ Object.assign(window, {
     handleImageUpload, 
     removePhoto, 
     adjustBonus, 
-    confirmMovePlayer
+    confirmMovePlayer,
+    clearMatchHistory
 });
 
 document.addEventListener('DOMContentLoaded', () => {

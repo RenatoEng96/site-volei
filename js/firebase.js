@@ -12,7 +12,7 @@ const firebaseConfig = {
     measurementId: "G-1Q5TTB0FQ5"
 };
 
-const appId = 'app-volei-teste'; 
+export const appId = 'app-volei-teste';
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

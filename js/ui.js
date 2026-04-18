@@ -42,11 +42,11 @@ export const getDailyPlayerStats = () => {
 
 export const getLevelInfo = (elo) => {
     const e = elo ?? 150;
-    if (e < 350) return { type: 'nivel1', label: 'BRONZE', bg: 'bg-orange-900/40', text: 'text-orange-400', dot: 'bg-orange-500' };
-    if (e < 450) return { type: 'nivel2', label: 'PRATA', bg: 'bg-slate-500/20', text: 'text-slate-400', dot: 'bg-slate-400' };
-    if (e < 550) return { type: 'nivel3', label: 'OURO', bg: 'bg-yellow-500/20', text: 'text-yellow-400', dot: 'bg-yellow-500' };
-    if (e < 650) return { type: 'nivel4', label: 'PLATINA', bg: 'bg-cyan-500/20', text: 'text-cyan-400', dot: 'bg-cyan-500' };
-    if (e < 800) return { type: 'nivel5', label: 'DIAMANTE', bg: 'bg-fuchsia-500/20', text: 'text-fuchsia-400', dot: 'bg-fuchsia-500' };
+    if (e < 250) return { type: 'nivel1', label: 'BRONZE', bg: 'bg-orange-900/40', text: 'text-orange-400', dot: 'bg-orange-500' };
+    if (e < 350) return { type: 'nivel2', label: 'PRATA', bg: 'bg-slate-500/20', text: 'text-slate-400', dot: 'bg-slate-400' };
+    if (e < 450) return { type: 'nivel3', label: 'OURO', bg: 'bg-yellow-500/20', text: 'text-yellow-400', dot: 'bg-yellow-500' };
+    if (e < 550) return { type: 'nivel4', label: 'PLATINA', bg: 'bg-cyan-500/20', text: 'text-cyan-400', dot: 'bg-cyan-500' };
+    if (e < 700) return { type: 'nivel5', label: 'DIAMANTE', bg: 'bg-fuchsia-500/20', text: 'text-fuchsia-400', dot: 'bg-fuchsia-500' };
     return { type: 'nivel6', label: 'MESTRE', bg: 'bg-red-600/20', text: 'text-red-500', dot: 'bg-red-600' };
 };
 
@@ -123,6 +123,10 @@ export const closeVictoryModalOnly = () => {
     state.score2 = 0; 
     document.getElementById('score1').innerText = 0; 
     document.getElementById('score2').innerText = 0; 
+    // NOVO: Limpa os selects e esconde a preview de Elo
+    document.getElementById('team1Select').value = ''; 
+    document.getElementById('team2Select').value = ''; 
+    if (typeof updateLiveEloPreview === 'function') updateLiveEloPreview();
 };
 
 export const switchView = (view) => {
@@ -164,6 +168,8 @@ export const renderPublic = () => {
         return; 
     }
     
+    // NOVO: Puxa as estatísticas para saber quem é craque, bagre e as streaks
+    const { stats, craques, bagres } = getDailyPlayerStats();
     const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
     
     const sortFn = (a, b) => { 
@@ -182,8 +188,23 @@ export const renderPublic = () => {
             const vitorias = p.vitorias || 0;
             const derrotas = (p.partidas || 0) - vitorias;
             
+            // NOVO: Cálculo dos selos do jogador
+            const isCraque = craques.has(p.name);
+            const isBagre = bagres.has(p.name);
+            const streak = p.streak || 0;
+            // Ajustado para ficar na lateral superior esquerda (top-6 left-4) acompanhando o corte do card
+            const badgesHTML = `
+                <div class="absolute top-6 left-4 flex flex-col gap-2 z-30 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)]">
+                    ${streak >= 3 ? `<i data-lucide="flame" class="w-5 h-5 text-orange-500 fill-orange-500" title="${streak} Vitórias Seguidas!"></i>` : ''}
+                    ${streak <= -3 ? `<i data-lucide="snowflake" class="w-5 h-5 text-blue-500 fill-blue-500" title="${Math.abs(streak)} Derrotas Seguidas"></i>` : ''}
+                    ${isCraque ? `<i data-lucide="crown" class="w-5 h-5 text-yellow-400 fill-yellow-400" title="Craque do Dia!"></i>` : ''}
+                    ${isBagre ? `<i data-lucide="fish" class="w-5 h-5 text-emerald-400" title="Bagre do Dia"></i>` : ''}
+                </div>
+            `;
+            
             const innerCard = `
                 <div class="fifa-card card-${lvlInfo.type} ${isDestaque ? '!w-full !h-full m-0' : 'w-full mx-auto !h-[330px]'}">
+                    ${badgesHTML}
                     <div class="flex flex-col items-center justify-center">
                         <span class="overall !text-4xl">${ptsValue}</span>
                         <span class="font-bold text-[8px] opacity-90 tracking-[0.15em]">ELO</span>
@@ -223,12 +244,12 @@ export const renderPublic = () => {
     };
 
     grid.innerHTML = 
-        renderGroup('Mestre', 'flame', 'text-red-500', state.players.filter(p => (p.eloRating ?? 150) >= 800).sort(sortFn)) + 
-        renderGroup('Diamante', 'gem', 'text-fuchsia-500', state.players.filter(p => (p.eloRating ?? 150) >= 650 && (p.eloRating ?? 150) < 800).sort(sortFn)) + 
-        renderGroup('Platina', 'shield', 'text-cyan-500', state.players.filter(p => (p.eloRating ?? 150) >= 550 && (p.eloRating ?? 150) < 650).sort(sortFn)) + 
-        renderGroup('Ouro', 'award', 'text-yellow-500', state.players.filter(p => (p.eloRating ?? 150) >= 450 && (p.eloRating ?? 150) < 550).sort(sortFn)) + 
-        renderGroup('Prata', 'medal', 'text-slate-400', state.players.filter(p => (p.eloRating ?? 150) >= 350 && (p.eloRating ?? 150) < 450).sort(sortFn)) + 
-        renderGroup('Bronze', 'medal', 'text-orange-500', state.players.filter(p => (p.eloRating ?? 150) < 350).sort(sortFn));
+        renderGroup('Mestre', 'flame', 'text-red-500', state.players.filter(p => (p.eloRating ?? 150) >= 700).sort(sortFn)) + 
+        renderGroup('Diamante', 'gem', 'text-fuchsia-500', state.players.filter(p => (p.eloRating ?? 150) >= 550 && (p.eloRating ?? 150) < 700).sort(sortFn)) + 
+        renderGroup('Platina', 'shield', 'text-cyan-500', state.players.filter(p => (p.eloRating ?? 150) >= 450 && (p.eloRating ?? 150) < 550).sort(sortFn)) + 
+        renderGroup('Ouro', 'award', 'text-yellow-500', state.players.filter(p => (p.eloRating ?? 150) >= 350 && (p.eloRating ?? 150) < 450).sort(sortFn)) + 
+        renderGroup('Prata', 'medal', 'text-slate-400', state.players.filter(p => (p.eloRating ?? 150) >= 250 && (p.eloRating ?? 150) < 350).sort(sortFn)) + 
+        renderGroup('Bronze', 'medal', 'text-orange-500', state.players.filter(p => (p.eloRating ?? 150) < 250).sort(sortFn));
         
     lucide.createIcons();
 };
@@ -394,6 +415,10 @@ export const renderTeams = () => {
     
     const sortedTeams = state.drawnTeams.sort((a,b) => a.isWaitlist ? 1 : (b.isWaitlist ? -1 : parseInt(a.label) - parseInt(b.label)));
     
+    // NOVO: Recupera as estatísticas diárias e calcula o Elo máximo
+    const { stats, craques, bagres } = getDailyPlayerStats();
+    const maxElo = state.players.length > 0 ? Math.max(...state.players.map(p => p.eloRating ?? 150)) : 0;
+    
     const content = sortedTeams.map(t => {
         const teamName = t.isWaitlist ? '<i data-lucide="clock" class="inline w-4 h-4 mr-1"></i> Lista de Espera' : getTeamName(t);
         const pSorted = [...t.players].sort((a,b) => { 
@@ -402,27 +427,56 @@ export const renderTeams = () => {
             return a.name.localeCompare(b.name); 
         });
         
+        // NOVO: Restaura o botão de promover a lista de espera
         const controlsHTML = !t.isWaitlist ? `
             <div class="absolute top-3 right-3 flex gap-1">
-                <button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400">
+                <button onclick="redrawTeamWithWaitlist('${t.id}')" class="p-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400" title="Substituir Pela Espera">
                     <i data-lucide="refresh-cw" class="w-3 h-3"></i>
                 </button>
-                <button onclick="deleteTeam('${t.id}')" class="p-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500">
+                <button onclick="deleteTeam('${t.id}')" class="p-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500" title="Excluir Equipe">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                 </button>
-            </div>` : '';
+            </div>` : `
+            <div class="absolute top-3 right-3 flex gap-1">
+                <button onclick="promoteWaitlistToTeam('${t.id}')" class="p-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400" title="Formar Novo Time com a Espera">
+                    <i data-lucide="arrow-up-circle" class="w-3 h-3"></i>
+                </button>
+            </div>`;
 
+        // NOVO: Restaura as informações de vitórias/derrotas, selos e o botão de troca de jogadores
         const playersHTML = pSorted.map(p => {
             const dbPlayer = state.players.find(x => x.id === p.id) || p;
             const catInfo = getCategoryInfo(dbPlayer.categoria);
             const ptsValue = dbPlayer.eloRating ?? 150;
+            
+            const pStats = stats[dbPlayer.name] || { wins: 0, losses: 0 };
+            const isCraque = craques.has(dbPlayer.name);
+            const isBagre = bagres.has(dbPlayer.name);
+            const isDestaque = ptsValue === maxElo && maxElo > 150;
+            const waitlistBadge = (t.isWaitlist && p.waitlistRounds > 0) ? `<span class="bg-blue-500/20 text-blue-400 text-[8px] font-black px-1.5 py-0.5 rounded ml-1" title="Rodadas na Espera">${p.waitlistRounds}R</span>` : '';
+
             return `
-                <div class="flex justify-between items-center text-xs border-b border-slate-700/50 pb-1.5">
-                    <span class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full ${catInfo.dot}"></span>
-                        <span class="font-bold ${catInfo.text} ml-1">${dbPlayer.name}</span>
+                <div class="flex justify-between items-center text-xs sm:text-sm border-b border-slate-700/50 pb-1.5 last:border-0 last:pb-0 group">
+                    <span class="flex items-center gap-1 sm:gap-2">
+                        <span class="w-2 h-2 rounded-full ${catInfo.dot} shrink-0"></span>
+                        <div class="w-5 h-5 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center overflow-hidden shrink-0">
+                            ${dbPlayer.photo ? `<img src="${dbPlayer.photo}" class="w-full h-full object-cover">` : `<i data-lucide="${dbPlayer.icon || 'user'}" class="w-3 h-3 ${catInfo.text} opacity-80"></i>`}
+                        </div>
+                        <span class="font-bold ${catInfo.text} truncate max-w-[110px] sm:max-w-[130px] ml-1">${dbPlayer.name}</span>
+                        <span class="text-[9px] font-bold text-slate-500 shrink-0 mx-0.5" title="Vitórias/Derrotas Diárias">(${pStats.wins}V ${pStats.losses}D)</span>
+                        ${waitlistBadge}
+                        ${(dbPlayer.streak || 0) >= 3 ? `<i data-lucide="flame" class="w-3 h-3 text-orange-500 fill-orange-500 shrink-0" title="${dbPlayer.streak} Vitórias Seguidas!"></i>` : ''}
+                        ${(dbPlayer.streak || 0) <= -3 ? `<i data-lucide="snowflake" class="w-3 h-3 text-blue-500 fill-blue-500 shrink-0" title="${Math.abs(dbPlayer.streak)} Derrotas Seguidas"></i>` : ''}
+                        ${isCraque ? `<i data-lucide="crown" class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0" title="Craque do Dia!"></i>` : ''}
+                        ${isBagre ? `<i data-lucide="fish" class="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400 shrink-0" title="Bagre do Dia"></i>` : ''}
+                        ${isDestaque ? `<i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400 shrink-0" title="MVP (Líder)"></i>` : ''}
                     </span>
-                    <span class="opacity-60 text-[10px]">${ptsValue} ELO</span>
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <span class="opacity-60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">${ptsValue} ELO</span>
+                        <button onclick="openMoveModal('${t.id}', '${p.id}')" class="p-1 text-slate-400 hover:text-blue-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity focus:opacity-100" title="Transferir Jogador">
+                            <i data-lucide="arrow-right-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                        </button>
+                    </div>
                 </div>`;
         }).join('');
 
@@ -469,6 +523,19 @@ export const renderPlacarTeams = () => {
 
 export const renderMatchHistory = () => {
     const container = document.getElementById('historyList');
+    const btnClear = document.getElementById('btnClearHistory');
+    
+    // NOVO: Controla se o botão de limpar histórico aparece ou não
+    if (btnClear) {
+        if (state.isAuthenticated && state.matchHistory && state.matchHistory.length > 0) {
+            btnClear.classList.remove('hidden');
+            btnClear.classList.add('flex');
+        } else {
+            btnClear.classList.add('hidden');
+            btnClear.classList.remove('flex');
+        }
+    }
+
     if (!container) return;
     
     if (!state.matchHistory || state.matchHistory.length === 0) { 
