@@ -1,10 +1,11 @@
-import { auth, db, playersRef, teamsRef, matchHistoryRef, settingsRef } from './firebase.js';
+import { auth, db, playersRef, teamsRef, matchHistoryRef, settingsRef, appId } from './firebase.js';
 import { onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { onSnapshot, doc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state } from './state.js';
 import { renderAll, switchView, showToast, openConfirmModal, renderSorteioTable } from './ui.js';
 
-const appId = 'app-volei-teste';
+// O appId agora é importado diretamente do firebase.js para garantir que as atualizações e exclusões
+// sejam feitas no banco de dados real (app-volei-34f53) e não num banco de testes.
 
 onAuthStateChanged(auth, (user) => {
     if (user) { 
