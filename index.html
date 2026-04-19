@@ -97,8 +97,8 @@
                         <option value="DENTRO">Estratégia: Dentro Forte</option>
                     </select>
                     
-                    <div class="flex gap-2 w-full sm:w-auto items-center">
-                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex-1 sm:flex-none">
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch sm:items-center">
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex-1 sm:flex-none justify-center">
                             <span class="pl-3 pr-1 py-2 text-xs sm:text-sm font-bold text-slate-400 whitespace-nowrap">Time de:</span>
                             <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.max(2, parseInt(t.value) - 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">-</button>
                             <input type="number" id="teamSize" value="4" min="2" max="10" class="w-6 sm:w-8 bg-transparent py-2 px-0 text-sm sm:text-base font-bold text-white text-center outline-none appearance-none m-0 pointer-events-none">
@@ -191,7 +191,7 @@
                     </div>
                 </div>
 
-                <div id="liveEloPreview" class="w-full mt-4 sm:mt-6 max-w-3xl mx-auto hidden bg-slate-900/80 p-3 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex-col sm:flex-row justify-between items-center gap-3 sm:gap-8 transition-all animate-in fade-in"></div>
+                <div id="liveEloPreview" class="w-full mt-4 sm:mt-6 max-w-3xl mx-auto hidden bg-slate-900/80 p-3 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex-row justify-between items-center gap-3 sm:gap-8 transition-all animate-in fade-in"></div>
 
                 <button onclick="resetScore()" class="mt-4 sm:mt-6 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-2 transition-all border border-slate-700 shadow-lg active:scale-95 w-full max-w-[200px]">
                     <i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i> ZERAR PLACAR
@@ -304,7 +304,7 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <div><label class="text-[9px] text-blue-400 font-bold uppercase">Partidas</label><input type="number" id="statJogos" value="0" min="0" class="w-full bg-slate-900 border border-blue-500/30 rounded-lg p-2 text-sm font-bold text-blue-400 text-center"></div>
                                 <div><label class="text-[9px] text-yellow-500 font-bold uppercase">Vitórias</label><input type="number" id="statVit" value="0" min="0" class="w-full bg-slate-900 border border-yellow-500/30 rounded-lg p-2 text-sm font-bold text-yellow-500 text-center"></div>
-                                <div><label class="text-[9px] text-fuchsia-400 font-bold uppercase">Ajuste Elo</label><div class="flex items-center bg-slate-900 border border-fuchsia-500/30 rounded-lg"><button type="button" onclick="adjustBonus(-5)" class="px-2 py-2 text-fuchsia-400 font-black">-</button><input type="number" id="statBonus" value="0" class="w-full bg-transparent p-0 text-sm font-bold text-fuchsia-400 text-center outline-none"><button type="button" onclick="adjustBonus(5)" class="px-2 py-2 text-fuchsia-400 font-black">+</button></div></div>
+                                <div><label class="text-[9px] text-fuchsia-400 font-bold uppercase">Elo Atual</label><div class="flex items-center bg-slate-900 border border-fuchsia-500/30 rounded-lg"><button type="button" onclick="adjustBonus(-5)" class="px-2 py-2 text-fuchsia-400 font-black">-</button><input type="number" id="statBonus" value="150" class="w-full bg-transparent p-0 text-sm font-bold text-fuchsia-400 text-center outline-none"><button type="button" onclick="adjustBonus(5)" class="px-2 py-2 text-fuchsia-400 font-black">+</button></div></div>
                             </div>
                             
                             <div>
@@ -316,9 +316,9 @@
                                 </select>
                             </div>
 
-                            <div class="flex gap-2 mt-6">
-                                <button onclick="savePlayer()" id="btnSave" class="flex-1 bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 rounded-lg flex justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> SALVAR</button>
-                                <button onclick="resetForm()" id="btnCancel" class="hidden px-3 bg-slate-700 rounded-lg"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                            <div class="flex flex-col gap-2 mt-6">
+                                <button onclick="savePlayer()" id="btnSave" class="w-full bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 rounded-lg flex justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> SALVAR</button>
+                                <button onclick="resetForm()" id="btnCancel" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg flex justify-center gap-2 text-sm transition-colors"><i data-lucide="x" class="w-4 h-4"></i> CANCELAR</button>
                             </div>
                         </div>
                     </div>

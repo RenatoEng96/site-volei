@@ -1,12 +1,12 @@
 # Próximas Etapas
 ## Correções
-- Fazer o foguinho e gelinho aparecer junto do Craque.
-- Remover o ícone de estrela.
+- ~~Fazer o foguinho e gelinho aparecer junto do Craque.~~
+- ~~Remover o ícone de estrela.~~
 - Na tela do celular, na aba Sorteio, o botão sortear times fica por cima da quantidade de jogadores.
 - Na aba Placar, no celular, seria bom adicionar o nome do time depois de "Se Vencer" no preview de ganho e perda de Elo, pois no celular fica um em cima do outro.
-- Mostrar o número do elo na base de atletas cadastrados da lista da aba Admin.
-- Alterar a função do botão Ajuste Elo, para que ao inves de fazer incremostos no ele ele sirva para definir o valor do elo atual.
-- Adicionar um botão de cancelar abaixo de salvar na tela de cadastrar e editar um jogador para suspender a edição ou cadastro de novo jogador. Atualmente se você clicar para editar não tem como cadastrar um novo jogador.
+- ~~Mostrar o número do elo na base de atletas cadastrados da lista da aba Admin.~~
+- ~~Alterar a função do botão Ajuste Elo, para que ao inves de fazer incremostos no ele ele sirva para definir o valor do elo atual.~~
+- ~~Adicionar um botão de cancelar abaixo de salvar na tela de cadastrar e editar um jogador para suspender a edição ou cadastro de novo jogador. Atualmente se você clicar para editar não tem como cadastrar um novo jogador.~~
 
 ## Novas Funcionalidades (Para Monetizar o App)
 - **Adptar o site para funcionar com o futsal e socyte.**

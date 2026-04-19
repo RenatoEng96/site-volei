@@ -88,7 +88,7 @@ export const savePlayer = async () => {
     btn.innerText = "SALVANDO...";
     
     try {
-        const elo = Math.max(0, (id ? state.players.find(x => x.id === id).eloRating || 150 : 150) + (parseInt(document.getElementById('statBonus').value) || 0));
+        const elo = Math.max(0, parseInt(document.getElementById('statBonus').value) || 150);
         
         const obj = { 
             name, 
@@ -132,7 +132,8 @@ export const editPlayer = (id) => {
     document.getElementById('statJogos').value = p.partidas || 0;
     document.getElementById('statVit').value = p.vitorias || 0;
     document.getElementById('playerIcon').value = p.icon || 'user';
-    
+    document.getElementById('statBonus').value = p.eloRating !== undefined ? p.eloRating : 150;
+
     if (p.photo) {
         document.getElementById('photoPreview').src = p.photo;
         document.getElementById('photoPreview').classList.remove('hidden');
