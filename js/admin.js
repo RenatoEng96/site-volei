@@ -33,9 +33,21 @@ onAuthStateChanged(auth, (user) => {
         // NOVO: Lê estado da chave Placar Aberto do Firebase
         onSnapshot(settingsRef, (docSnap) => {
             if (docSnap.exists()) {
-                state.eloEnabled = docSnap.data().eloEnabled;
+                const data = docSnap.data();
+                state.eloEnabled = data.eloEnabled;
                 const toggle = document.getElementById('toggleElo');
                 if (toggle) toggle.checked = state.eloEnabled;
+
+                if (data.score1 !== undefined) {
+                    state.score1 = data.score1;
+                    const s1 = document.getElementById('score1');
+                    if (s1) s1.innerText = state.score1;
+                }
+                if (data.score2 !== undefined) {
+                    state.score2 = data.score2;
+                    const s2 = document.getElementById('score2');
+                    if (s2) s2.innerText = state.score2;
+                }
             }
         });
     }

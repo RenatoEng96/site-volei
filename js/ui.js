@@ -1,4 +1,6 @@
 import { state } from './state.js';
+import { settingsRef } from './firebase.js';
+import { updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 export const getDailyPlayerStats = () => {
     const today = new Date().toLocaleDateString('pt-BR');
@@ -116,11 +118,12 @@ export const closeMoveModal = () => {
     state.moveData = { sourceTeamId: null, playerId: null }; 
 };
 
-export const closeVictoryModalOnly = () => { 
+export const closeVictoryModalOnly = async () => { 
     document.getElementById('victoryModal').classList.add('hidden'); 
     document.getElementById('victoryModal').classList.remove('flex'); 
     state.score1 = 0; 
-    state.score2 = 0; 
+    state.score2 = 0;
+    try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {} 
     document.getElementById('score1').innerText = 0; 
     document.getElementById('score2').innerText = 0; 
     document.getElementById('team1Select').value = ''; 

@@ -10,12 +10,19 @@
 
 
 ## Funcionalidades Gerais
-- Fazer com que o placar seja atualizado simultaneamente para todas as pessoas que accessem o site.
 - ~~Adicionar a data ao histórico de partidas, cada dia deve ficar em uma página: 1, 2, 3, etc.~~
 - ~~Ao clicar em uma partida no histórico deve mostrar quais eram os jogadores daquele time e o Elo ganho e perdido.~~
 - ~~Ao clicar na cartinha deve mostrar o histórico das partidas daquele jogador com o resultado, data, elo, time.~~
 - ~~Na aba sorteio adicionar um botão, na lista de quem vai jogar hoje, com o nome selecionar apenas jogadores em times, para selecionar~~
 ~~todos os jogadores que estão em times e lista de espera.~~ 
+- ~~Fazer com que o placar seja atualizado simultaneamente para todas as pessoas que accessem o site.~~
+- Adicionar filtro para pesquisar jogadores pelo nome, ou ordem alfabética ou padrao por nível.
+- Travar placar e os sorteios enquanto houver uma partida em andamento.
+- Adicionar botão de excluir na lista de espera.
+- Alterar pódio para pontos de Elo ao invés de vitórias.
+- Colocar nas cartinhas o número da posição no ranking.
+
+
 
 ## Novas Funcionalidades (Para Monetizar o App)
 - **Adptar o site para funcionar com o futsal e socyte.**
@@ -29,6 +36,7 @@
     - A opção de escolher a modalidade do esporte (vôlei ou futebol) fica no adimin
 
 - **Deve se adicionar dois tipos de acesso. Usuário e Admin.**
+    - O admin vai poder designar alguns jogadores para serem moderadores, esses vão cadastrar jogadores, ativar Elo, etc.
     - Qualquer pessoa pode se cadastrar no sistema. Com esse cadastro, a pessoa vai poder ser o admin de um racha ou apenas um jogador normal para acessar os resultados sorteios e placar.
     - Um jogador pode participar de mais de um racha, podendo podendo selecionar qual grupo de racha ele vai abrir, caso esteja cadastrado em mais de um.
     - Cada usuário admin e seus usuários públicos vão ter seu próprio banco de dados.  
@@ -40,7 +48,11 @@
     - Obs: Esse mensalidade é a do racha normal, não tem nada haver com a mensalidade do aplicativo, que só é paga pelo admin.
     - Caso o admin faça adesão ao sistema pago, além de não ter anúncios ele vai poder gerenciar a mensalidade do racha pelo app.
     - Novamento exemplo do vêlei, digamos que a mensalidade do vêlei na chacara seja R$ 15,00, quando um jogador normal entrar em seu perfil vai mostrar a data e a chave Pix para ele realizar o pagamento. Ao ser feito o pagamento vai contabilizar automaticamente para o admin o status de pago, caso um jogador fique dois meses em atraso os sitema deve excluir esse jogador dos sorteios. 
-    - Fazer tipo um extrato bancário para prestação de conta do racha. Por exemplo, vai-se somar o saldo pago pelas mensalidades dos jogadores como também resgistrar um débito para algum gasto, como compra de uma bola, rede, menslidade do app, etc. Isso para deixar mais transparente a contabilidade do racha. 
+    - Fazer tipo um extrato bancário para prestação de conta do racha. Por exemplo, vai-se somar o saldo pago pelas mensalidades dos jogadores como também resgistrar um débito para algum gasto, como compra de uma bola, rede, menslidade do app, etc. Isso para deixar mais transparente a contabilidade do racha.
+    - O sistema terá três formas de monetização:
+        - Anúncios
+        - Assinatura, focado em donos de Society e rachas pagos.
+        - Compra do App por jogadores normais para remover os anúncios, pagamento único. 
 
 
 ## Falhas encontradas pelo Gemini

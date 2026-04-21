@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { showToast, openConfirmModal, closeMoveModal, getTeamName } from './ui.js';
-import { db, appId, teamsRef, matchHistoryRef, playersRef } from './firebase.js';
+import { db, appId, teamsRef, matchHistoryRef, playersRef, settingsRef } from './firebase.js';
 
 // Importando as ferramentas do banco corretamente direto do Google
 import { doc, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -606,15 +606,20 @@ export const checkWinCondition = () => {
     }
 };
 
-export const updateScore = (team, change) => {
+export const updateScore = async (team, change) => {
     if (team === 1) { state.score1 = Math.max(0, state.score1 + change); document.getElementById('score1').innerText = state.score1; }
     else { state.score2 = Math.max(0, state.score2 + change); document.getElementById('score2').innerText = state.score2; }
+    
+    // Sincroniza com a nuvem
+    try { await updateDoc(settingsRef, { score1: state.score1, score2: state.score2 }); } catch(e) {}
     checkWinCondition();
 };
 
 export const resetScore = () => {
-    openConfirmModal("Zerar Placar", "Deseja realmente zerar o placar da partida atual?", () => {
+    openConfirmModal("Zerar Placar", "Deseja realmente zerar o placar da partida atual?", async () => {
         state.score1 = 0; state.score2 = 0; 
+        try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {}
+        
         document.getElementById('score1').innerText = state.score1; 
         document.getElementById('score2').innerText = state.score2;
         document.getElementById('team1Select').value = ''; 
@@ -687,7 +692,8 @@ export const saveAndCloseVictoryModal = async () => {
         document.getElementById('victoryModal').classList.add('hidden');
         document.getElementById('victoryModal').classList.remove('flex');
         
-        state.score1 = 0; state.score2 = 0; 
+        state.score1 = 0; state.score2 = 0;
+        try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {} 
         document.getElementById('score1').innerText = state.score1; 
         document.getElementById('score2').innerText = state.score2;
         document.getElementById('team1Select').value = ''; 
