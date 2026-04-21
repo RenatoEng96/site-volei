@@ -1,6 +1,4 @@
-import { auth, db, playersRef, teamsRef, matchHistoryRef, settingsRef, appId } from './firebase.js';
-import { onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { onSnapshot, doc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { auth, db, playersRef, teamsRef, matchHistoryRef, settingsRef, appId, onAuthStateChanged, signInAnonymously, onSnapshot, doc, setDoc, updateDoc, addDoc, deleteDoc } from './firebase.js';
 import { state } from './state.js';
 import { renderAll, switchView, showToast, openConfirmModal, renderSorteioTable } from './ui.js';
 

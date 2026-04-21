@@ -1,9 +1,6 @@
 import { state } from './state.js';
 import { showToast, openConfirmModal, closeMoveModal, getTeamName } from './ui.js';
-import { db, appId, teamsRef, matchHistoryRef, playersRef, settingsRef } from './firebase.js';
-
-// Importando as ferramentas do banco corretamente direto do Google
-import { doc, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { db, appId, teamsRef, matchHistoryRef, playersRef, settingsRef, doc, addDoc, deleteDoc, updateDoc } from './firebase.js';
 
 // --- Algoritmos de Balanceamento (Nossa Lógica Original Restaurada) --- //
 

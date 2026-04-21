@@ -22,3 +22,5 @@ export const playersRef = collection(db, 'artifacts', appId, 'public', 'data', '
 export const teamsRef = collection(db, 'artifacts', appId, 'public', 'data', 'teams');
 export const matchHistoryRef = collection(db, 'artifacts', appId, 'public', 'data', 'matchHistory');
 export const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global');
+
+export { signInAnonymously, onAuthStateChanged, doc, setDoc, collection, onSnapshot, deleteDoc, addDoc, updateDoc };

@@ -1,6 +1,5 @@
 import { state } from './state.js';
-import { settingsRef } from './firebase.js';
-import { updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { settingsRef, updateDoc } from './firebase.js';
 
 export const getDailyPlayerStats = () => {
     const today = new Date().toLocaleDateString('pt-BR');
