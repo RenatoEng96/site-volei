@@ -1,6 +1,7 @@
 import { auth, db, playersRef, teamsRef, matchHistoryRef, settingsRef, appId, onAuthStateChanged, signInAnonymously, onSnapshot, doc, setDoc, updateDoc, addDoc, deleteDoc } from './firebase.js';
 import { state } from './state.js';
 import { renderAll, switchView, showToast, openConfirmModal, renderSorteioTable } from './ui.js';
+import { checkWinCondition, updateLiveEloPreview } from './logic.js';
 
 // O appId agora é importado diretamente do firebase.js para garantir que as atualizações e exclusões
 // sejam feitas no banco de dados real (app-volei-34f53) e não num banco de testes.
@@ -28,7 +29,7 @@ onAuthStateChanged(auth, (user) => {
             renderAll(); 
         });
         
-        // NOVO: Lê estado da chave Placar Aberto do Firebase
+        // NOVO: Lê estado do Placar, Sincroniza Times e Tela Final
         onSnapshot(settingsRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -36,6 +37,22 @@ onAuthStateChanged(auth, (user) => {
                 const toggle = document.getElementById('toggleElo');
                 if (toggle) toggle.checked = state.eloEnabled;
 
+                let needsPreviewUpdate = false;
+
+                // Sincroniza Times
+                if (data.team1 !== undefined) {
+                    state.currentTeam1 = data.team1;
+                    const t1 = document.getElementById('team1Select');
+                    if (t1 && t1.value !== data.team1) { t1.value = data.team1; needsPreviewUpdate = true; }
+                }
+                
+                if (data.team2 !== undefined) {
+                    state.currentTeam2 = data.team2;
+                    const t2 = document.getElementById('team2Select');
+                    if (t2 && t2.value !== data.team2) { t2.value = data.team2; needsPreviewUpdate = true; }
+                }
+
+                // Sincroniza Pontos
                 if (data.score1 !== undefined) {
                     state.score1 = data.score1;
                     const s1 = document.getElementById('score1');
@@ -45,6 +62,24 @@ onAuthStateChanged(auth, (user) => {
                     state.score2 = data.score2;
                     const s2 = document.getElementById('score2');
                     if (s2) s2.innerText = state.score2;
+                }
+
+                if (needsPreviewUpdate && typeof updateLiveEloPreview === 'function') {
+                    updateLiveEloPreview();
+                }
+
+                // Verifica se a partida acabou para abrir o modal em todas as telas
+                if (typeof checkWinCondition === 'function') {
+                    checkWinCondition();
+                }
+
+                // Se alguém zerar ou salvar o jogo, fecha o modal automaticamente para todo mundo
+                if (state.score1 === 0 && state.score2 === 0) {
+                    const vicModal = document.getElementById('victoryModal');
+                    if (vicModal && vicModal.classList.contains('flex')) {
+                        vicModal.classList.add('hidden');
+                        vicModal.classList.remove('flex');
+                    }
                 }
             }
         });

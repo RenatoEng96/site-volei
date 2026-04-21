@@ -122,7 +122,7 @@ export const closeVictoryModalOnly = async () => {
     document.getElementById('victoryModal').classList.remove('flex'); 
     state.score1 = 0; 
     state.score2 = 0;
-    try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {} 
+    try { await updateDoc(settingsRef, { score1: 0, score2: 0, team1: '', team2: '' }); } catch(e) {} 
     document.getElementById('score1').innerText = 0; 
     document.getElementById('score2').innerText = 0; 
     document.getElementById('team1Select').value = ''; 
@@ -524,8 +524,9 @@ export const renderPlacarTeams = () => {
     
     if (!select1 || !select2) return;
     
-    const val1 = select1.value;
-    const val2 = select2.value;
+    // Puxa o estado atualizado da nuvem, se existir, senão usa o local
+    const val1 = state.currentTeam1 !== undefined ? state.currentTeam1 : select1.value;
+    const val2 = state.currentTeam2 !== undefined ? state.currentTeam2 : select2.value;
     
     let optHTML = '<option value="" class="bg-slate-800 text-sm text-slate-400">SELECIONE</option>';
     

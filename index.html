@@ -167,7 +167,7 @@
                     <!-- METADE AZUL -->
                     <div class="flex-1 relative bg-blue-900/30 hover:bg-blue-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] landscape:min-h-[75vh] md:landscape:min-h-[450px] flex flex-col items-center">
                         <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-2 border border-blue-500/30 backdrop-blur-sm z-20 shrink-0">
-                            <select id="team1Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
+                            <select id="team1Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-3 flex items-center text-blue-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-5 sm:h-5"></i></div>
@@ -184,7 +184,7 @@
                     <!-- METADE VERMELHA -->
                     <div class="flex-1 relative bg-red-900/30 hover:bg-red-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] landscape:min-h-[75vh] md:landscape:min-h-[450px] flex flex-col items-center">
                         <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-2 border border-red-500/30 backdrop-blur-sm z-20 shrink-0">
-                            <select id="team2Select" onchange="updateLiveEloPreview()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
+                            <select id="team2Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-3 flex items-center text-red-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-5 sm:h-5"></i></div>

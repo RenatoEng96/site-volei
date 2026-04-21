@@ -4,7 +4,7 @@ import {
     closeMoveModal, closeVictoryModalOnly, renderSorteioTable, 
     changeHistoryPage, openPlayerHistoryModal, closePlayerHistoryModal 
 } from './ui.js';
-import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer, promoteWaitlistToTeam, clearMatchHistory } from './logic.js';
+import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer, promoteWaitlistToTeam, clearMatchHistory, syncTeamsToCloud } from './logic.js';
 import { 
     toggleEloSystem, handleLogin, handleLogout, togglePlayerSelection, 
     toggleAllPlayers, savePlayer, deletePlayer, editPlayer, resetForm, 
@@ -74,7 +74,8 @@ Object.assign(window, {
     changeHistoryPage,
     openPlayerHistoryModal,
     closePlayerHistoryModal,
-    selectOnlyPlayersInTeams
+    selectOnlyPlayersInTeams,
+    syncTeamsToCloud
 });
 
 document.addEventListener('DOMContentLoaded', () => {

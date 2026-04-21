@@ -659,6 +659,17 @@ export const checkWinCondition = () => {
     }
 };
 
+export const syncTeamsToCloud = async () => {
+    const t1 = document.getElementById('team1Select')?.value || '';
+    const t2 = document.getElementById('team2Select')?.value || '';
+    try {
+        await updateDoc(settingsRef, { team1: t1, team2: t2 });
+    } catch (e) {
+        console.error("Erro ao sincronizar times:", e);
+    }
+    if (typeof updateLiveEloPreview === 'function') updateLiveEloPreview();
+};
+
 export const updateScore = async (team, change) => {
     if (team === 1) { state.score1 = Math.max(0, state.score1 + change); document.getElementById('score1').innerText = state.score1; }
     else { state.score2 = Math.max(0, state.score2 + change); document.getElementById('score2').innerText = state.score2; }
@@ -671,7 +682,7 @@ export const updateScore = async (team, change) => {
 export const resetScore = () => {
     openConfirmModal("Zerar Placar", "Deseja realmente zerar o placar da partida atual?", async () => {
         state.score1 = 0; state.score2 = 0; 
-        try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {}
+        try { await updateDoc(settingsRef, { score1: 0, score2: 0, team1: '', team2: '' }); } catch(e) {}
         
         document.getElementById('score1').innerText = state.score1; 
         document.getElementById('score2').innerText = state.score2;
@@ -683,6 +694,11 @@ export const resetScore = () => {
 };
 
 export const saveAndCloseVictoryModal = async () => {
+    // Trava de segurança: Se a pontuação já for 0, alguém já salvou.
+    if (state.score1 === 0 && state.score2 === 0) {
+        showToast("Esta partida já foi encerrada por outro usuário.", "warning");
+        return;
+    }
     const preview = calculateEloPreview();
     if (!preview) {
         showToast("Selecione dois times válidos e diferentes no placar!", "error");
@@ -746,7 +762,7 @@ export const saveAndCloseVictoryModal = async () => {
         document.getElementById('victoryModal').classList.remove('flex');
         
         state.score1 = 0; state.score2 = 0;
-        try { await updateDoc(settingsRef, { score1: 0, score2: 0 }); } catch(e) {} 
+        try { await updateDoc(settingsRef, { score1: 0, score2: 0, team1: '', team2: '' }); } catch(e) {} 
         document.getElementById('score1').innerText = state.score1; 
         document.getElementById('score2').innerText = state.score2;
         document.getElementById('team1Select').value = ''; 
