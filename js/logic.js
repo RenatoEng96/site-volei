@@ -147,7 +147,7 @@ export const drawTeams = async () => {
 
     openConfirmModal("Sorteio Geral", "Todas as equipes atuais serão desfeitas e os contadores zerados.", async () => {
         try {
-            const deletePromises = state.drawnTeams.map(t => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', t.id)));
+            const deletePromises = state.drawnTeams.map(t => deleteDoc(doc(teamsRef, t.id)));
             await Promise.all(deletePromises);
             
             for (let i = 0; i < result.teams.length; i++) {
@@ -341,13 +341,13 @@ export const redrawTeamWithWaitlist = async (teamId) => {
         });
 
         try {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', targetTeamDoc.id), { players: newTeam });
+            await updateDoc(doc(teamsRef, targetTeamDoc.id), { players: newTeam });
             
             if (waitlistTeamDoc) {
                 if (newWaitlist.length > 0) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id), { players: newWaitlist });
+                    await updateDoc(doc(teamsRef, waitlistTeamDoc.id), { players: newWaitlist });
                 } else {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id));
+                    await deleteDoc(doc(teamsRef, waitlistTeamDoc.id));
                 }
             } else if (newWaitlist.length > 0) {
                 await addDoc(teamsRef, { label: 'DE FORA', isWaitlist: true, players: newWaitlist });
@@ -369,9 +369,9 @@ export const createWaitlist = () => {
                     const filteredPlayers = team.players.filter(p => state.selectedPlayerIds.has(p.id));
                     if (filteredPlayers.length !== team.players.length) {
                         if (filteredPlayers.length === 0) {
-                            updatePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', team.id)));
+                            updatePromises.push(deleteDoc(doc(teamsRef, team.id)));
                         } else {
-                            updatePromises.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', team.id), { players: filteredPlayers }));
+                            updatePromises.push(updateDoc(doc(teamsRef, team.id), { players: filteredPlayers }));
                         }
                     }
                 } else {
@@ -399,9 +399,9 @@ export const createWaitlist = () => {
             
             if (waitlistTeamDoc) {
                 if (updatedWaitlist.length > 0) {
-                    updatePromises.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id), { players: updatedWaitlist }));
+                    updatePromises.push(updateDoc(doc(teamsRef, waitlistTeamDoc.id), { players: updatedWaitlist }));
                 } else {
-                    updatePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeamDoc.id)));
+                    updatePromises.push(deleteDoc(doc(teamsRef, waitlistTeamDoc.id)));
                 }
             } else if (updatedWaitlist.length > 0) {
                 updatePromises.push(addDoc(teamsRef, { label: 'DE FORA', isWaitlist: true, players: updatedWaitlist }));
@@ -460,12 +460,12 @@ export const confirmMovePlayer = async () => {
         const updates = [];
 
         if (sourceTeam.players.length === 0) {
-            updates.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', sourceTeamId)));
+            updates.push(deleteDoc(doc(teamsRef, sourceTeamId)));
         } else {
-            updates.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', sourceTeamId), { players: sourceTeam.players }));
+            updates.push(updateDoc(doc(teamsRef, sourceTeamId), { players: sourceTeam.players }));
         }
 
-        updates.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', destTeamId), { players: destTeam.players }));
+        updates.push(updateDoc(doc(teamsRef, destTeamId), { players: destTeam.players }));
 
         await Promise.all(updates);
         showToast("Transferência concluída!", "success");
@@ -478,7 +478,7 @@ export const confirmMovePlayer = async () => {
 export const clearTeams = () => {
     openConfirmModal("Limpar Todas as Equipes", "Deseja realmente excluir todas as equipes geradas?", async () => {
         try {
-            const deletePromises = state.drawnTeams.map(t => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', t.id)));
+            const deletePromises = state.drawnTeams.map(t => deleteDoc(doc(teamsRef, t.id)));
             await Promise.all(deletePromises);
             showToast("Todas as equipes foram removidas!", "info");
         } catch (e) { showToast("Erro ao limpar equipes", "error"); }
@@ -486,6 +486,13 @@ export const clearTeams = () => {
 };
 
 export const deleteTeam = (id) => {
+    const t1 = document.getElementById('team1Select')?.value;
+    const t2 = document.getElementById('team2Select')?.value;
+    if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
+        showToast("Exclusão bloqueada! Um jogo está em andamento no placar.", "error");
+        return;
+    }
+
     const teamToDelete = state.drawnTeams.find(t => t.id === id);
     if (!teamToDelete) return;
 
@@ -497,7 +504,7 @@ export const deleteTeam = (id) => {
         try { 
             if (teamToDelete.isWaitlist) {
                 // Comportamento original para a lista de espera
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', id)); 
+                await deleteDoc(doc(teamsRef, id)); 
                 showToast("Lista de espera removida.", "info"); 
             } else {
                 // Move os jogadores para a lista de espera
@@ -506,7 +513,7 @@ export const deleteTeam = (id) => {
                 const updates = [];
 
                 // 1. Apaga o time atual
-                updates.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', id)));
+                updates.push(deleteDoc(doc(teamsRef, id)));
 
                 if (waitlistTeam) {
                     // 2A. Se já existe uma lista de espera, junta e ordena por categoria
@@ -515,7 +522,7 @@ export const deleteTeam = (id) => {
                         if (catDiff !== 0) return catDiff;
                         return a.name.localeCompare(b.name);
                     });
-                    updates.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistTeam.id), { players: updatedWaitlistPlayers }));
+                    updates.push(updateDoc(doc(teamsRef, waitlistTeam.id), { players: updatedWaitlistPlayers }));
                 } else {
                     // 2B. Se não existe lista de espera, cria uma nova com esses jogadores
                     const sortedPlayers = playersToMove.sort((a, b) => {
@@ -715,9 +722,13 @@ export const saveAndCloseVictoryModal = async () => {
 
     try {
         const updatePromises = [];
+        const processedPlayerIds = new Set(); // NOVO: Impede que o jogador pontue duas vezes
 
         [ {team: team1, change: changeT1, actual: actualT1}, {team: team2, change: changeT2, actual: actualT2} ].forEach(({team, change, actual}) => {
             team.players.forEach(p => {
+                if (processedPlayerIds.has(p.id)) return; // Se já processou em outro time, pula
+                processedPlayerIds.add(p.id);
+
                 const dbPlayer = state.players.find(x => x.id === p.id);
                 if (dbPlayer) {
                     const partidas = (dbPlayer.partidas || 0) + 1;
@@ -735,7 +746,7 @@ export const saveAndCloseVictoryModal = async () => {
 
                     const newElo = Math.max(0, (dbPlayer.eloRating !== undefined ? dbPlayer.eloRating : 150) + finalChange);
                     
-                    updatePromises.push(updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', p.id), {
+                    updatePromises.push(updateDoc(doc(playersRef, p.id), {
                         eloRating: newElo, partidas, vitorias, streak: newStreak, updatedAt: Date.now()
                     }));
                 }
@@ -779,6 +790,13 @@ export const saveAndCloseVictoryModal = async () => {
 };
 
 export const promoteWaitlistToTeam = async (waitlistTeamId) => {
+    const t1 = document.getElementById('team1Select')?.value;
+    const t2 = document.getElementById('team2Select')?.value;
+    if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
+        showToast("Ação bloqueada! Um jogo está em andamento no placar.", "error");
+        return;
+    }
+
     openConfirmModal("Promover Lista de Espera", "Deseja criar um novo time equilibrado usando os jogadores da lista de espera?", async () => {
         const waitlistDoc = state.drawnTeams.find(t => t.id === waitlistTeamId && t.isWaitlist);
         if (!waitlistDoc) return;
@@ -868,9 +886,9 @@ export const promoteWaitlistToTeam = async (waitlistTeamId) => {
             await addDoc(teamsRef, { label: nextLabelNumber.toString(), players: newTeamPlayers });
 
             if (sortedWaitlist.length > 0) {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistDoc.id), { players: sortedWaitlist });
+                await updateDoc(doc(teamsRef, waitlistDoc.id), { players: sortedWaitlist });
             } else {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'teams', waitlistDoc.id));
+                await deleteDoc(doc(teamsRef, waitlistDoc.id));
             }
             showToast("Nova equipe formada a partir da espera!", "success");
         } catch (e) {
@@ -884,7 +902,7 @@ export const clearMatchHistory = () => {
     openConfirmModal("Limpar Histórico", "Deseja realmente apagar todo o histórico de partidas?", async () => {
         try {
             // Mapeia todas as partidas e cria uma requisição de delete para cada uma
-            const deletePromises = state.matchHistory.map(m => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matchHistory', m.id)));
+            const deletePromises = state.matchHistory.map(m => deleteDoc(doc(matchHistoryRef, m.id)));
             await Promise.all(deletePromises);
             showToast("Histórico de partidas limpo!", "info");
         } catch (e) { 

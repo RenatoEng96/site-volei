@@ -93,6 +93,13 @@ export const closeConfirmModal = () => {
 };
 
 export const openMoveModal = (teamId, playerId) => {
+    const t1 = document.getElementById('team1Select')?.value;
+    const t2 = document.getElementById('team2Select')?.value;
+    if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
+        showToast("Transferência bloqueada! Um jogo está em andamento no placar.", "error");
+        return;
+    }
+
     state.moveData = { sourceTeamId: teamId, playerId: playerId };
     const player = state.drawnTeams.find(t => t.id === teamId).players.find(p => p.id === playerId);
     document.getElementById('movePlayerName').innerText = player.name;
@@ -312,6 +319,14 @@ export const renderRanking = () => {
     lucide.createIcons();
 };
 
+export const updateSorteioCounters = () => {
+    const countElement = document.getElementById('playerCountSorteio');
+    if(countElement) countElement.innerText = `${state.selectedPlayerIds.size} / ${state.players.length} Selecionados`;
+    
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if(selectAllCheckbox) selectAllCheckbox.checked = state.players.length > 0 && state.selectedPlayerIds.size === state.players.length;
+};
+
 export const renderSorteioTable = () => {
     const tbody = document.getElementById('sorteioTableBody');
     if(!tbody) return;
@@ -347,9 +362,9 @@ export const renderSorteioTable = () => {
         const isSelected = state.selectedPlayerIds.has(p.id);
         
         return `
-            <tr class="hover:bg-slate-700/30 transition-colors cursor-pointer" onclick="togglePlayerSelection('${p.id}', !state.selectedPlayerIds.has('${p.id}')); renderSorteioTable();">
+            <tr class="hover:bg-slate-700/30 transition-colors cursor-pointer" onclick="const c = document.getElementById('chk-${p.id}'); c.checked = !c.checked; togglePlayerSelection('${p.id}', c.checked); updateSorteioCounters();">
                 <td class="px-2 py-3 text-center" onclick="event.stopPropagation()">
-                    <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="togglePlayerSelection('${p.id}', this.checked); renderSorteioTable();" class="w-4 h-4 accent-green-500 cursor-pointer">
+                    <input type="checkbox" id="chk-${p.id}" ${isSelected ? 'checked' : ''} onclick="togglePlayerSelection('${p.id}', this.checked); updateSorteioCounters();" class="w-4 h-4 accent-green-500 cursor-pointer">
                 </td>
                 <td class="px-3 py-3 font-bold text-slate-200 flex items-center gap-2 whitespace-nowrap">
                     <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">

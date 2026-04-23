@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { 
     switchView, showToast, openConfirmModal, closeConfirmModal, openMoveModal, 
     closeMoveModal, closeVictoryModalOnly, renderSorteioTable, 
-    changeHistoryPage, openPlayerHistoryModal, closePlayerHistoryModal 
+    changeHistoryPage, openPlayerHistoryModal, closePlayerHistoryModal, updateSorteioCounters  
 } from './ui.js';
 import { drawTeams, clearTeams, deleteTeam, createWaitlist, redrawTeamWithWaitlist, updateScore, resetScore, saveAndCloseVictoryModal, updateLiveEloPreview, confirmMovePlayer, promoteWaitlistToTeam, clearMatchHistory, syncTeamsToCloud } from './logic.js';
 import { 
@@ -75,7 +75,8 @@ Object.assign(window, {
     openPlayerHistoryModal,
     closePlayerHistoryModal,
     selectOnlyPlayersInTeams,
-    syncTeamsToCloud
+    syncTeamsToCloud,
+    updateSorteioCounters
 });
 
 document.addEventListener('DOMContentLoaded', () => {

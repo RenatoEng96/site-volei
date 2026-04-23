@@ -5,12 +5,11 @@ export const state = {
     selectedPlayerIds: new Set(), 
     isFirstLoad: true,
     isAuthenticated: false, 
-    currentUser: null, 
     eloEnabled: false, // <-- Flag para permitir/bloquear o Placar Público 
     score1: 0, 
     score2: 0,
-    confirmActionCallback: null,
-    historyCurrentPage: 0, 
+    historyCurrentPage: 0, // Adicionado recentemente
+    confirmActionCallback: null, 
     moveData: { 
         sourceTeamId: null, 
         playerId: null 

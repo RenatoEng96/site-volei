@@ -155,7 +155,7 @@ export const savePlayer = async () => {
         };
         
         if(id) {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', id), obj);
+            await updateDoc(doc(playersRef, id), obj);
         } else {
             await addDoc(playersRef, obj);
         }
@@ -173,7 +173,7 @@ export const savePlayer = async () => {
 
 export const deletePlayer = (id) => {
     openConfirmModal("Excluir", "Remover atleta?", async () => { 
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', id)); 
+        await deleteDoc(doc(playersRef, id)); 
         showToast("Removido."); 
     });
 };
