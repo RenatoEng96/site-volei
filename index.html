@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TIME CERTO</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col touch-manipulation">
@@ -18,6 +20,7 @@
                 </div>
                 <span class="font-bold text-lg sm:text-xl tracking-tighter uppercase italic hidden sm:block">TIME<span class="text-green-500">CERTO</span></span>
             </div>
+            
             <div class="flex gap-1 overflow-x-auto no-scrollbar pb-1 pt-1 flex-1 sm:flex-none justify-end">
                 <button onclick="switchView('public')" id="btn-public" class="nav-btn active px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-base font-medium transition-all flex items-center gap-1 sm:gap-2 whitespace-nowrap">
                     <i data-lucide="layout-grid" class="w-3 h-3 sm:w-4 sm:h-4"></i> Ranking
@@ -42,7 +45,6 @@
 
     <main class="max-w-7xl mx-auto w-full p-2 sm:p-4 md:p-8 flex-1">
         
-        <!-- ABA PÚBLICA (RANKING) -->
         <section id="view-public" class="animate-in fade-in duration-500">
             <header class="mb-8 sm:mb-12 mt-4 flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-800/40 p-6 rounded-3xl border border-slate-700/50 shadow-lg">
                 <div class="flex-1 flex flex-col items-center md:items-start justify-center text-center md:text-left">
@@ -50,24 +52,26 @@
                         TURMA DO <span class="text-green-500">VÔLEI</span>
                     </h2>
                     <p class="text-sm sm:text-base text-slate-400 font-bold flex items-center justify-center md:justify-start gap-2 bg-slate-900/50 px-4 py-2 rounded-full border border-slate-700/50">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 text-green-500"></i> 
-                        Elo atualizado automaticamente!
+                        <i data-lucide="refresh-cw" class="w-4 h-4 text-green-500"></i> Elo atualizado automaticamente!
                     </p>
                 </div>
                 
                 <div class="flex-[1.5] w-full bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-700/50 shadow-inner">
-                    <div class="flex justify-between items-center cursor-pointer select-none p-2 sm:p-3 -mx-2 sm:-mx-3 -mt-2 rounded-xl hover:bg-slate-800/80 transition-colors group" onclick="document.getElementById('eloSystemContent').classList.toggle('hidden'); document.getElementById('eloSystemToggleIcon').classList.toggle('rotate-180');">
+                    <div class="flex justify-between items-center cursor-pointer select-none p-2 sm:p-3 -mx-2 sm:-mx-3 -mt-2 rounded-xl hover:bg-slate-800/80 transition-colors group" onclick="toggleUI('eloSystemContent', 'eloSystemToggleIcon')">
                         <h3 class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-widest m-0 text-center md:text-left flex items-center gap-1.5"><i data-lucide="bar-chart-2" class="w-4 h-4 text-green-500"></i> Sistema de Classificação</h3>
-                        <div class="flex items-center gap-2"><span class="text-[9px] sm:text-[10px] text-slate-400 group-hover:text-green-400 font-bold transition-colors uppercase tracking-wider bg-slate-900 px-2 py-1 rounded-md border border-slate-700 group-hover:border-green-500/30">Ver Níveis</span><div class="bg-slate-900 p-1 rounded-full group-hover:bg-green-500/20 border border-slate-700 group-hover:border-green-500/30 transition-all"><i data-lucide="chevron-down" id="eloSystemToggleIcon" class="w-4 h-4 text-slate-400 group-hover:text-green-400 transition-transform duration-300"></i></div></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] sm:text-[10px] text-slate-400 group-hover:text-green-400 font-bold transition-colors uppercase tracking-wider bg-slate-900 px-2 py-1 rounded-md border border-slate-700 group-hover:border-green-500/30">Ver Níveis</span>
+                            <div class="bg-slate-900 p-1 rounded-full group-hover:bg-green-500/20 border border-slate-700 group-hover:border-green-500/30 transition-all"><i data-lucide="chevron-down" id="eloSystemToggleIcon" class="w-4 h-4 text-slate-400 group-hover:text-green-400 transition-transform duration-300"></i></div>
+                        </div>
                     </div>
                     <div id="eloSystemContent" class="hidden pt-4 transition-all border-t border-slate-700/50 mt-2">
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20"><div class="bg-red-900/50 p-1.5 rounded-md border border-red-500/30"><i data-lucide="flame" class="w-4 h-4 text-red-500"></i></div><div><p class="text-[10px] font-black text-red-500 uppercase">Mestre</p><p class="text-[9px] text-slate-400">700+ ELO</p></div></div>
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/20"><div class="bg-fuchsia-900/50 p-1.5 rounded-md border border-fuchsia-500/30"><i data-lucide="gem" class="w-4 h-4 text-fuchsia-400"></i></div><div><p class="text-[10px] font-black text-fuchsia-400 uppercase">Diamante</p><p class="text-[9px] text-slate-400">550-699</p></div></div>
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20"><div class="bg-cyan-900/50 p-1.5 rounded-md border border-cyan-500/30"><i data-lucide="shield" class="w-4 h-4 text-cyan-400"></i></div><div><p class="text-[10px] font-black text-cyan-400 uppercase">Platina</p><p class="text-[9px] text-slate-400">450-549</p></div></div>
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20"><div class="bg-yellow-900/50 p-1.5 rounded-md border border-yellow-500/30"><i data-lucide="award" class="w-4 h-4 text-yellow-400"></i></div><div><p class="text-[10px] font-black text-yellow-400 uppercase">Ouro</p><p class="text-[9px] text-slate-400">350-449</p></div></div>
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-400/10 border border-slate-400/20 hover:bg-slate-400/20"><div class="bg-slate-700/50 p-1.5 rounded-md border border-slate-400/30"><i data-lucide="medal" class="w-4 h-4 text-slate-300"></i></div><div><p class="text-[10px] font-black text-slate-300 uppercase">Prata</p><p class="text-[9px] text-slate-400">250-349</p></div></div>
-                            <div class="flex items-center gap-2 p-2 rounded-lg bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/20"><div class="bg-orange-900/50 p-1.5 rounded-md border border-orange-500/30"><i data-lucide="medal" class="w-4 h-4 text-orange-500"></i></div><div><p class="text-[10px] font-black text-orange-500 uppercase">Bronze</p><p class="text-[9px] text-slate-400">0-249</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20"><div class="bg-red-900/50 p-1.5 rounded-md border border-red-500/30"><i data-lucide="flame" class="w-4 h-4 text-red-500"></i></div><div><p class="text-[10px] font-black text-red-500 uppercase">Mestre</p><p class="text-[9px] text-slate-400">700+ ELO</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20"><div class="bg-fuchsia-900/50 p-1.5 rounded-md border border-fuchsia-500/30"><i data-lucide="gem" class="w-4 h-4 text-fuchsia-400"></i></div><div><p class="text-[10px] font-black text-fuchsia-400 uppercase">Diamante</p><p class="text-[9px] text-slate-400">550-699</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20"><div class="bg-cyan-900/50 p-1.5 rounded-md border border-cyan-500/30"><i data-lucide="shield" class="w-4 h-4 text-cyan-400"></i></div><div><p class="text-[10px] font-black text-cyan-400 uppercase">Platina</p><p class="text-[9px] text-slate-400">450-549</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20"><div class="bg-yellow-900/50 p-1.5 rounded-md border border-yellow-500/30"><i data-lucide="award" class="w-4 h-4 text-yellow-400"></i></div><div><p class="text-[10px] font-black text-yellow-400 uppercase">Ouro</p><p class="text-[9px] text-slate-400">350-449</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-400/10 border border-slate-400/20"><div class="bg-slate-700/50 p-1.5 rounded-md border border-slate-400/30"><i data-lucide="medal" class="w-4 h-4 text-slate-300"></i></div><div><p class="text-[10px] font-black text-slate-300 uppercase">Prata</p><p class="text-[9px] text-slate-400">250-349</p></div></div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-orange-500/10 border border-orange-500/20"><div class="bg-orange-900/50 p-1.5 rounded-md border border-orange-500/30"><i data-lucide="medal" class="w-4 h-4 text-orange-500"></i></div><div><p class="text-[10px] font-black text-orange-500 uppercase">Bronze</p><p class="text-[9px] text-slate-400">0-249</p></div></div>
                         </div>
                     </div>
                 </div>
@@ -80,13 +84,12 @@
                     <h2 class="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center gap-2 sm:gap-3 text-yellow-500">
                         <i data-lucide="trophy" class="w-6 h-6 sm:w-8 sm:h-8"></i> Ranking Geral (Elo)
                     </h2>
-                    <p class="text-sm sm:text-base text-slate-400">Os melhores jogadores da Turma do Vôlei</p>
+                    <p class="text-sm sm:text-base text-slate-400">Os melhores jogadores da Turma</p>
                 </header>
                 <div id="rankingList" class="bg-slate-800/40 p-3 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-700"></div>
             </div>
         </section>
 
-        <!-- NOVA ABA: SORTEIO -->
         <section id="view-sorteio" class="hidden-view animate-in fade-in duration-500">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 sm:mb-8 gap-4 mt-4 bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700">
                 <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2 text-white"><i data-lucide="dices" class="w-5 h-5 sm:w-6 sm:h-6 text-green-500"></i> Área de Sorteio</h2>
@@ -100,9 +103,9 @@
                     <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch sm:items-center">
                         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex-1 sm:flex-none justify-center">
                             <span class="pl-3 pr-1 py-2 text-xs sm:text-sm font-bold text-slate-400 whitespace-nowrap">Time de:</span>
-                            <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.max(2, parseInt(t.value) - 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">-</button>
+                            <button type="button" onclick="adjustTeamSize(-1)" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">-</button>
                             <input type="number" id="teamSize" value="4" min="2" max="10" class="w-6 sm:w-8 bg-transparent py-2 px-0 text-sm sm:text-base font-bold text-white text-center outline-none appearance-none m-0 pointer-events-none">
-                            <button type="button" onclick="const t = document.getElementById('teamSize'); t.value = Math.min(10, parseInt(t.value) + 1);" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">+</button>
+                            <button type="button" onclick="adjustTeamSize(1)" class="px-2 sm:px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-bold text-base">+</button>
                         </div>
                         <button onclick="drawTeams()" class="flex-[2] sm:flex-none bg-green-500 hover:bg-green-600 text-slate-900 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors h-full"><i data-lucide="shuffle" class="w-4 h-4"></i> SORTEAR TIMES</button>
                     </div>
@@ -113,8 +116,8 @@
                 <div class="p-4 sm:p-6 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/30 gap-3">
                     <h2 class="text-lg sm:text-xl font-bold">Quem vai jogar hoje?</h2>
                     <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto flex-wrap">
-                        <input type="text" id="searchSorteio" placeholder="Buscar atleta..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-300 outline-none w-full sm:w-32 focus:border-green-500" onkeyup="window.renderSorteioTable()">
-                        <select id="sortSorteio" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs sm:text-sm text-slate-300 outline-none w-full sm:w-28 focus:border-green-500" onchange="window.renderSorteioTable()">
+                        <input type="text" id="searchSorteio" placeholder="Buscar atleta..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-300 outline-none w-full sm:w-32 focus:border-green-500" onkeyup="renderSorteioTable()">
+                        <select id="sortSorteio" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs sm:text-sm text-slate-300 outline-none w-full sm:w-28 focus:border-green-500" onchange="renderSorteioTable()">
                             <option value="default">Por Nível</option>
                             <option value="alpha">A-Z</option>
                         </select>
@@ -142,7 +145,7 @@
                     <div class="p-4 sm:p-6 border-b border-slate-700 bg-slate-900/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         <h2 class="text-lg sm:text-xl font-bold text-green-400 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5"></i> Equipes Atuais</h2>
                         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                            <select id="waitlistStrategy" onchange="const wsp = document.getElementById('waitlistStrategyPlacar'); if(wsp) wsp.value = this.value;" class="flex-1 sm:flex-none bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-[10px] sm:text-xs text-slate-300 outline-none font-bold">
+                            <select id="waitlistStrategy" onchange="syncSelect('waitlistStrategyPlacar', this.value)" class="flex-1 sm:flex-none bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-[10px] sm:text-xs text-slate-300 outline-none font-bold">
                                 <option value="BALANCEADO" selected>Sortear Time de Fora</option>
                                 <option value="FORCAR">Time Fora Sempre Entra</option>
                             </select>
@@ -155,53 +158,47 @@
             </div>
         </section>
 
-        <!-- ABA PLACAR -->
         <section id="view-placar" class="hidden-view animate-in zoom-in-95 duration-500">
             <div class="max-w-5xl mx-auto text-center px-1 sm:px-4 flex flex-col items-center">
-                <!-- QUADRA DE VÔLEI -->
                 <div class="relative w-full flex flex-row border-2 sm:border-4 border-slate-300/80 rounded-xl sm:rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden bg-slate-800 mt-2 sm:mt-4">
                     <div class="absolute z-30 flex items-center justify-center pointer-events-none left-1/2 top-0 bottom-0 -translate-x-1/2 w-4 sm:w-6 md:w-8 h-full">
                         <div class="absolute inset-0 border-x-2 sm:border-x-4 border-white/80 shadow-[0_0_10px_rgba(0,0,0,0.8)]" style="background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 2px, transparent 2px, transparent 8px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.4) 0, rgba(255,255,255,0.4) 2px, transparent 2px, transparent 8px); background-color: rgba(15, 23, 42, 0.4);"></div>
                     </div>
 
-                    <!-- METADE AZUL -->
-                    <div class="flex-1 relative bg-blue-900/30 hover:bg-blue-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] landscape:min-h-[75vh] md:landscape:min-h-[450px] flex flex-col items-center">
+                    <div class="flex-1 relative bg-blue-900/30 hover:bg-blue-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] flex flex-col items-center">
                         <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-2 border border-blue-500/30 backdrop-blur-sm z-20 shrink-0">
-                            <select id="team1Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
+                            <select id="team1Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl font-bold text-blue-400 uppercase tracking-widest bg-transparent outline-none w-full cursor-pointer appearance-none text-center">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-3 flex items-center text-blue-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-5 sm:h-5"></i></div>
                         </div>
                         <div class="flex-1 w-full flex items-center justify-center relative z-10 py-2">
-                            <span id="score1" class="select-none text-[120px] sm:text-[130px] md:text-[150px] landscape:text-[140px] md:landscape:text-[150px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all leading-none">0</span>
+                            <span id="score1" class="select-none text-[120px] sm:text-[130px] md:text-[150px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] leading-none">0</span>
                         </div>
                         <div class="flex gap-2 sm:gap-3 md:gap-4 w-full max-w-[200px] sm:max-w-[240px] md:max-w-[280px] relative z-20 shrink-0">
-                            <button onclick="updateScore(1, -1)" class="select-none flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-sm sm:text-lg md:text-xl transition-all border border-slate-600/50 shadow-lg active:scale-95">-1</button>
-                            <button onclick="updateScore(1, 1)" class="select-none flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-xl sm:text-2xl md:text-3xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95">+1</button>
+                            <button onclick="updateScore(1, -1)" class="select-none flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-sm sm:text-lg transition-all border border-slate-600/50 shadow-lg active:scale-95">-1</button>
+                            <button onclick="updateScore(1, 1)" class="select-none flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-xl sm:text-2xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95">+1</button>
                         </div>
                     </div>
 
-                    <!-- METADE VERMELHA -->
-                    <div class="flex-1 relative bg-red-900/30 hover:bg-red-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] landscape:min-h-[75vh] md:landscape:min-h-[450px] flex flex-col items-center">
+                    <div class="flex-1 relative bg-red-900/30 hover:bg-red-900/40 transition-colors p-2 pt-3 sm:p-6 md:p-8 landscape:p-2 landscape:pt-3 md:landscape:p-8 min-h-[260px] sm:min-h-[400px] md:min-h-[450px] flex flex-col items-center">
                         <div class="w-full relative bg-slate-900/60 rounded-lg sm:rounded-xl p-1 sm:p-2 md:p-2 border border-red-500/30 backdrop-blur-sm z-20 shrink-0">
-                            <select id="team2Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl landscape:text-sm md:landscape:text-2xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none w-full transition-colors cursor-pointer appearance-none text-center text-ellipsis overflow-hidden">
+                            <select id="team2Select" onchange="syncTeamsToCloud()" style="text-align-last: center;" class="text-[10px] sm:text-xl md:text-2xl font-bold text-red-400 uppercase tracking-widest bg-transparent outline-none w-full cursor-pointer appearance-none text-center">
                                 <option value="" class="bg-slate-800 text-slate-300">SELECIONE</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-1 sm:right-2 md:right-3 flex items-center text-red-400"><i data-lucide="chevron-down" class="w-3 h-3 sm:w-5 sm:h-5"></i></div>
                         </div>
                         <div class="flex-1 w-full flex items-center justify-center relative z-10 py-2">
-                            <span id="score2" class="select-none text-[120px] sm:text-[130px] md:text-[150px] landscape:text-[140px] md:landscape:text-[150px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(239,68,68,0.6)] transition-all leading-none">0</span>
+                            <span id="score2" class="select-none text-[120px] sm:text-[130px] md:text-[150px] font-black text-white font-['Oswald'] drop-shadow-[0_0_20px_rgba(239,68,68,0.6)] leading-none">0</span>
                         </div>
                         <div class="flex gap-2 sm:gap-3 md:gap-4 w-full max-w-[200px] sm:max-w-[240px] md:max-w-[280px] relative z-20 shrink-0">
-                            <button onclick="updateScore(2, -1)" class="select-none flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-sm sm:text-lg md:text-xl transition-all border border-slate-600/50 shadow-lg active:scale-95">-1</button>
-                            <button onclick="updateScore(2, 1)" class="select-none flex-[2] bg-red-600 hover:bg-red-500 text-white font-black py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-xl sm:text-2xl md:text-3xl transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] border border-red-400/50 active:scale-95">+1</button>
+                            <button onclick="updateScore(2, -1)" class="select-none flex-1 bg-slate-900/80 hover:bg-slate-800 text-white font-bold py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-sm sm:text-lg transition-all border border-slate-600/50 shadow-lg active:scale-95">-1</button>
+                            <button onclick="updateScore(2, 1)" class="select-none flex-[2] bg-red-600 hover:bg-red-500 text-white font-black py-1.5 sm:py-2 md:py-3 rounded-md sm:rounded-xl text-xl sm:text-2xl transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] border border-red-400/50 active:scale-95">+1</button>
                         </div>
                     </div>
                 </div>
 
                 <div id="liveEloPreview" class="w-full mt-4 sm:mt-6 max-w-3xl mx-auto hidden bg-slate-900/80 p-3 sm:p-5 rounded-2xl border border-slate-700 shadow-inner flex-row justify-between items-center gap-3 sm:gap-8 transition-all animate-in fade-in"></div>
 
-                <button onclick="resetScore()" class="mt-4 sm:mt-6 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-2 transition-all border border-slate-700 shadow-lg active:scale-95 w-full max-w-[200px]">
+                <button onclick="resetScore()" class="mt-4 sm:mt-6 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-2 border border-slate-700 shadow-lg active:scale-95 w-full max-w-[200px]">
                     <i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i> ZERAR PLACAR
                 </button>
             </div>
@@ -212,9 +209,8 @@
                         <h2 class="text-lg sm:text-xl font-bold text-green-400 flex items-center gap-2">
                             <i data-lucide="users" class="w-5 h-5"></i> Times Sorteados
                         </h2>
-            
                         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                            <select id="waitlistStrategyPlacar" onchange="const ws = document.getElementById('waitlistStrategy'); if(ws) ws.value = this.value;" class="flex-1 sm:flex-none bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-[10px] sm:text-xs text-slate-300 outline-none font-bold">
+                            <select id="waitlistStrategyPlacar" onchange="syncSelect('waitlistStrategy', this.value)" class="flex-1 sm:flex-none bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-[10px] sm:text-xs text-slate-300 outline-none font-bold">
                                 <option value="BALANCEADO" selected>Sortear Time de Fora</option>
                                 <option value="FORCAR">Time Fora Sempre Entra</option>
                             </select>
@@ -229,11 +225,10 @@
 
             <div id="historySection" class="mt-8 sm:mt-12 border-t border-slate-800 pt-8 sm:pt-12 max-w-4xl mx-auto text-left mb-16">
                 <div class="bg-slate-800/60 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
-                    <div class="p-4 sm:p-5 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center cursor-pointer select-none hover:bg-slate-800 group" onclick="document.getElementById('historyContent').classList.toggle('hidden'); document.getElementById('historyToggleIcon').classList.toggle('rotate-180');">
+                    <div class="p-4 sm:p-5 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center cursor-pointer select-none hover:bg-slate-800 group" onclick="toggleUI('historyContent', 'historyToggleIcon')">
                         <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-slate-200 group-hover:text-blue-400"><i data-lucide="history" class="w-5 h-5 text-blue-500"></i> Histórico de Partidas</h2>
                         <div class="flex items-center gap-2">
                             <button id="btnClearHistory" onclick="event.stopPropagation(); clearMatchHistory();" class="hidden items-center gap-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 px-2 py-1 rounded-md border border-red-500/30 transition-colors text-[10px] sm:text-xs font-bold" title="Limpar Histórico"><i data-lucide="trash-2" class="w-3 h-3"></i> <span class="hidden sm:inline">LIMPAR</span></button>
-                        
                             <span class="text-[10px] sm:text-xs text-slate-400 group-hover:text-blue-400 font-bold bg-slate-950 px-2 py-1 rounded-md border border-slate-800">Ver Jogos</span>
                             <div class="bg-slate-950 p-1.5 rounded-full group-hover:bg-blue-500/20 border border-slate-800"><i data-lucide="chevron-down" id="historyToggleIcon" class="w-5 h-5 text-slate-400 group-hover:text-blue-400 transition-transform"></i></div>
                         </div>
@@ -245,7 +240,6 @@
             </div>
         </section>
 
-        <!-- ABA LOGIN (Apenas para Admin) -->
         <section id="view-login" class="hidden-view flex justify-center py-12 sm:py-20 px-2">
             <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-md">
                 <div class="text-center mb-8">
@@ -253,16 +247,14 @@
                     <h2 class="text-xl sm:text-2xl font-bold">Acesso Restrito</h2>
                 </div>
                 <div class="space-y-4">
-                    <input type="text" id="loginUser" placeholder="Usuário" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="email" id="loginUser" placeholder="E-mail de Admin" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500">
                     <input type="password" id="loginPass" placeholder="Senha" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500">
                     <button onclick="handleLogin()" class="w-full bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 rounded-lg">ENTRAR NO PAINEL</button>
                 </div>
             </div>
         </section>
 
-        <!-- ABA ADMIN (Apenas Edição de Jogadores e Configurações) -->
         <section id="view-admin" class="hidden-view animate-in slide-in-from-bottom-4">
-            <!-- Barra Superior com Configurações e Logout -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 mt-4 bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700">
                  <div>
                     <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 sm:w-6 sm:h-6 text-green-500"></i> Configurações & Atletas</h2>
@@ -270,7 +262,6 @@
                  </div>
                  
                  <div class="flex items-center gap-4 w-full sm:w-auto">
-                     <!-- Toggle Switch para Sistema de Elo Aberto -->
                      <div class="flex flex-1 sm:flex-none items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700">
                          <div class="text-right flex-1 sm:flex-none">
                              <p class="text-sm font-bold text-white leading-none">Placar Aberto</p>
@@ -286,10 +277,9 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-                <!-- FORMULÁRIO -->
                 <div class="lg:col-span-1">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700 lg:sticky top-24">
-                        <div class="flex justify-between items-center cursor-pointer select-none p-2 sm:p-3 -mx-2 sm:-mx-3 -mt-2 rounded-xl hover:bg-slate-900/50 transition-colors group" onclick="document.getElementById('formContent').classList.toggle('hidden'); document.getElementById('formToggleIcon').classList.toggle('rotate-180');">
+                        <div class="flex justify-between items-center cursor-pointer select-none p-2 sm:p-3 -mx-2 sm:-mx-3 -mt-2 rounded-xl hover:bg-slate-900/50 transition-colors group" onclick="toggleUI('formContent', 'formToggleIcon')">
                             <h2 id="formTitle" class="text-lg sm:text-xl font-bold flex items-center gap-2 text-green-400"><i data-lucide="user-plus" class="w-5 h-5"></i> Novo Atleta</h2>
                             <div class="flex items-center gap-2"><span class="text-[10px] sm:text-xs text-slate-400 font-bold bg-slate-900 px-2 py-1 rounded-md border border-slate-700">Expandir</span><div class="bg-slate-900 p-1.5 rounded-full border border-slate-700"><i data-lucide="chevron-down" id="formToggleIcon" class="w-5 h-5 text-slate-400 transition-transform"></i></div></div>
                         </div>
@@ -324,7 +314,14 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <div><label class="text-[9px] text-blue-400 font-bold uppercase">Partidas</label><input type="number" id="statJogos" value="0" min="0" class="w-full bg-slate-900 border border-blue-500/30 rounded-lg p-2 text-sm font-bold text-blue-400 text-center"></div>
                                 <div><label class="text-[9px] text-yellow-500 font-bold uppercase">Vitórias</label><input type="number" id="statVit" value="0" min="0" class="w-full bg-slate-900 border border-yellow-500/30 rounded-lg p-2 text-sm font-bold text-yellow-500 text-center"></div>
-                                <div><label class="text-[9px] text-fuchsia-400 font-bold uppercase">Elo Atual</label><div class="flex items-center bg-slate-900 border border-fuchsia-500/30 rounded-lg"><button type="button" onclick="adjustBonus(-5)" class="px-2 py-2 text-fuchsia-400 font-black">-</button><input type="number" id="statBonus" value="150" class="w-full bg-transparent p-0 text-sm font-bold text-fuchsia-400 text-center outline-none"><button type="button" onclick="adjustBonus(5)" class="px-2 py-2 text-fuchsia-400 font-black">+</button></div></div>
+                                <div>
+                                    <label class="text-[9px] text-fuchsia-400 font-bold uppercase">Elo Atual</label>
+                                    <div class="flex items-center bg-slate-900 border border-fuchsia-500/30 rounded-lg">
+                                        <button type="button" onclick="adjustBonus(-5)" class="px-2 py-2 text-fuchsia-400 font-black">-</button>
+                                        <input type="number" id="statBonus" value="150" class="w-full bg-transparent p-0 text-sm font-bold text-fuchsia-400 text-center outline-none">
+                                        <button type="button" onclick="adjustBonus(5)" class="px-2 py-2 text-fuchsia-400 font-black">+</button>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
@@ -344,7 +341,6 @@
                     </div>
                 </div>
 
-                <!-- TABELA ADMIN (SÓ COM EDITAR/EXCLUIR) -->
                 <div class="lg:col-span-2">
                     <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden w-full">
                         <div class="p-4 sm:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/30">
@@ -368,7 +364,6 @@
             </div>
         </section>
 
-        <!-- Modais (Victory, Confirm, Move) mantidos originais -->
         <div id="victoryModal" class="fixed inset-0 bg-slate-950/80 z-[100] hidden flex-col items-center justify-center backdrop-blur-sm animate-in fade-in duration-300 px-4">
             <div class="bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-yellow-500 flex flex-col items-center max-w-sm w-full text-center">
                 <i data-lucide="trophy" class="w-16 h-16 text-yellow-400 mb-4 animate-bounce"></i>
@@ -423,7 +418,26 @@
         <i id="toastIcon" data-lucide="info" class="w-4 h-4"></i><span id="toastMsg"></span>
     </div>
 
-    <!-- Script Principal (Mantém a sua importação) -->
+    <script>
+        // Alterna elementos ocultos (usado em menus sanfona)
+        window.toggleUI = function(contentId, iconId) {
+            document.getElementById(contentId).classList.toggle('hidden');
+            if (iconId) document.getElementById(iconId).classList.toggle('rotate-180');
+        };
+
+        // Ajusta o tamanho do time no input numérico
+        window.adjustTeamSize = function(change) {
+            const t = document.getElementById('teamSize');
+            t.value = Math.max(2, Math.min(10, parseInt(t.value) + change));
+        };
+
+        // Mantém dois select boxes sincronizados (ex: Lista de Espera)
+        window.syncSelect = function(targetId, value) {
+            const target = document.getElementById(targetId);
+            if (target) target.value = value;
+        };
+    </script>
+
     <script type="module" src="js/main.js"></script>
 
 </body>
