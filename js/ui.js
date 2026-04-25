@@ -388,15 +388,15 @@ export const editPlayer = (id) => {
     document.getElementById('formTitle').innerHTML = '<i data-lucide="edit" class="w-5 h-5"></i> Editar Atleta';
     document.getElementById('btnSave').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ATUALIZAR';
 
-    // 5. Garante que o formulário esteja aberto e visível
+    // 5. GARANTE QUE O FORMULÁRIO ABRA AUTOMATICAMENTE
     const formContent = document.getElementById('formContent');
-    if (formContent && formContent.classList.contains('hidden')) {
-        window.toggleUI('formContent', 'formToggleIcon');
-    }
+    const formIcon = document.getElementById('formToggleIcon');
+    if (formContent) formContent.classList.remove('hidden');
+    if (formIcon) formIcon.classList.add('rotate-180'); // Gira a setinha para cima
 
     if (typeof lucide !== 'undefined') lucide.createIcons();
     
-    // Rola a tela suavemente para o formulário (útil no celular)
+    // 6. Rola a tela suavemente para o formulário (útil no telemóvel)
     document.getElementById('view-admin').scrollIntoView({ behavior: 'smooth' });
 };
 
@@ -416,6 +416,12 @@ export const resetForm = () => {
     document.getElementById('formTitle').innerHTML = '<i data-lucide="user-plus" class="w-5 h-5"></i> Novo Atleta';
     document.getElementById('btnSave').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> SALVAR';
     if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // 3. FECHA O FORMULÁRIO AO CANCELAR (OU APÓS SALVAR)
+    const formContent = document.getElementById('formContent');
+    const formIcon = document.getElementById('formToggleIcon');
+    if (formContent) formContent.classList.add('hidden');
+    if (formIcon) formIcon.classList.remove('rotate-180'); // Gira a setinha para baixo
 };
 
 // ============================================================================
