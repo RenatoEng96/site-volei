@@ -72,12 +72,34 @@ export const selectOnlyPlayersInTeams = () => {
 };
 
 // ============================================================================
+// HELPER: LIMPEZA DO STORAGE
+// ============================================================================
+const deletePhotoFromStorage = async (photoUrl) => {
+    // Só tenta deletar se for realmente um link do Firebase Storage
+    if (!photoUrl || !photoUrl.includes('firebasestorage')) return;
+    try {
+        const photoRef = ref(storage, photoUrl);
+        await deleteObject(photoRef);
+        console.log("Foto antiga removida do Storage com sucesso.");
+    } catch (error) {
+        // Se o erro for apenas "A foto já não existe", ignoramos pacificamente
+        if (error.code === 'storage/object-not-found') {
+            console.log("Aviso: A foto antiga já não estava no Storage. Limpeza ignorada.");
+        } else {
+            // Se for um erro real (ex: falta de permissão), aí sim mostramos no console
+            console.error("Erro real ao limpar foto do Storage:", error);
+        }
+    }
+};
+
+// ============================================================================
 // GERENCIAMENTO DE ATLETAS (CRUD)
 // ============================================================================
 
 export const savePlayer = async () => {
     const name = document.getElementById('playerName').value.trim();
     const id = document.getElementById('editId').value;
+    const newPhotoUrl = document.getElementById('photoData').value; // A foto que está no form
     
     if(!name) {
         return showToast("Preencha o nome do atleta!", "error");
@@ -88,7 +110,6 @@ export const savePlayer = async () => {
     btn.innerText = "SALVANDO...";
     
     try {
-        // Conforme a melhoria solicitada: Pega o valor exato do input, e não apenas faz incremento
         const elo = Math.max(0, parseInt(document.getElementById('statBonus').value) || 150);
         
         const playerData = { 
@@ -98,21 +119,37 @@ export const savePlayer = async () => {
             vitorias: parseInt(document.getElementById('statVit').value), 
             eloRating: elo, 
             icon: document.getElementById('playerIcon').value, 
-            photo: document.getElementById('photoData').value,
+            photo: newPhotoUrl,
             updatedAt: Date.now()
         };
+
+        // Guarda a URL da foto antiga para podermos deletar caso tenha sido trocada
+        let oldPhotoUrl = null;
+        if (id) {
+            const existingPlayer = state.players.find(p => p.id === id);
+            if (existingPlayer && existingPlayer.photo) {
+                oldPhotoUrl = existingPlayer.photo;
+            }
+        }
         
         if (id) {
             await updateDoc(doc(playersRef, id), playerData);
+            
+            // SE a foto mudou (ou foi removida), deletamos a antiga do Storage!
+            if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl) {
+                await deletePhotoFromStorage(oldPhotoUrl);
+            }
+            
             showToast("Atleta atualizado!"); 
         } else {
-            // Inicializa a streak como 0 para novos jogadores
             playerData.streak = 0;
             await addDoc(playersRef, playerData);
             showToast("Atleta cadastrado!"); 
         }
         
-        // Dispara a função global de limpar o formulário
+        // Limpamos o input escondido para a faxina automática não deletar a foto recém-salva!
+        document.getElementById('photoData').value = '';
+
         if (window.resetForm) window.resetForm();
         
     } catch(e) { 
@@ -128,7 +165,18 @@ export const savePlayer = async () => {
 export const deletePlayer = (id) => {
     openConfirmModal("Excluir Atleta", "Tem a certeza que deseja remover este atleta da base?", async () => { 
         try {
+            // Antes de excluir o documento, pega o link da foto para deletar do Storage
+            const playerInfo = state.players.find(p => p.id === id);
+            const photoUrlToDelete = playerInfo ? playerInfo.photo : null;
+
+            // Deleta o jogador do Firestore
             await deleteDoc(doc(playersRef, id)); 
+
+            // Se ele tinha foto, deleta o arquivo físico do Storage
+            if (photoUrlToDelete) {
+                await deletePhotoFromStorage(photoUrlToDelete);
+            }
+
             showToast("Atleta removido."); 
         } catch(e) {
             console.error(e);
@@ -192,11 +240,32 @@ window.handleImageUpload = async (event) => {
 };
 
 // Função auxiliar para remover a foto caso o usuário clique em "Remover Foto"
-window.removePhoto = () => {
+window.removePhoto = async () => {
+    const currentUrl = document.getElementById('photoData').value;
+    const editId = document.getElementById('editId').value;
+
+    // Se existe um link de foto no formulário
+    if (currentUrl) {
+        let isSavedPhoto = false;
+        
+        // Verifica se essa foto já estava salva no banco
+        if (editId) {
+            const p = state.players.find(x => x.id === editId);
+            if (p && p.photo === currentUrl) isSavedPhoto = true;
+        }
+
+        // Se a foto NÃO estava salva (foi um upload feito agora e o usuário se arrependeu)
+        // Podemos deletar do Storage instantaneamente para não acumular lixo!
+        if (!isSavedPhoto) {
+            await deletePhotoFromStorage(currentUrl);
+        }
+    }
+
+    // Limpa a interface do formulário
     document.getElementById('photoPreview').src = '';
     document.getElementById('photoPreview').classList.add('hidden');
     document.getElementById('photoPlaceholder').classList.remove('hidden');
-    document.getElementById('photoData').value = ''; // Limpa o link
+    document.getElementById('photoData').value = ''; 
     document.getElementById('btnRemovePhoto').classList.add('hidden');
-    document.getElementById('playerPhoto').value = ''; // Reseta o input file
+    document.getElementById('playerPhoto').value = ''; 
 };
