@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isAuthenticated && user) {
             // ATENÇÃO: Verifique se o e-mail está exatamente igual ao do login
-            state.isMaster = (user.email.trim().toLowerCase() === 'renato96.ram@gmail.com.br');
+            state.isMaster = (user.email.trim().toLowerCase() === 'renato96.ram@gmail.com');
             
             try {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
