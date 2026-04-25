@@ -891,33 +891,37 @@ export const renderMatchHistory = () => {
 };
 
 export const togglePlacarLock = (isLocked) => {
-    let overlay = document.getElementById('placarLockOverlay');
-    // Busca a div exata onde a quadra azul e vermelha é desenhada
-    const quadra = document.querySelector('#view-placar .relative.w-full.flex-row');
-    
-    if (!quadra) return;
-
-    if (isLocked) {
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'placarLockOverlay';
-            overlay.className = 'absolute inset-0 z-[40] bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center m-1 rounded-xl sm:rounded-3xl border border-slate-700 transition-all';
-            overlay.innerHTML = `
-                <div class="bg-slate-900/90 p-6 rounded-2xl shadow-2xl flex flex-col items-center text-center max-w-xs border border-slate-700">
-                    <div class="bg-slate-800 p-3 rounded-full mb-4 border border-slate-700 shadow-inner">
-                        <i data-lucide="lock" class="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 animate-pulse"></i>
-                    </div>
-                    <h3 class="text-lg sm:text-xl font-black text-white uppercase tracking-widest mb-2">Quadra Ocupada</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm font-bold leading-relaxed">Uma partida já está em andamento e o placar está sendo controlado por outro aparelho.</p>
-                    ${state.isAuthenticated ? `<button onclick="forceUnlockPlacar()" class="mt-6 text-[10px] sm:text-xs text-red-400 font-black border border-red-500/30 px-4 py-2 rounded-lg hover:bg-red-500/20 uppercase tracking-wider transition-colors"><i data-lucide="shield-alert" class="w-3 h-3 inline mr-1"></i> Desbloquear (Admin)</button>` : ''}
-                </div>
-            `;
-            quadra.appendChild(overlay);
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
-    } else {
-        if (overlay) overlay.remove();
+    const overlay = document.getElementById('placar-lock-overlay');
+    if (overlay) {
+        overlay.classList.toggle('hidden', !isLocked);
+        // Garante que o ícone do Lucide seja renderizado se o elemento for mostrado
+        if (isLocked && typeof lucide !== 'undefined') lucide.createIcons();
     }
+
+    // Lista de controles que devem ser desativados visualmente
+    const controlsToDisable = [
+        'btnSaveResult', 
+        'btnClearHistory',
+        'teamSize', 
+        'draftStrategy',
+        'waitlistStrategy',
+        'waitlistStrategyPlacar'
+    ];
+
+    controlsToDisable.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.disabled = isLocked;
+            el.style.opacity = isLocked ? "0.5" : "1";
+            el.style.cursor = isLocked ? "not-allowed" : "default";
+        }
+    });
+
+    // Oculta botões de ação nas cartinhas (remover/mover) para evitar cliques acidentais
+    const actionButtons = document.querySelectorAll('.remove-player-btn, .move-player-btn');
+    actionButtons.forEach(btn => {
+        btn.style.visibility = isLocked ? 'hidden' : 'visible';
+    });
 };
 
 export const forceUnlockPlacar = async () => {

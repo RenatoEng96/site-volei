@@ -87,7 +87,7 @@ const initDatabaseListeners = () => {
             const toggle = document.getElementById('toggleElo');
             if (toggle) toggle.checked = state.eloEnabled;
 
-            // LÓGICA DE BLOQUEIO
+            // LÓGICA DE BLOQUEIO ABSOLUTO
             const matchActive = data.matchInProgress === true;
             const ownerId = data.matchOwner;
             const myId = state.localSessionId;
@@ -95,10 +95,12 @@ const initDatabaseListeners = () => {
             // Só bloqueia se houver jogo E o dono for diferente de mim
             const shouldLock = matchActive && (ownerId !== myId);
             
-            console.log(`[PLACAR] Em curso: ${matchActive} | Dono: ${ownerId} | Eu: ${myId} | Bloquear: ${shouldLock}`);
+            // Grava na memória global que o placar está travado
+            state.isPlacarLocked = shouldLock; 
             
             togglePlacarLock(shouldLock);
         } else {
+            state.isPlacarLocked = false;
             togglePlacarLock(false);
         }
     });

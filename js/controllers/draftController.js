@@ -8,6 +8,11 @@ import { showToast, openConfirmModal, closeMoveModal } from '../ui.js';
 // ============================================================================
 
 export const drawTeams = async () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     const sizeInput = document.getElementById('teamSize');
     const size = sizeInput ? parseInt(sizeInput.value) || 4 : 4;
 
@@ -78,6 +83,11 @@ export const drawTeams = async () => {
 // ============================================================================
 
 export const createWaitlist = () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     openConfirmModal("Atualizar Lista de Espera", "Os atletas selecionados (que não estejam em times) formarão a nova lista de espera. Deseja continuar?", async () => {
         try {
             const waitlistTeamDoc = state.drawnTeams.find(t => t.isWaitlist);
@@ -135,6 +145,11 @@ export const createWaitlist = () => {
 };
 
 export const clearTeams = () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     openConfirmModal("Limpar Todas as Equipes", "Deseja realmente excluir todas as equipes geradas?", async () => {
         try {
             const deletePromises = state.drawnTeams.map(t => deleteDoc(doc(teamsRef, t.id)));
@@ -151,6 +166,11 @@ export const clearTeams = () => {
 // ============================================================================
 
 export const confirmMovePlayer = async () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     const destTeamId = document.getElementById('moveDestination').value;
     const { sourceTeamId, playerId } = state.moveData;
 

@@ -20,6 +20,7 @@ const MATCH_CONFIG = {
  * Atualiza o placar local e sincroniza com a nuvem
  */
 export const updateScore = (team, change) => {
+    if (state.isPlacarLocked) return; // <-- BLOQUEIA CLIQUES FANTASMA
     // 1. Atualiza a pontuação APENAS no dispositivo local!
     if (team === 1) {
         state.score1 = Math.max(0, state.score1 + change);
@@ -38,6 +39,11 @@ export const updateScore = (team, change) => {
  * Zera o placar local e na nuvem
  */
 export const resetScore = () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Existe uma partida em andamento em outro dispositivo.", "info");
+        return;
+    }
+
     openConfirmModal("Zerar Placar", "Deseja realmente zerar a pontuação e liberar a quadra para outros usuários?", async () => {
         // 1. Reseta o estado local
         state.score1 = 0;
@@ -79,6 +85,8 @@ export const resetScore = () => {
  * e aciona o preview de Elo.
  */
 export const syncTeamsToCloud = async () => {
+    if (state.isPlacarLocked) return; // <-- IMPEDE TROCAR TIMES DURANTE JOGO ALHEIO
+
     const select1 = document.getElementById('team1Select');
     const select2 = document.getElementById('team2Select');
     
@@ -163,6 +171,11 @@ export const checkWinCondition = () => {
  * Aplica o resultado matemático no banco de dados e salva o histórico
  */
 export const saveAndCloseVictoryModal = async () => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Existe uma partida em andamento em outro dispositivo.", "info");
+        return;
+    }
+
     // 1. Recupera os dados da partida diretamente da UI
     const previewData = updateLiveEloPreview();
 

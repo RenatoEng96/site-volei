@@ -25,7 +25,7 @@ export const state = {
     drawnTeams: [],         // Times atualmente sorteados (inclui a Lista de Espera)
     matchHistory: [],       // Histórico de partidas jogadas
     eloEnabled: false,      // Flag global que define se o Placar Aberto está ativo
-
+    isPlacarLocked: false,  // <-- NOVO: Controle absoluto de bloqueio da quadra
     // ---------------------------------------------------
     // 2. ESTADO DE AUTENTICAÇÃO E SEGURANÇA
     // ---------------------------------------------------
