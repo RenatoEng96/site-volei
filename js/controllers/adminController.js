@@ -165,11 +165,10 @@ export const savePlayer = async () => {
             
             // Se tinha uma foto antiga e ela é diferente da nova, apaga a velha do Storage para poupar espaço
             if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl) {
-                if (window.deletePhotoFromStorage) {
-                    await window.deletePhotoFromStorage(oldPhotoUrl);
-                }
+                // Removemos a verificação desnecessária de window, pois a função está no próprio arquivo
+                await deletePhotoFromStorage(oldPhotoUrl);
             }
-            showToast("Atleta atualizado!"); 
+            showToast("Atleta atualizado!");
         } else {
             playerData.streak = 0;
             await addDoc(playersRef, playerData);

@@ -24,7 +24,7 @@ import {
     playersRef, teamsRef, matchHistoryRef, settingsRef, 
     globalGroupsRef, setGroupContext, deleteDoc, updateDoc,
     onSnapshot, addDoc, query, where, getDoc, doc, db,
-    storage, ref, uploadBytes, getDownloadURL 
+    storage, ref, uploadBytes, getDownloadURL, deleteObject 
 } from './firebase.js';
 
 export const adjustBonus = (val) => {
@@ -267,17 +267,55 @@ export const saveUserProfile = async () => {
     btn.disabled = true;
     
     try {
-        // Agora incluímos o e-mail e usamos setDoc para garantir que o registro seja criado ou atualizado
-        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+        // Importamos funções extras para buscar e atualizar nos grupos
+        const { setDoc, collection, query, where, getDocs, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
         
+        const userEmail = state.user.email.toLowerCase();
+
+        // Pega a URL da foto antes de salvar as novidades
+        const oldPhotoUrl = state.userProfile?.photo;
+
+        // 1. Salva o Perfil Global
         await setDoc(doc(db, 'users', state.user.uid), {
             name: name,
             photo: photo,
-            email: state.user.email.toLowerCase(), // CRUCIAL para o Admin te encontrar
+            email: userEmail,
             updatedAt: Date.now()
         }, { merge: true });
 
         state.userProfile = { ...state.userProfile, name, photo };
+
+        // NOVO: Exclui a foto antiga do Storage, caso ela tenha mudado ou sido removida
+        if (oldPhotoUrl && oldPhotoUrl !== photo) {
+            try {
+                await deleteObject(ref(storage, oldPhotoUrl));
+                console.log("Foto antiga do perfil excluída do Storage.");
+            } catch(e) {
+                // Ignora silenciosamente se a foto já não existir lá
+                if (e.code !== 'storage/object-not-found') console.error("Erro ao excluir foto antiga:", e);
+            }
+        }
+
+        // 2. NOVO: Sincroniza a foto e o nome em todos os grupos onde o usuário está cadastrado usando o e-mail
+        if (state.userGroups && state.userGroups.length > 0) {
+            for (const group of state.userGroups) {
+                const playersRef = collection(db, 'groups', group.id, 'players');
+                const q = query(playersRef, where('email', '==', userEmail));
+                const qs = await getDocs(q);
+                
+                const updatePromises = [];
+                qs.forEach(docSnap => {
+                    updatePromises.push(updateDoc(docSnap.ref, {
+                        name: name,
+                        photo: photo
+                    }));
+                });
+                if (updatePromises.length > 0) {
+                    await Promise.all(updatePromises);
+                }
+            }
+        }
+
         showToast("Perfil atualizado com sucesso!", "success");
     } catch (e) {
         console.error(e);
@@ -289,11 +327,23 @@ export const saveUserProfile = async () => {
     }
 };
 
-export const removeUserProfilePhoto = () => {
+export const removeUserProfilePhoto = async () => {
     const photoPreview = document.getElementById('userProfilePhotoPreview');
     const photoPlaceholder = document.getElementById('userProfilePhotoPlaceholder');
     const photoData = document.getElementById('userProfilePhotoData');
     const btnRemove = document.getElementById('btnRemoveProfilePhoto');
+
+    const currentUrl = photoData.value;
+    
+    // Se há uma foto carregada no formulário que NÃO é a que está no banco de dados (um upload não salvo)
+    // nós a apagamos imediatamente do Storage para não acumular lixo
+    if (currentUrl && (!state.userProfile || currentUrl !== state.userProfile.photo)) {
+        try {
+            await deleteObject(ref(storage, currentUrl));
+        } catch (e) {
+            console.error("Erro ao limpar foto não salva:", e);
+        }
+    }
 
     // Limpa a interface
     photoPreview.src = '';
@@ -409,12 +459,40 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('userProfilePhotoData').value = state.userProfile.photo;
                         document.getElementById('btnRemoveProfilePhoto').classList.remove('hidden');
                     }
+                } else {
+                    // Limpa a interface caso o usuário ainda não tenha perfil salvo
+                    document.getElementById('userProfileNameInput').value = '';
+                    document.getElementById('userProfilePhotoPreview').src = '';
+                    document.getElementById('userProfilePhotoPreview').classList.add('hidden');
+                    document.getElementById('userProfilePhotoPlaceholder').classList.remove('hidden');
+                    document.getElementById('userProfilePhotoData').value = '';
+                    document.getElementById('btnRemoveProfilePhoto').classList.add('hidden');
                 }
             } catch (error) { console.error("Erro ao puxar perfil", error); }
 
             switchView('groups');
             loadUserGroups();
         } else {
+            // LIMPA O ESTADO E OS CAMPOS QUANDO O USUÁRIO FAZ LOGOUT (Evita que os dados vazem para o próximo login no mesmo celular)
+            state.userProfile = null;
+            const nameInput = document.getElementById('userProfileNameInput');
+            if (nameInput) nameInput.value = '';
+            
+            const photoPreview = document.getElementById('userProfilePhotoPreview');
+            if (photoPreview) {
+                photoPreview.src = '';
+                photoPreview.classList.add('hidden');
+            }
+            
+            const photoPlaceholder = document.getElementById('userProfilePhotoPlaceholder');
+            if (photoPlaceholder) photoPlaceholder.classList.remove('hidden');
+            
+            const photoData = document.getElementById('userProfilePhotoData');
+            if (photoData) photoData.value = '';
+            
+            const btnRemove = document.getElementById('btnRemoveProfilePhoto');
+            if (btnRemove) btnRemove.classList.add('hidden');
+
             clearAllListeners();
             switchView('auth');
         }
