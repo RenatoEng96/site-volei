@@ -1034,12 +1034,28 @@ export const renderUserGroups = () => {
     msg.classList.remove('flex');
 
     grid.innerHTML = state.userGroups.map(group => {
-        // Determina a permissão visualmente
+        const isAdmin = state.isMaster || (group.adminUids && group.adminUids.includes(state.user?.uid));
+        
         let roleTag = '';
         let roleBg = '';
-        if (state.isMaster || (group.adminUids && group.adminUids.includes(state.user?.uid))) {
+        let menuDots = '';
+
+        if (isAdmin) {
             roleTag = '<i data-lucide="shield-check" class="w-3 h-3"></i> Admin';
             roleBg = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+            
+            // Adiciona os três pontinhos para admins
+            menuDots = `
+                <div class="relative z-20" onclick="event.stopPropagation();">
+                    <button onclick="document.getElementById('menu-${group.id}').classList.toggle('hidden')" class="p-1.5 text-slate-400 hover:text-white rounded-md hover:bg-slate-700 transition-colors">
+                        <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                    </button>
+                    <div id="menu-${group.id}" class="hidden absolute right-0 top-8 w-40 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
+                        <button onclick="renameGroup('${group.id}', '${group.name}'); document.getElementById('menu-${group.id}').classList.add('hidden')" class="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 flex items-center gap-2"><i data-lucide="edit-2" class="w-4 h-4"></i> Renomear</button>
+                        <button onclick="deleteGroup('${group.id}'); document.getElementById('menu-${group.id}').classList.add('hidden')" class="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-slate-800 flex items-center gap-2 border-t border-slate-800"><i data-lucide="trash-2" class="w-4 h-4"></i> Excluir</button>
+                    </div>
+                </div>
+            `;
         } else {
             roleTag = '<i data-lucide="user" class="w-3 h-3"></i> Jogador';
             roleBg = 'bg-slate-700/50 text-slate-300 border-slate-600/50';
@@ -1048,16 +1064,17 @@ export const renderUserGroups = () => {
         const dateStr = group.createdAt ? new Date(group.createdAt).toLocaleDateString('pt-BR') : '--/--/----';
 
         return `
-            <div onclick="selectGroup('${group.id}', '${group.name}')" class="bg-slate-900/50 hover:bg-slate-800 border border-slate-700 rounded-2xl p-5 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-green-500/10 group-card flex flex-col justify-between h-full min-h-[140px]">
+            <div onclick="selectGroup('${group.id}', '${group.name}')" class="bg-slate-900/50 hover:bg-slate-800 border border-slate-700 rounded-2xl p-5 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 group-card flex flex-col justify-between h-full min-h-[140px] relative">
                 <div>
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-bold text-white group-card-hover:text-green-400 transition-colors">${group.name}</h3>
-                        <span class="px-2 py-1 rounded-md text-[10px] font-bold border flex items-center gap-1 ${roleBg}">${roleTag}</span>
+                        <h3 class="text-xl font-bold text-white group-card-hover:text-blue-400 transition-colors pr-6">${group.name}</h3>
+                        ${menuDots}
                     </div>
-                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> Criado em ${dateStr}</p>
+                    <span class="inline-block px-2 py-1 rounded-md text-[10px] font-bold border flex items-center gap-1 w-max ${roleBg}">${roleTag}</span>
+                    <p class="text-xs text-slate-500 mt-3 flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> Criado em ${dateStr}</p>
                 </div>
                 <div class="mt-4 flex justify-end">
-                    <span class="text-sm font-bold text-green-500 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">ENTRAR <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+                    <span class="text-sm font-bold text-blue-500 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">ENTRAR <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
                 </div>
             </div>
         `;

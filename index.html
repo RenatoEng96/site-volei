@@ -12,15 +12,15 @@
 
     <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 flex justify-between items-center h-16">
-            <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity shrink-0 mr-2" onclick="switchView('public'); window.scrollTo({ top: 0, behavior: 'smooth' });">
+            <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity shrink-0 mr-2" onclick="switchView('groups'); window.scrollTo({ top: 0, behavior: 'smooth' });">
                 <div class="bg-green-500 p-1.5 rounded-lg">
                     <i data-lucide="volleyball" class="w-5 h-5 sm:w-6 sm:h-6 text-slate-900"></i>
                 </div>
-                <span id="headerAppName" class="font-bold text-lg sm:text-xl tracking-tighter uppercase italic hidden sm:block">TIME<span class="text-green-500">CERTO</span></span>
+                <span class="font-bold text-lg sm:text-xl tracking-tighter uppercase italic hidden sm:block">TIME<span class="text-green-500">CERTO</span></span>
             </div>
             <div id="mainNavButtons" class="flex gap-1 overflow-x-auto no-scrollbar pb-1 pt-1 flex-1 sm:flex-none justify-end hidden-view">
                 <button onclick="switchView('groups')" id="btn-groups" class="nav-btn px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-base font-medium transition-all flex items-center gap-1 sm:gap-2 whitespace-nowrap text-blue-400">
-                    <i data-lucide="users" class="w-3 h-3 sm:w-4 sm:h-4"></i> Grupos
+                    <i data-lucide="user-circle" class="w-3 h-3 sm:w-4 sm:h-4"></i> Perfil
                 </button>
                 <button onclick="switchView('public')" id="btn-public" class="nav-btn active px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-base font-medium transition-all flex items-center gap-1 sm:gap-2 whitespace-nowrap">
                     <i data-lucide="layout-grid" class="w-3 h-3 sm:w-4 sm:h-4"></i> Ranking
@@ -45,11 +45,11 @@
 
     <main class="max-w-7xl mx-auto w-full p-2 sm:p-4 md:p-8 flex-1">
         
-        <!-- ABA PÚBLICA (RANKING) -->
+        <!-- ABA (RANKING) -->
         <section id="view-public" class="animate-in fade-in duration-500">
             <header class="mb-8 sm:mb-12 mt-4 flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-800/40 p-6 rounded-3xl border border-slate-700/50 shadow-lg">
                 <div class="flex-1 flex flex-col items-center md:items-start justify-center text-center md:text-left">
-                    <h2 class="text-4xl sm:text-5xl md:text-6xl font-black mb-2 tracking-tight text-white font-['Oswald'] drop-shadow-md">
+                    <h2 id="publicGroupName" class="text-4xl sm:text-5xl md:text-6xl font-black mb-2 tracking-tight text-white font-['Oswald'] drop-shadow-md uppercase">
                         TURMA DO <span class="text-green-500">VÔLEI</span>
                     </h2>
                     <p class="text-sm sm:text-base text-slate-400 font-bold flex items-center justify-center md:justify-start gap-2 bg-slate-900/50 px-4 py-2 rounded-full border border-slate-700/50">
@@ -292,6 +292,40 @@
         </section>
 
         <section id="view-groups" class="hidden-view animate-in fade-in duration-500 py-6 sm:py-10">
+            <div class="bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-700 mb-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+                <label class="relative group/photo flex flex-col items-center shrink-0">
+                    <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center overflow-hidden group-hover/photo:border-blue-500 transition-colors">
+                        <img id="userProfilePhotoPreview" class="w-full h-full object-cover hidden" src="" alt="Sua Foto">
+                        <div id="userProfilePhotoPlaceholder" class="text-slate-500 flex flex-col items-center">
+                            <i data-lucide="camera" class="w-8 h-8 mb-1"></i>
+                            <span class="text-[10px] font-bold uppercase">Sua Foto</span>
+                        </div>
+                    </div>
+    
+                    <input type="file" id="userProfilePhotoInput" accept="image/*" class="hidden" onchange="handleUserProfilePhotoUpload(event)">
+                    <input type="hidden" id="userProfilePhotoData" value="">
+    
+                    <div class="absolute bottom-2 right-2 bg-blue-500 p-2 rounded-full border-2 border-slate-800 shadow-lg cursor-pointer hover:bg-blue-400 transition-colors" onclick="document.getElementById('userProfilePhotoInput').click()">
+                        <i data-lucide="edit-2" class="w-4 h-4 text-white"></i>
+                    </div>
+
+                    <div id="btnRemoveProfilePhoto" class="absolute top-0 right-0 bg-red-500 p-2 rounded-full border-2 border-slate-800 shadow-lg cursor-pointer hover:bg-red-400 transition-colors hidden" onclick="event.preventDefault(); removeUserProfilePhoto();">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+                    </div>
+                </label>
+                <div class="flex-1 w-full space-y-4 text-center sm:text-left">
+                    <div>
+                        <h2 class="text-2xl font-black text-white mb-1">Seu Perfil</h2>
+                        <p class="text-sm text-slate-400 mb-4">Seus dados oficiais no TimeCerto.</p>
+                        <label class="text-xs font-bold text-slate-400 mb-1 block uppercase tracking-wider">Como você quer ser chamado?</label>
+                        <input type="text" id="userProfileNameInput" placeholder="Seu nome de jogador" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-blue-500 transition-colors font-bold text-lg text-center sm:text-left">
+                    </div>
+                    <button onclick="saveUserProfile()" id="btnSaveProfile" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 mx-auto sm:mx-0">
+                        <i data-lucide="save" class="w-5 h-5"></i> SALVAR PERFIL
+                    </button>
+                </div>
+            </div>
+
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
@@ -309,8 +343,7 @@
                 </div>
             </div>
 
-            <div id="userGroupsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
+            <div id="userGroupsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
             <div id="noGroupsMessage" class="hidden flex-col items-center justify-center py-16 bg-slate-800/30 rounded-3xl border border-slate-700 border-dashed text-center">
                 <div class="bg-slate-800 p-4 rounded-full mb-4">

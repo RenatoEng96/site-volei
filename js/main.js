@@ -22,8 +22,9 @@ import {
 // Importação das novas variáveis e métodos do Firebase
 import { 
     playersRef, teamsRef, matchHistoryRef, settingsRef, 
-    globalGroupsRef, setGroupContext,
-    onSnapshot, addDoc, query, where, getDoc, doc, db
+    globalGroupsRef, setGroupContext, deleteDoc, updateDoc,
+    onSnapshot, addDoc, query, where, getDoc, doc, db,
+    storage, ref, uploadBytes, getDownloadURL 
 } from './firebase.js';
 
 export const adjustBonus = (val) => {
@@ -184,23 +185,22 @@ export const selectGroup = (groupId, groupName) => {
         state.currentUserRole = 'player';
     }
 
-    // Muda o título na UI
-    const headerName = document.getElementById('headerAppName');
-    if (headerName) headerName.innerHTML = `<span class="text-green-500">${groupName.toUpperCase()}</span>`;
+    // AGORA ATUALIZA O NOME LÁ NO RANKING
+    const publicTitle = document.getElementById('publicGroupName');
+    if (publicTitle) {
+        publicTitle.innerHTML = `${groupName.toUpperCase()}`;
+    }
 
     // MUDA O "CANO" DA BASE DE DADOS PARA A PASTA DESTE GRUPO
     setGroupContext(groupId);
 
-    // Desliga os listeners antigos (se o utilizador estava noutro grupo antes)
+    // Desliga os listeners antigos
     if (state.unsubscribeGroup && state.unsubscribeGroup.length > 0) {
         state.unsubscribeGroup.forEach(unsub => unsub());
     }
     state.unsubscribeGroup = [];
 
-    // Inicia a escuta da base de dados do grupo escolhido
     initDatabaseListeners();
-
-    // Vai para a tela inicial do grupo (Ranking)
     switchView('public');
 };
 
@@ -255,6 +255,114 @@ const initDatabaseListeners = async () => {
     state.unsubscribeGroup.push(unsubPlayers, unsubTeams, unsubMatches, unsubSettings);
 };
 
+// --- NOVAS FUNÇÕES: PERFIL DO USUÁRIO ---
+export const saveUserProfile = async () => {
+    const name = document.getElementById('userProfileNameInput').value.trim();
+    const photo = document.getElementById('userProfilePhotoData').value;
+    
+    if (!name) return showToast("Preencha o seu nome.", "error");
+    
+    const btn = document.getElementById('btnSaveProfile');
+    btn.innerHTML = "SALVANDO...";
+    btn.disabled = true;
+    
+    try {
+        // Agora incluímos o e-mail e usamos setDoc para garantir que o registro seja criado ou atualizado
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+        
+        await setDoc(doc(db, 'users', state.user.uid), {
+            name: name,
+            photo: photo,
+            email: state.user.email.toLowerCase(), // CRUCIAL para o Admin te encontrar
+            updatedAt: Date.now()
+        }, { merge: true });
+
+        state.userProfile = { ...state.userProfile, name, photo };
+        showToast("Perfil atualizado com sucesso!", "success");
+    } catch (e) {
+        console.error(e);
+        showToast("Erro ao salvar perfil.", "error");
+    } finally {
+        btn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> SALVAR PERFIL';
+        btn.disabled = false;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+};
+
+export const removeUserProfilePhoto = () => {
+    const photoPreview = document.getElementById('userProfilePhotoPreview');
+    const photoPlaceholder = document.getElementById('userProfilePhotoPlaceholder');
+    const photoData = document.getElementById('userProfilePhotoData');
+    const btnRemove = document.getElementById('btnRemoveProfilePhoto');
+
+    // Limpa a interface
+    photoPreview.src = '';
+    photoPreview.classList.add('hidden');
+    photoPlaceholder.classList.remove('hidden');
+    photoData.value = ''; // Esvazia o valor que será salvo
+    btnRemove.classList.add('hidden');
+
+    showToast("Foto removida. Não esqueça de clicar em 'Salvar Perfil'.", "info");
+};
+
+window.handleUserProfilePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const btnSave = document.getElementById('btnSaveProfile');
+    btnSave.disabled = true;
+    btnSave.innerText = "CARREGANDO FOTO...";
+    showToast("A fazer upload da sua foto...", "info");
+
+    try {
+        const fileExtension = file.name.split('.').pop();
+        const fileName = `users/${state.user.uid}_${Date.now()}.${fileExtension}`;
+        const storageRef = ref(storage, fileName);
+        
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        document.getElementById('userProfilePhotoPreview').src = downloadURL;
+        document.getElementById('userProfilePhotoPreview').classList.remove('hidden');
+        document.getElementById('userProfilePhotoPlaceholder').classList.add('hidden');
+        document.getElementById('userProfilePhotoData').value = downloadURL;
+        document.getElementById('btnRemoveProfilePhoto').classList.remove('hidden'); 
+        
+        showToast("Foto carregada com sucesso!");
+    } catch (error) {
+        console.error("Erro no upload:", error);
+        showToast("Erro ao processar imagem", "error");
+    } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> SALVAR PERFIL';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+};
+
+// --- NOVAS FUNÇÕES: GERENCIAR GRUPOS ---
+window.renameGroup = async (groupId, currentName) => {
+    const newName = prompt("Digite o novo nome para este grupo:", currentName);
+    if (newName && newName.trim() !== "" && newName !== currentName) {
+        try {
+            await updateDoc(doc(db, 'groups', groupId), { name: newName.trim() });
+            showToast("Grupo renomeado com sucesso!", "success");
+        } catch (e) {
+            showToast("Erro ao renomear o grupo.", "error");
+        }
+    }
+};
+
+window.deleteGroup = (groupId) => {
+    openConfirmModal("Excluir Grupo", "Deseja apagar este grupo permanentemente? Todos os jogadores e dados serão perdidos. Esta ação NÃO pode ser desfeita.", async () => {
+        try {
+            await deleteDoc(doc(db, 'groups', groupId));
+            showToast("Grupo excluído com sucesso.", "info");
+        } catch (e) {
+            showToast("Erro ao excluir o grupo.", "error");
+        }
+    });
+};
+
 // ============================================================================
 // BINDINGS GLOBAIS (Disponibilizando para o HTML)
 // ============================================================================
@@ -269,7 +377,7 @@ Object.assign(window, {
     openMoveModal, updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, forceUnlockPlacar,
     // NOVOS BINDINGS DE SAAS:
     handleAuthAction, toggleAuthMode, handlePasswordReset, handleLogout, 
-    handleCreateGroup, selectGroup
+    handleCreateGroup, selectGroup, saveUserProfile, removeUserProfilePhoto
 });
 
 // ============================================================================
@@ -284,18 +392,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingOverlay) loadingOverlay.classList.add('hidden');
         
         if (isAuthenticated && user) {
-            // ATENÇÃO: Verifique se o e-mail está exatamente igual ao do login
             state.isMaster = (user.email.trim().toLowerCase() === 'renato96.ram@gmail.com');
             
             try {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if(userDoc.exists()) state.userProfile = userDoc.data();
-            } catch (error) {}
+                if(userDoc.exists()) {
+                    state.userProfile = userDoc.data();
+                    
+                    // PREENCHE A INTERFACE DO PERFIL SE TIVER DADOS SALVOS
+                    document.getElementById('userProfileNameInput').value = state.userProfile.name || '';
+                    if (state.userProfile.photo) {
+                        const img = document.getElementById('userProfilePhotoPreview');
+                        img.src = state.userProfile.photo;
+                        img.classList.remove('hidden');
+                        document.getElementById('userProfilePhotoPlaceholder').classList.add('hidden');
+                        document.getElementById('userProfilePhotoData').value = state.userProfile.photo;
+                        document.getElementById('btnRemoveProfilePhoto').classList.remove('hidden');
+                    }
+                }
+            } catch (error) { console.error("Erro ao puxar perfil", error); }
 
             switchView('groups');
             loadUserGroups();
         } else {
-            // Se o usuário deslogar por qualquer motivo, limpamos os processos
             clearAllListeners();
             switchView('auth');
         }

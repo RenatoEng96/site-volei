@@ -4,7 +4,7 @@ import {
     globalGroupsRef, 
 } from '../firebase.js';
 import { showToast, openConfirmModal, renderSorteioTable, resetForm } from '../ui.js';
-import { arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // NOVO IMPORT
+import { arrayUnion, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // NOVO IMPORT
 
 // ============================================================================
 // CONFIGURAÇÕES GLOBAIS
@@ -104,14 +104,15 @@ export const savePlayer = async () => {
     const nameInput = document.getElementById('playerName');
     const emailInput = document.getElementById('playerEmail');
     const editIdInput = document.getElementById('editId');
-    const newPhotoUrl = document.getElementById('photoData').value; // Restaura captura da foto
+    const photoDataInput = document.getElementById('photoData'); 
     
-    const name = nameInput.value.trim();
+    let name = nameInput.value.trim();
+    let newPhotoUrl = photoDataInput.value; 
     const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
     const id = editIdInput.value;
 
-    if(!name) {
-        return showToast("Preencha o nome do atleta!", "error");
+    if(!name && !email) {
+        return showToast("Preencha o nome ou o e-mail do atleta!", "error");
     }
     
     const btn = document.getElementById('btnSave'); 
@@ -119,9 +120,23 @@ export const savePlayer = async () => {
     btn.innerText = "SALVANDO...";
     
     try {
+        // 1. BUSCA DE PERFIL GLOBAL: Se o e-mail existir na coleção 'users', puxa nome e foto oficiais
+        if (email) {
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('email', '==', email));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const globalProfile = querySnapshot.docs[0].data();
+                if (globalProfile.name) name = globalProfile.name;
+                if (globalProfile.photo) newPhotoUrl = globalProfile.photo;
+                showToast("Dados sincronizados com o perfil do jogador!", "info");
+            }
+        }
+
+        // 2. CÁLCULO DO ELO
         const elo = Math.max(0, parseInt(document.getElementById('statBonus').value) || 150);
-        
-        // Restaura todos os dados do jogador (Estatísticas, Categoria, Ícone, Foto)
+
         const playerData = { 
             name, 
             categoria: parseInt(document.getElementById('statCategoria').value), 
@@ -129,13 +144,13 @@ export const savePlayer = async () => {
             vitorias: parseInt(document.getElementById('statVit').value), 
             eloRating: elo, 
             icon: document.getElementById('playerIcon').value, 
-            photo: newPhotoUrl,
+            photo: newPhotoUrl, 
             updatedAt: Date.now()
         };
 
         if (email) playerData.email = email;
 
-        // Guarda a URL da foto antiga para podermos deletar caso tenha sido trocada
+        // 3. RECUPERA A FOTO ANTIGA (Caso seja uma edição)
         let oldPhotoUrl = null;
         if (id) {
             const existingPlayer = state.players.find(p => p.id === id);
@@ -143,36 +158,47 @@ export const savePlayer = async () => {
                 oldPhotoUrl = existingPlayer.photo;
             }
         }
-        
+
+        // 4. SALVA OU ATUALIZA NO FIREBASE
         if (id) {
             await updateDoc(doc(playersRef, id), playerData);
             
-            // SE a foto mudou (ou foi removida), deletamos a antiga do Storage (Limpeza Correta!)
+            // Se tinha uma foto antiga e ela é diferente da nova, apaga a velha do Storage para poupar espaço
             if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl) {
-                await deletePhotoFromStorage(oldPhotoUrl);
+                if (window.deletePhotoFromStorage) {
+                    await window.deletePhotoFromStorage(oldPhotoUrl);
+                }
             }
-            
             showToast("Atleta atualizado!"); 
         } else {
             playerData.streak = 0;
             await addDoc(playersRef, playerData);
-            showToast("Atleta cadastrado!"); 
+            showToast("Novo atleta cadastrado!"); 
         }
         
-        // NOVO: Adiciona o e-mail no Grupo para o SaaS
+        // 5. VINCULA O JOGADOR AO GRUPO
         if (email && state.currentGroupId) {
             const groupDocRef = doc(db, 'groups', state.currentGroupId);
-            // Puxamos dinamicamente o arrayUnion para evitar erros
             const { arrayUnion } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
             await updateDoc(groupDocRef, {
                 memberEmails: arrayUnion(email)
             });
         }
 
-        // Limpamos o input escondido para a faxina automática não deletar a foto recém-salva!
-        document.getElementById('photoData').value = '';
+        // 6. LIMPEZA TOTAL DO FORMULÁRIO (Evita o vazamento da foto para o próximo cadastro)
+        photoDataInput.value = ''; 
+        if (document.getElementById('photoPreview')) {
+            document.getElementById('photoPreview').src = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+        }
+        if (document.getElementById('photoPlaceholder')) {
+            document.getElementById('photoPlaceholder').classList.remove('hidden');
+        }
 
         if (window.resetForm) window.resetForm();
+        if (document.getElementById('playerModal')) {
+            document.getElementById('playerModal').classList.add('hidden');
+        }
         
     } catch(e) { 
         console.error(e);
