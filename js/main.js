@@ -5,7 +5,7 @@ import {
     closeVictoryModalOnly, renderSorteioTable, renderAll, updateLiveEloPreview,
     closeMoveModal, closePlayerHistoryModal, editPlayer, resetForm, openMoveModal,
     updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, togglePlacarLock, 
-    forceUnlockPlacar, toggleAuthMode, renderUserGroups
+    forceUnlockPlacar, toggleAuthMode, renderUserGroups, setFormMode
 } from './ui.js';
 import {
     drawTeams, createWaitlist, clearTeams, confirmMovePlayer, deleteTeam,
@@ -424,7 +424,7 @@ Object.assign(window, {
     renderSorteioTable, savePlayer, deletePlayer, closeConfirmModal, updateLiveEloPreview, 
     handleImageUpload, removePhoto, adjustBonus, confirmMovePlayer, clearMatchHistory, 
     selectOnlyPlayersInTeams, closeMoveModal, closePlayerHistoryModal, editPlayer, resetForm, 
-    openMoveModal, updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, forceUnlockPlacar,
+    openMoveModal, updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, forceUnlockPlacar, setFormMode,
     // NOVOS BINDINGS DE SAAS:
     handleAuthAction, toggleAuthMode, handlePasswordReset, handleLogout, 
     handleCreateGroup, selectGroup, saveUserProfile, removeUserProfilePhoto

@@ -101,40 +101,55 @@ const deletePhotoFromStorage = async (photoUrl) => {
 // ============================================================================
 
 export const savePlayer = async () => {
-    const nameInput = document.getElementById('playerName');
-    const emailInput = document.getElementById('playerEmail');
+    const mode = document.getElementById('formMode')?.value || 'manual';
     const editIdInput = document.getElementById('editId');
-    const photoDataInput = document.getElementById('photoData'); 
-    
-    let name = nameInput.value.trim();
-    let newPhotoUrl = photoDataInput.value; 
-    const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
     const id = editIdInput.value;
 
-    if(!name && !email) {
-        return showToast("Preencha o nome ou o e-mail do atleta!", "error");
-    }
+    let name = '';
+    let newPhotoUrl = '';
+    let email = '';
     
     const btn = document.getElementById('btnSave'); 
     btn.disabled = true; 
     btn.innerText = "SALVANDO...";
     
     try {
-        // 1. BUSCA DE PERFIL GLOBAL: Se o e-mail existir na coleção 'users', puxa nome e foto oficiais
-        if (email) {
+        // 1. VALIDAÇÃO E BUSCA DE DADOS CONFORME O MODO
+        if (mode === 'email') {
+            const emailInput = document.getElementById('playerEmail');
+            email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+            
+            if (!email) {
+                throw new Error("Preencha o e-mail da conta do jogador!");
+            }
+            
+            // Busca o perfil na coleção global 'users'
             const usersRef = collection(db, 'users');
             const q = query(usersRef, where('email', '==', email));
             const querySnapshot = await getDocs(q);
             
             if (!querySnapshot.empty) {
                 const globalProfile = querySnapshot.docs[0].data();
-                if (globalProfile.name) name = globalProfile.name;
-                if (globalProfile.photo) newPhotoUrl = globalProfile.photo;
-                showToast("Dados sincronizados com o perfil do jogador!", "info");
+                name = globalProfile.name || 'Jogador sem nome';
+                newPhotoUrl = globalProfile.photo || '';
+                showToast("Dados importados do perfil do jogador!", "info");
+            } else {
+                throw new Error("Nenhum usuário encontrado com este e-mail.");
+            }
+        } else {
+            // Modo Manual
+            const nameInput = document.getElementById('playerName');
+            const photoDataInput = document.getElementById('photoData');
+            name = nameInput.value.trim();
+            newPhotoUrl = photoDataInput.value;
+            email = ''; // Força remover o e-mail se estiver mudando de Vinculado para Manual
+            
+            if (!name) {
+                throw new Error("Preencha o nome do atleta!");
             }
         }
 
-        // 2. CÁLCULO DO ELO
+        // 2. CÁLCULO DO ELO E MONTAGEM DO OBJETO
         const elo = Math.max(0, parseInt(document.getElementById('statBonus').value) || 150);
 
         const playerData = { 
@@ -148,14 +163,27 @@ export const savePlayer = async () => {
             updatedAt: Date.now()
         };
 
-        if (email) playerData.email = email;
+        const { deleteField, arrayUnion, arrayRemove } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
-        // 3. RECUPERA A FOTO ANTIGA (Caso seja uma edição)
+        // Trata o campo de e-mail no Firestore
+        if (mode === 'email') {
+            playerData.email = email;
+        } else {
+            // Se for manual, apagamos o campo e-mail APENAS se for uma EDIÇÃO (se o 'id' existir)
+            if (id) {
+                playerData.email = deleteField();
+            }
+            // Se não tiver 'id' (novo cadastro), simplesmente não adicionamos a propriedade 'email' ao objeto
+        }
+
+        // 3. RECUPERA A FOTO E E-MAIL ANTIGOS (Caso seja uma edição)
         let oldPhotoUrl = null;
+        let oldEmail = null;
         if (id) {
             const existingPlayer = state.players.find(p => p.id === id);
-            if (existingPlayer && existingPlayer.photo) {
-                oldPhotoUrl = existingPlayer.photo;
+            if (existingPlayer) {
+                if (existingPlayer.photo) oldPhotoUrl = existingPlayer.photo;
+                if (existingPlayer.email) oldEmail = existingPlayer.email;
             }
         }
 
@@ -163,9 +191,9 @@ export const savePlayer = async () => {
         if (id) {
             await updateDoc(doc(playersRef, id), playerData);
             
-            // Se tinha uma foto antiga e ela é diferente da nova, apaga a velha do Storage para poupar espaço
-            if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl) {
-                // Removemos a verificação desnecessária de window, pois a função está no próprio arquivo
+            // Se tinha uma foto antiga DE CADASTRO MANUAL (sem e-mail anterior) 
+            // e ela é diferente da nova, apaga a velha do Storage para poupar espaço
+            if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl && !oldEmail) {
                 await deletePhotoFromStorage(oldPhotoUrl);
             }
             showToast("Atleta atualizado!");
@@ -175,17 +203,21 @@ export const savePlayer = async () => {
             showToast("Novo atleta cadastrado!"); 
         }
         
-        // 5. VINCULA O JOGADOR AO GRUPO
-        if (email && state.currentGroupId) {
+        // 5. VINCULA OU DESVINCULA O JOGADOR NO GRUPO GLOBAL
+        if (state.currentGroupId) {
             const groupDocRef = doc(db, 'groups', state.currentGroupId);
-            const { arrayUnion } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-            await updateDoc(groupDocRef, {
-                memberEmails: arrayUnion(email)
-            });
+            
+            if (mode === 'email' && email) {
+                await updateDoc(groupDocRef, { memberEmails: arrayUnion(email) });
+            } else if (mode === 'manual' && oldEmail) {
+                // Se mudou de e-mail para manual, remove o e-mail antigo da lista de acesso do grupo
+                await updateDoc(groupDocRef, { memberEmails: arrayRemove(oldEmail) });
+            }
         }
 
         // 6. LIMPEZA TOTAL DO FORMULÁRIO (Evita o vazamento da foto para o próximo cadastro)
-        photoDataInput.value = ''; 
+        const photoDataInput = document.getElementById('photoData');
+        if(photoDataInput) photoDataInput.value = ''; 
         if (document.getElementById('photoPreview')) {
             document.getElementById('photoPreview').src = '';
             document.getElementById('photoPreview').classList.add('hidden');
@@ -201,7 +233,7 @@ export const savePlayer = async () => {
         
     } catch(e) { 
         console.error(e);
-        showToast("Erro ao salvar atleta", "error"); 
+        showToast(e.message || "Erro ao salvar atleta", "error"); 
     } finally { 
         btn.disabled = false; 
         btn.innerHTML = "<i data-lucide='save' class='w-4 h-4'></i> SALVAR"; 
@@ -210,21 +242,32 @@ export const savePlayer = async () => {
 };
 
 export const deletePlayer = (id) => {
-    openConfirmModal("Excluir Atleta", "Tem a certeza que deseja remover este atleta da base?", async () => { 
+    openConfirmModal("Excluir Atleta", "Tem a certeza que deseja remover este atleta do grupo?", async () => { 
         try {
-            // Antes de excluir o documento, pega o link da foto para deletar do Storage
             const playerInfo = state.players.find(p => p.id === id);
-            const photoUrlToDelete = playerInfo ? playerInfo.photo : null;
+            if (!playerInfo) return;
 
-            // Deleta o jogador do Firestore
+            const photoUrlToDelete = playerInfo.photo;
+            const playerEmail = playerInfo.email;
+
+            // 1. Deleta o jogador da subcoleção do grupo
             await deleteDoc(doc(playersRef, id)); 
 
-            // Se ele tinha foto, deleta o arquivo físico do Storage
-            if (photoUrlToDelete) {
+            // 2. Se era um jogador manual (SEM E-MAIL vinculado), deletamos a foto física do Storage
+            if (!playerEmail && photoUrlToDelete) {
                 await deletePhotoFromStorage(photoUrlToDelete);
             }
 
-            showToast("Atleta removido."); 
+            // 3. Se tinha e-mail vinculado, NÃO apagamos a foto global, apenas removemos o acesso dele ao grupo
+            if (playerEmail && state.currentGroupId) {
+                const groupDocRef = doc(db, 'groups', state.currentGroupId);
+                const { arrayRemove } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                await updateDoc(groupDocRef, {
+                    memberEmails: arrayRemove(playerEmail)
+                });
+            }
+
+            showToast("Atleta removido do grupo."); 
         } catch(e) {
             console.error(e);
             showToast("Erro ao excluir", "error");

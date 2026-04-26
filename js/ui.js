@@ -383,12 +383,34 @@ export const openPlayerHistoryModal = (playerName) => {
 // CONTROLE DO FORMULÁRIO DE ATLETAS (ADMIN)
 // ============================================================================
 
+export const setFormMode = (mode) => {
+    const modeInput = document.getElementById('formMode');
+    if (modeInput) modeInput.value = mode;
+
+    const btnManual = document.getElementById('btnModeManual');
+    const btnEmail = document.getElementById('btnModeEmail');
+    const manualFields = document.getElementById('manualFields');
+    const emailFields = document.getElementById('emailFields');
+
+    if (mode === 'manual') {
+        btnManual.className = "flex-1 py-2 text-xs font-bold rounded-md bg-slate-800 text-white transition-all shadow";
+        btnEmail.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all";
+        manualFields.classList.remove('hidden');
+        emailFields.classList.add('hidden');
+    } else {
+        btnEmail.className = "flex-1 py-2 text-xs font-bold rounded-md bg-slate-800 text-white transition-all shadow";
+        btnManual.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all";
+        emailFields.classList.remove('hidden');
+        manualFields.classList.add('hidden');
+    }
+};
+
 export const editPlayer = (id) => {
     // 1. Busca o jogador no estado global
     const p = state.players.find(x => x.id === id);
     if (!p) return;
 
-    // 2. Preenche TODOS os campos do formulário (Restaurado!)
+    // 2. Preenche TODOS os campos do formulário
     document.getElementById('editId').value = p.id;
     document.getElementById('playerName').value = p.name;
     document.getElementById('statCategoria').value = p.categoria || 1;
@@ -397,11 +419,18 @@ export const editPlayer = (id) => {
     document.getElementById('statBonus').value = p.eloRating ?? 150;
     document.getElementById('playerIcon').value = p.icon || 'user';
     
-    // NOVO: Puxa o e-mail para edição, se existir
+    // Puxa o e-mail para edição, se existir
     const emailInput = document.getElementById('playerEmail');
     if(emailInput) emailInput.value = p.email || '';
 
-    // 3. Trata a foto de perfil (Restaurado!)
+    // Define o modo de formulário com base na existência de e-mail
+    if (p.email) {
+        setFormMode('email');
+    } else {
+        setFormMode('manual');
+    }
+
+    // 3. Trata a foto de perfil
     if (p.photo) {
         document.getElementById('photoPreview').src = p.photo;
         document.getElementById('photoPreview').classList.remove('hidden');
@@ -416,7 +445,7 @@ export const editPlayer = (id) => {
     document.getElementById('formTitle').innerHTML = '<i data-lucide="edit" class="w-5 h-5"></i> Editar Atleta';
     document.getElementById('btnSave').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ATUALIZAR';
 
-    // 5. GARANTE QUE O FORMULÁRIO ABRA AUTOMATICAMENTE (Restaurado!)
+    // 5. GARANTE QUE O FORMULÁRIO ABRA AUTOMATICAMENTE
     const formContent = document.getElementById('formContent');
     const formIcon = document.getElementById('formToggleIcon');
     if (formContent) formContent.classList.remove('hidden');
@@ -440,6 +469,9 @@ export const resetForm = () => {
     
     const emailInput = document.getElementById('playerEmail');
     if(emailInput) emailInput.value = '';
+
+    // Reseta o modo do formulário para manual
+    setFormMode('manual');
 
     // 2. Limpa a Foto APENAS VISUALMENTE (Sem deletar do Storage)
     document.getElementById('photoPreview').src = '';

@@ -393,23 +393,38 @@
                         
                         <div id="formContent" class="space-y-4 mt-4 sm:mt-6 transition-all hidden border-t border-slate-700 pt-4">
                             <input type="hidden" id="editId" value="">
-                            <input type="text" id="playerName" placeholder="Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-2 focus:ring-green-500">
-                            <div class="mt-2 relative">
-                                <i data-lucide="mail" class="absolute left-3 top-3.5 w-4 h-4 text-slate-500"></i>
-                                <input type="email" id="playerEmail" placeholder="E-mail do Atleta (Para acesso)" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-500">
-                                <p class="text-[9px] text-slate-400 mt-1 ml-1">Se preenchido, este usuário verá este grupo na tela inicial dele.</p>
-                            </div>
                             
-                            <div class="mb-2 mt-4 flex flex-col items-center">
-                                <label class="relative cursor-pointer group/photo flex flex-col items-center">
-                                    <div class="w-20 h-20 rounded-full bg-slate-900 border-2 border-dashed border-slate-600 flex items-center justify-center overflow-hidden group-hover/photo:border-green-500 transition-colors">
-                                        <div id="photoPlaceholder" class="text-slate-500 flex flex-col items-center"><i data-lucide="camera" class="w-6 h-6 mb-1"></i><span class="text-[9px] font-bold uppercase">Foto</span></div>
-                                        <img id="photoPreview" class="w-full h-full object-cover hidden" src="" alt="Preview">
-                                    </div>
-                                    <input type="file" id="playerPhoto" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                                    <input type="hidden" id="photoData" value="">
-                                </label>
-                                <button type="button" id="btnRemovePhoto" onclick="removePhoto()" class="mt-2 text-xs text-red-400 hidden flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Remover Foto</button>
+                            <div class="flex gap-2 bg-slate-900 p-1 rounded-lg border border-slate-700 mb-4">
+                                <button type="button" id="btnModeManual" onclick="setFormMode('manual')" class="flex-1 py-2 text-xs font-bold rounded-md bg-slate-800 text-white transition-all shadow">
+                                    Cadastro Manual
+                                </button>
+                                <button type="button" id="btnModeEmail" onclick="setFormMode('email')" class="flex-1 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+                                    Vincular E-mail
+                                </button>
+                            </div>
+                            <input type="hidden" id="formMode" value="manual">
+
+                            <div id="emailFields" class="hidden mt-2 relative">
+                                <i data-lucide="mail" class="absolute left-3 top-3.5 w-4 h-4 text-blue-500"></i>
+                                <input type="email" id="playerEmail" placeholder="E-mail da conta do jogador" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-[9px] text-slate-400 mt-2 ml-1">
+                                    <span class="font-bold text-blue-400">Nota:</span> O nome e a foto serão importados automaticamente do perfil do usuário associado a este e-mail.
+                                </p>
+                            </div>
+
+                            <div id="manualFields" class="space-y-4">
+                                <input type="text" id="playerName" placeholder="Nome Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-2 focus:ring-green-500">
+                                <div class="mb-2 mt-4 flex flex-col items-center">
+                                    <label class="relative cursor-pointer group/photo flex flex-col items-center">
+                                        <div class="w-20 h-20 rounded-full bg-slate-900 border-2 border-dashed border-slate-600 flex items-center justify-center overflow-hidden group-hover/photo:border-green-500 transition-colors">
+                                            <div id="photoPlaceholder" class="text-slate-500 flex flex-col items-center"><i data-lucide="camera" class="w-6 h-6 mb-1"></i><span class="text-[9px] font-bold uppercase">Foto</span></div>
+                                            <img id="photoPreview" class="w-full h-full object-cover hidden" src="" alt="Preview">
+                                        </div>
+                                        <input type="file" id="playerPhoto" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                        <input type="hidden" id="photoData" value="">
+                                    </label>
+                                    <button type="button" id="btnRemovePhoto" onclick="removePhoto()" class="mt-2 text-xs text-red-400 hidden flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Remover Foto</button>
+                                </div>
                             </div>
 
                             <div class="mb-4">
