@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { 
-    db, doc, addDoc, updateDoc, deleteDoc, playersRef, settingsRef, matchHistoryRef, storage, ref, uploadBytes, getDownloadURL, deleteObject,
+    db, doc, addDoc, updateDoc, deleteDoc, playersRef, settingsRef, matchHistoryRef, teamsRef, storage, ref, uploadBytes, getDownloadURL, deleteObject,
     globalGroupsRef, 
 } from '../firebase.js';
 import { showToast, openConfirmModal, renderSorteioTable, resetForm } from '../ui.js';
@@ -179,11 +179,13 @@ export const savePlayer = async () => {
         // 3. RECUPERA A FOTO E E-MAIL ANTIGOS (Caso seja uma edição)
         let oldPhotoUrl = null;
         let oldEmail = null;
+        let oldName = null;
         if (id) {
             const existingPlayer = state.players.find(p => p.id === id);
             if (existingPlayer) {
                 if (existingPlayer.photo) oldPhotoUrl = existingPlayer.photo;
                 if (existingPlayer.email) oldEmail = existingPlayer.email;
+                if (existingPlayer.name) oldName = existingPlayer.name;
             }
         }
 
@@ -196,6 +198,53 @@ export const savePlayer = async () => {
             if (oldPhotoUrl && oldPhotoUrl !== newPhotoUrl && !oldEmail) {
                 await deletePhotoFromStorage(oldPhotoUrl);
             }
+            
+            // ATUALIZA O NOME NAS EQUIPES SORTEADAS
+            state.drawnTeams.forEach(async team => {
+                let updated = false;
+                const newPlayers = team.players.map(p => {
+                    if (p.id === id) {
+                        updated = true;
+                        return { ...p, ...playerData };
+                    }
+                    return p;
+                });
+                if (updated) {
+                    await updateDoc(doc(teamsRef, team.id), { players: newPlayers });
+                }
+            });
+
+            // ATUALIZA O NOME NO HISTÓRICO DE PARTIDAS
+            if (oldName && oldName !== name) {
+                state.matchHistory.forEach(async m => {
+                    let mUpdated = false;
+                    let t1Players = m.team1.players ? [...m.team1.players] : [];
+                    let t2Players = m.team2.players ? [...m.team2.players] : [];
+                    
+                    const updateArray = (arr) => {
+                        let changed = false;
+                        for (let i=0; i<arr.length; i++) {
+                            if (arr[i] === oldName) {
+                                arr[i] = name;
+                                changed = true;
+                                mUpdated = true;
+                            }
+                        }
+                        return changed;
+                    };
+                    
+                    updateArray(t1Players);
+                    updateArray(t2Players);
+                    
+                    if (mUpdated) {
+                        await updateDoc(doc(matchHistoryRef, m.id), {
+                            "team1.players": t1Players,
+                            "team2.players": t2Players
+                        });
+                    }
+                });
+            }
+            
             showToast("Atleta atualizado!");
         } else {
             playerData.streak = 0;

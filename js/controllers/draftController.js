@@ -83,11 +83,6 @@ export const drawTeams = async () => {
 // ============================================================================
 
 export const createWaitlist = () => {
-    if (state.isPlacarLocked) {
-        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
-        return;
-    }
-
     openConfirmModal("Atualizar Lista de Espera", "Os atletas selecionados (que não estejam em times) formarão a nova lista de espera. Deseja continuar?", async () => {
         try {
             const waitlistTeamDoc = state.drawnTeams.find(t => t.isWaitlist);
@@ -147,6 +142,13 @@ export const createWaitlist = () => {
 export const clearTeams = () => {
     if (state.isPlacarLocked) {
         showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+    
+    const t1 = document.getElementById('team1Select')?.value;
+    const t2 = document.getElementById('team2Select')?.value;
+    if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
+        showToast("Ação bloqueada! Um jogo está em andamento no placar.", "error");
         return;
     }
 
@@ -229,6 +231,11 @@ export const confirmMovePlayer = async () => {
 };
 
 export const deleteTeam = (id) => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     const t1 = document.getElementById('team1Select')?.value;
     const t2 = document.getElementById('team2Select')?.value;
     if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
@@ -284,6 +291,11 @@ export const deleteTeam = (id) => {
 // ============================================================================
 
 export const redrawTeamWithWaitlist = async (teamId) => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     const t1 = document.getElementById('team1Select')?.value;
     const t2 = document.getElementById('team2Select')?.value;
     if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {
@@ -443,6 +455,11 @@ export const redrawTeamWithWaitlist = async (teamId) => {
 };
 
 export const promoteWaitlistToTeam = async (waitlistTeamId) => {
+    if (state.isPlacarLocked) {
+        showToast("Ação bloqueada: Uma partida está em andamento agora.", "info");
+        return;
+    }
+
     const t1 = document.getElementById('team1Select')?.value;
     const t2 = document.getElementById('team2Select')?.value;
     if (t1 && t2 && (state.score1 > 0 || state.score2 > 0)) {

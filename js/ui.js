@@ -720,10 +720,21 @@ export const renderAdminTable = () => {
     const tbody = document.getElementById('adminTableBody');
     if(!tbody) return;
     
-    const sorted = [...state.players].sort((a, b) => { 
-        const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
-        if(c !== 0) return c; 
-        return a.name.localeCompare(b.name); 
+    const searchTerm = document.getElementById('searchAdmin')?.value.toLowerCase() || '';
+    const sortMode = document.getElementById('sortAdmin')?.value || 'alpha';
+    
+    let filtered = state.players.filter(p => p.name.toLowerCase().includes(searchTerm));
+
+    const sorted = filtered.sort((a, b) => { 
+        if (sortMode === 'level') {
+            const c = (parseInt(b.categoria)||1) - (parseInt(a.categoria)||1); 
+            if(c !== 0) return c; 
+            const eloDiff = (b.eloRating ?? 150) - (a.eloRating ?? 150);
+            if(eloDiff !== 0) return eloDiff;
+            return (a.name || '').localeCompare(b.name || '');
+        } else {
+            return (a.name || '').localeCompare(b.name || '');
+        }
     });
     
     tbody.innerHTML = sorted.map(p => {
@@ -893,7 +904,7 @@ export const renderMatchHistory = () => {
     const btnClear = document.getElementById('btnClearHistory');
     
     if (btnClear) {
-        if (state.isAuthenticated && state.matchHistory && state.matchHistory.length > 0) {
+        if (state.isAuthenticated && state.matchHistory && state.matchHistory.length > 0 && (state.currentUserRole === 'admin' || state.isMaster)) {
             btnClear.classList.remove('hidden'); btnClear.classList.add('flex');
         } else {
             btnClear.classList.add('hidden'); btnClear.classList.remove('flex');

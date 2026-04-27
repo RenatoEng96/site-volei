@@ -140,13 +140,15 @@ export const checkWinCondition = () => {
         const warning = document.getElementById('victoryTeamWarning');
         const eloInfoDiv = document.getElementById('victoryEloInfo');
 
+        const isAdmin = state.currentUserRole === 'admin' || state.isMaster;
+
         // Validações de segurança para o Placar Público
         if (!select1.value || !select2.value || select1.value === select2.value) { 
             btnSaveResult.classList.add('hidden'); 
             warning.classList.remove('hidden'); 
             warning.innerText = "Selecione duas equipes válidas e diferentes.";
             if(eloInfoDiv) eloInfoDiv.classList.add('hidden');
-        } else if (!state.isAuthenticated && !state.eloEnabled) {
+        } else if (!isAdmin && !state.eloEnabled) {
             btnSaveResult.classList.add('hidden'); 
             warning.classList.remove('hidden'); 
             warning.innerText = "O Placar Público está fechado. Apenas o administrador pode salvar os resultados.";

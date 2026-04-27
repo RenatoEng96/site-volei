@@ -464,8 +464,15 @@
                 <!-- TABELA ADMIN (SÓ COM EDITAR/EXCLUIR) -->
                 <div class="lg:col-span-2">
                     <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden w-full">
-                        <div class="p-4 sm:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900/30">
+                        <div class="p-4 sm:p-6 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/30 gap-3">
                             <h2 class="text-lg sm:text-xl font-bold">Base de Atletas Cadastrados</h2>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="searchAdmin" placeholder="Buscar atleta..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-300 outline-none w-full sm:w-48 focus:border-green-500" oninput="clearTimeout(window.adminSearchTimeout); window.adminSearchTimeout = setTimeout(() => window.renderAdminTable(), 300)">
+                                <select id="sortAdmin" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs sm:text-sm text-slate-300 outline-none focus:border-green-500" onchange="window.renderAdminTable()">
+                                    <option value="alpha">A-Z</option>
+                                    <option value="level">Por Nível</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="overflow-x-auto w-full max-h-[600px] overflow-y-auto">
                             <table class="w-full text-left min-w-[500px]">

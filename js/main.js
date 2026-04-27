@@ -5,7 +5,7 @@ import {
     closeVictoryModalOnly, renderSorteioTable, renderAll, updateLiveEloPreview,
     closeMoveModal, closePlayerHistoryModal, editPlayer, resetForm, openMoveModal,
     updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, togglePlacarLock, 
-    forceUnlockPlacar, toggleAuthMode, renderUserGroups, setFormMode
+    forceUnlockPlacar, toggleAuthMode, renderUserGroups, setFormMode, renderAdminTable
 } from './ui.js';
 import {
     drawTeams, createWaitlist, clearTeams, confirmMovePlayer, deleteTeam,
@@ -427,7 +427,7 @@ Object.assign(window, {
     openMoveModal, updateSorteioCounters, changeHistoryPage, openPlayerHistoryModal, forceUnlockPlacar, setFormMode,
     // NOVOS BINDINGS DE SAAS:
     handleAuthAction, toggleAuthMode, handlePasswordReset, handleLogout, 
-    handleCreateGroup, selectGroup, saveUserProfile, removeUserProfilePhoto
+    handleCreateGroup, selectGroup, saveUserProfile, removeUserProfilePhoto, renderAdminTable
 });
 
 // ============================================================================
